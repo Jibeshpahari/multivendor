@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\CategoriesExport;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Facades\Excel;
 use Throwable;
 
 
@@ -163,6 +165,13 @@ class CategoryController extends Controller
             DB::rollBack();
             return redirect()->back()->with('error', 'Something went wrong, category could not be deleted.');
         }
+    }
+
+    public function export(Request $request)
+    {
+        $slugs = $request->input('slugs');
+
+        return Excel::download(new CategoriesExport($slugs), 'categories-' . now()->format('Y-m-d') . '.xlsx');
     }
 
 

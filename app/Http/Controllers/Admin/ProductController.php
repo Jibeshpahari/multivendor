@@ -38,10 +38,11 @@ class ProductController extends Controller
                 'name' => $title
             ]
         ];
+        $collapsed = true;
 
         $categories = Category::active()->get();
         $notes = [];
-        return view('admin.product.form', compact('title', 'nav', 'categories', 'notes'));
+        return view('admin.product.form', compact('title', 'nav', 'collapsed', 'categories', 'notes'));
     }
 
 }

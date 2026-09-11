@@ -1,4 +1,4 @@
-<div id="sidebar">
+<div id="sidebar" class="{{ $collapsed ?? false ? 'collapsed' : '' }}">
 
     <div class="sidebar-logo">
         <div class="logo-mark">N</div>
@@ -33,7 +33,7 @@
 
             <li class="nav-item has-sub {{ isActive('admin.products.*') ? 'active open' : '' }}" data-tip="Products">
                 <a href="javascript:void(0)">
-                    <span class="nav-icon"><i class="fa-solid fa-box-open"></i></span>
+                    <span class="nav-icon"><i class="fa-solid fa-box"></i></span>
                     <span class="nav-text">Products</span>
                     <span class="nav-badge">12</span>
                     <i class="fa-solid fa-chevron-right nav-arrow"></i>
@@ -72,6 +72,26 @@
                     <span class="nav-icon"><i class="fa-solid fa-users"></i></span>
                     <span class="nav-text">Customers</span>
                 </a>
+            </li>
+
+            <li class="nav-item has-sub {{ isActive('admin.vendors.*') ? 'active open' : '' }}" data-tip="Vendors">
+                <a href="javascript:void(0)">
+                    <span class="nav-icon"><i class="fa-solid fa-store"></i></span>
+                    <span class="nav-text">Vendors</span>
+                    <i class="fa-solid fa-chevron-right nav-arrow"></i>
+                </a>
+
+                <ul class="sub-menu {{ isActive('admin.vendors.*') ? 'open' : '' }}">
+                    <li class="sub-item">
+                        <a href="{{ route('admin.vendors.index') }}">Listing</a>
+                    </li>
+                    <li class="sub-item">
+                        <a href="">Add New</a>
+                    </li>
+                    <li class="sub-item">
+                        <a href="">Reports</a>
+                    </li>
+                </ul>
             </li>
 
         </ul>

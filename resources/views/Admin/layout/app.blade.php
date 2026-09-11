@@ -73,7 +73,7 @@
     @stack('css')
 </head>
 
-<body>
+<body class="{{ ($collapsed ?? false) ? 'collapsed' : '' }}">
 
     <!-- ═══════════════ SIDEBAR ═══════════════ -->
     @include('admin.layout.components.sidebar')
