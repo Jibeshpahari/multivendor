@@ -1622,6 +1622,9 @@
             justify-content: flex-end;
             gap: 10px;
             padding: 14px 20px;
+            border: 1px solid #00000050;
+            box-shadow: 0px 0px 10px #00000040;
+            border-radius: 5px;
         }
 
         .modal-overlay {

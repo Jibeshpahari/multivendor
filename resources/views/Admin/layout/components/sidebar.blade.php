@@ -94,9 +94,15 @@
                 </ul>
             </li>
 
+            <li class="nav-item" data-tip="Customers">
+                <a href="{{ route('admin.notes.index') }}">
+                    <span class="nav-icon"><i class="fa-solid fa-note-sticky"></i></span>
+                    <span class="nav-text">Notes</span>
+                </a>
+            </li>
+
         </ul>
         <p class="nav-label" style="margin-top:12px;">Management</p>
-
         <ul class="nav-list">
             <li class="nav-item has-sub {{ isActive('admin.settings.*') ? 'active open' : '' }}" data-tip="Settings">
                 <a href="javascript:void(0)">

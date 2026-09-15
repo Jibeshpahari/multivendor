@@ -96,7 +96,7 @@
         </div>
 
         <div class="card-body px-0 py-3">
-
+            {{-- Bulk Edit Bar --}}
             <div class="bg-dark text-white rounded-3 mb-3 bulk-bar d-flex justify-conent-between d-none" id="bulkBar">
                 <div class="align-content-center">
                     <span class="me-auto fw-semibold bulk-count" id="bulkCount"></span>
@@ -105,7 +105,7 @@
                     <button class="btn btn-sm btn-dark bulk-archive">
                         <i class="fa-solid fa-box-archive"></i> Archive
                     </button>
-                    <button class="btn btn-sm btn-dark bulk-export">
+                    <button class="btn btn-sm btn-dark bulk-export" id="exportBtn">
                         <i class="fa-solid fa-file-export"></i> Export
                     </button>
                     <button class="btn btn-sm btn-danger bulk-delete">
@@ -335,6 +335,10 @@
                     notify('error', error.responseJSON?.message || 'Failed to update', 'toast');
                 }
             });
+        });
+
+        $(document).on('click', '#exportBtn', function() {
+            
         });
     </script>
 @endpush

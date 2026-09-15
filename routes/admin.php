@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\admin\AdminController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\NoteController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\SiteSettingsController;
 use App\Http\Controllers\Admin\UserController;
@@ -46,4 +47,9 @@ Route::controller(SiteSettingsController::class)->prefix('settings')->name('sett
     Route::get('site-settings', 'index')->name('site-settings');
     Route::post('/settings/site-identity', 'storeSiteSettings')->name('site-setting.store');
     // Route::put('/settings/site-identity/{setting}', 'updateSiteIdentity')->name('site-identity.update');
+});
+
+Route::controller(NoteController::class)->prefix('task-notes')->name('notes.')->group( function () {
+    Route::get('/', 'index')->name('index');
+    
 });

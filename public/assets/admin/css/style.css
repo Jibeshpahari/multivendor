@@ -1913,6 +1913,12 @@ label.status-toggle-item {
     color: var(--do-ink);
 }
 
+.dropdown-options .do-kebab-btn:focus-visible,
+.dropdown-options .do-kebab-btn.focused {
+    outline: 2px solid #00527aba !important;
+    color: var(--do-ink);
+}
+
 .dropdown-options .dropdown-menu.do-menu {
     width: 190px;
     background: #FFFFFF;
@@ -2189,6 +2195,15 @@ table th .form-check-input[type="checkbox"]:indeterminate,
 table td .form-check-input[type="checkbox"]:checked {
     background-color: #000000;
     border-color: #000000;
+}
+
+table th .form-check-input[type="checkbox"]:focus,
+table th .form-check-input[type="checkbox"]:focus-visible,
+table td .form-check-input[type="checkbox"]:focus,
+table td .form-check-input[type="checkbox"]:focus-visible {
+    outline: 2px solid transparent !important;
+    outline: 2px solid #000000cc !important;
+    outline-offset: 2px !important;
 }
 
 
