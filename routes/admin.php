@@ -51,5 +51,10 @@ Route::controller(SiteSettingsController::class)->prefix('settings')->name('sett
 
 Route::controller(NoteController::class)->prefix('task-notes')->name('notes.')->group( function () {
     Route::get('/', 'index')->name('index');
-    
+    Route::post('/save/{note?}', 'save')->name('save');
+    Route::post('/add-new-topic', 'addTopic')->name('add.topic');
+    Route::post('mark-done', 'done')->name('mark-done');
+
+    Route::post('/notes', 'store')->name('store');
+    Route::post('/notes/{id}', 'update')->name('update');
 });

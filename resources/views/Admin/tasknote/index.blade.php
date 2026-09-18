@@ -1,84 +1,193 @@
 @extends('admin.layout.app')
 
 @section('content')
+    @php
+        $baseUrl = url()->current();
+    @endphp
+
     <div class="card p-4">
-        <div class="filter-bar-wrapper">
-            <div class="filter-bar">
-                <div class="dropdown">
-                    <button class="filter-btn dropdown-toggle" type="button" id="topicFilterBtn"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fa-solid fa-hashtag"></i> Topic <span id="topicFilterValue">All</span>
-                    </button>
-                    <ul class="dropdown-menu topic-picker-menu filter-menu" id="topicFilterMenu"></ul>
-                </div>
+        <form method="GET" action="{{ $baseUrl }}" id="filterForm">
+            <div class="filter-bar-wrapper">
+                <div class="filter-bar">
+                    <div class="dropdown">
+                        <button class="filter-btn dropdown-toggle {{ !empty($filters['topic']) ? 'is-active' : '' }}"
+                            type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-hashtag"></i> Topic
+                            <span>{{ !empty($filters['topic']) ? optional($topics->firstWhere('id', $filters['topic']))->name : 'All' }}</span>
+                        </button>
+                        <ul class="dropdown-menu topic-picker-menu filter-menu">
+                            <li>
+                                <a class="dropdown-item {{ empty($filters['topic']) ? 'active' : '' }}"
+                                    href="{{ request()->fullUrlWithQuery(['topic' => null, 'page' => null]) }}">
+                                    <span class="topic-dot dot-all"></span> All notes
+                                    <span class="topic-count" style="margin-left:auto;">{{ $counts['all'] ?? 0 }}</span>
+                                </a>
+                            </li>
+                            @foreach ($topics as $t)
+                                <li>
+                                    <a class="dropdown-item {{ (string) ($filters['topic'] ?? '') === (string) $t->id ? 'active' : '' }}"
+                                        href="{{ request()->fullUrlWithQuery(['topic' => $t->id, 'page' => null]) }}">
+                                        <span class="topic-dot dot-topic-{{ $t->id % 7 }}"></span>
+                                        <span>{{ $t->name }}</span>
+                                        <span class="topic-count"
+                                            style="margin-left:auto;">{{ $counts['topics'][$t->id] ?? 0 }}</span>
+                                    </a>
+                                </li>
+                            @endforeach
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="#" id="filterAddTopic"><i class="fa-solid fa-plus"
+                                        style="width:9px;"></i> New topic</a></li>
+                        </ul>
+                    </div>
 
-                <div class="dropdown">
-                    <button class="filter-btn dropdown-toggle" type="button" id="statusFilterBtn"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fa-solid fa-circle-dot"></i> Status <span id="statusFilterValue">All</span>
-                    </button>
-                    <ul class="dropdown-menu topic-picker-menu filter-menu" id="statusFilterMenu"></ul>
-                </div>
+                    <div class="dropdown">
+                        <button class="filter-btn dropdown-toggle {{ !empty($filters['status']) ? 'is-active' : '' }}"
+                            type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-circle-dot"></i> Status
+                            <span>{{ $filters['status'] ?? null ? \Illuminate\Support\Str::title($filters['status']) : 'All' }}</span>
+                        </button>
+                        <ul class="dropdown-menu topic-picker-menu filter-menu">
+                            <li>
+                                <a class="dropdown-item {{ empty($filters['status']) ? 'active' : '' }}"
+                                    href="{{ request()->fullUrlWithQuery(['status' => null, 'page' => null]) }}">
+                                    <span class="status-dot dot-all"></span> All
+                                    <span class="topic-count" style="margin-left:auto;">{{ $counts['all'] ?? 0 }}</span>
+                                </a>
+                            </li>
+                            @foreach ([['key' => 'todo', 'label' => 'To do'], ['key' => 'progress', 'label' => 'In progress'], ['key' => 'done', 'label' => 'Done']] as $s)
+                                <li>
+                                    <a class="dropdown-item {{ ($filters['status'] ?? '') === $s['key'] ? 'active' : '' }}"
+                                        href="{{ request()->fullUrlWithQuery(['status' => $s['key'], 'page' => null]) }}">
+                                        <span class="status-dot dot-status-{{ $s['key'] }}"></span>
+                                        <span>{{ $s['label'] }}</span>
+                                        <span class="topic-count"
+                                            style="margin-left:auto;">{{ $counts['statuses'][$s['key']] ?? 0 }}</span>
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
 
-                <div class="dropdown">
-                    <button class="filter-btn dropdown-toggle" type="button" id="priorityFilterBtn"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fa-solid fa-flag"></i> Priority <span id="priorityFilterValue">All</span>
-                    </button>
-                    <ul class="dropdown-menu topic-picker-menu filter-menu" id="priorityFilterMenu"></ul>
-                </div>
+                    <div class="dropdown">
+                        <button class="filter-btn dropdown-toggle {{ !empty($filters['priority']) ? 'is-active' : '' }}"
+                            type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-flag"></i> Priority
+                            <span>{{ $filters['priority'] ?? null ? \Illuminate\Support\Str::title($filters['priority']) : 'All' }}</span>
+                        </button>
+                        <ul class="dropdown-menu topic-picker-menu filter-menu">
+                            <li>
+                                <a class="dropdown-item {{ empty($filters['priority']) ? 'active' : '' }}"
+                                    href="{{ request()->fullUrlWithQuery(['priority' => null, 'page' => null]) }}">
+                                    <i class="fa-solid fa-flag dot-priority-all" style="width:9px; font-size:10px;"></i> All
+                                    <span class="topic-count" style="margin-left:auto;">{{ $counts['all'] ?? 0 }}</span>
+                                </a>
+                            </li>
+                            @foreach ([['key' => 'low', 'label' => 'Low'], ['key' => 'medium', 'label' => 'Medium'], ['key' => 'high', 'label' => 'High'], ['key' => 'urgent', 'label' => 'Urgent']] as $p)
+                                <li>
+                                    <a class="dropdown-item {{ ($filters['priority'] ?? '') === $p['key'] ? 'active' : '' }}"
+                                        href="{{ request()->fullUrlWithQuery(['priority' => $p['key'], 'page' => null]) }}">
+                                        <i class="fa-solid fa-flag dot-priority-{{ $p['key'] }}"
+                                            style="width:9px; font-size:10px;"></i>
+                                        <span>{{ $p['label'] }}</span>
+                                        <span class="topic-count"
+                                            style="margin-left:auto;">{{ $counts['priorities'][$p['key']] ?? 0 }}</span>
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
 
-                <div class="dropdown">
-                    <button class="filter-btn dropdown-toggle" type="button" id="dateFilterBtn"
-                        data-bs-toggle="dropdown" data-bs-auto-close="outside">
-                        <i class="fa-solid fa-calendar"></i> Date <span id="dateFilterValue">Any time</span>
-                    </button>
-                    <div class="dropdown-menu date-filter-box" aria-labelledby="dateFilterBtn">
-                        <div class="field-row">
-                            <label>From</label>
-                            <input type="date" id="filterFrom">
-                        </div>
-                        <div class="field-row" style="margin-bottom:12px;">
-                            <label>To</label>
-                            <input type="date" id="filterTo">
-                        </div>
-                        <div class="df-actions">
-                            <button class="btn-apply" id="btnApplyDate">Apply</button>
-                            <button id="btnClearDate">Clear</button>
+                    <div class="dropdown">
+                        <button
+                            class="filter-btn dropdown-toggle {{ !empty($filters['from']) || !empty($filters['to']) ? 'is-active' : '' }}"
+                            type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                            <i class="fa-solid fa-calendar"></i> Date
+                            <span>
+                                @if (!empty($filters['from']) && !empty($filters['to']))
+                                    {{ $filters['from'] }} → {{ $filters['to'] }}
+                                @elseif(!empty($filters['from']))
+                                    From {{ $filters['from'] }}
+                                @elseif(!empty($filters['to']))
+                                    Until {{ $filters['to'] }}
+                                @else
+                                    Any time
+                                @endif
+                            </span>
+                        </button>
+                        <div class="dropdown-menu date-filter-box">
+                            <div class="field-row">
+                                <label>From</label>
+                                <input type="date" name="from" value="{{ $filters['from'] ?? '' }}">
+                            </div>
+                            <div class="field-row" style="margin-bottom:12px;">
+                                <label>To</label>
+                                <input type="date" name="to" value="{{ $filters['to'] ?? '' }}">
+                            </div>
+                            <div class="df-actions">
+                                <button class="btn-apply" type="submit">Apply</button>
+                                <button type="button" id="btnClearDate">Clear</button>
+                            </div>
                         </div>
                     </div>
+
+                    @foreach (['topic', 'status', 'priority', 'q'] as $key)
+                        @if (!empty($filters[$key]))
+                            <input type="hidden" name="{{ $key }}" value="{{ $filters[$key] }}">
+                        @endif
+                    @endforeach
+
+                    @php
+                        $anyActive =
+                            !empty($filters['topic']) ||
+                            !empty($filters['status']) ||
+                            !empty($filters['priority']) ||
+                            !empty($filters['from']) ||
+                            !empty($filters['to']) ||
+                            !empty($filters['q']);
+                    @endphp
+                    <a class="filter-clear-all" href="{{ $baseUrl }}"
+                        style="{{ $anyActive ? 'display:inline-flex;' : '' }}">
+                        <i class="fa-solid fa-rotate-left"></i> Clear filters
+                    </a>
                 </div>
 
-                <button class="filter-clear-all" id="btnClearAllFilters" style="display: none;">
-                    <i class="fa-solid fa-rotate-left"></i> Clear filters
-                </button>
+                <div class="card-search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" name="q" id="searchInput" placeholder="Search notes..."
+                        value="{{ $filters['q'] ?? '' }}">
+                </div>
             </div>
-
-            <div class="card-search">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="searchInput" placeholder="Search notes...">
-            </div>
-        </div>
+        </form>
     </div>
 
     <div class="card p-4" style="min-height: 100px">
         <div class="list-meta-row">
-            <div class="list-count" id="listCount">0 notes</div>
+            <div class="list-count" id="listCount">{{ $notes->total() }} note{{ $notes->total() === 1 ? '' : 's' }}
+            </div>
             <div class="header-actions">
-                <button class="btn-new-note-main" id="btnNewNoteMain"><i class="fa-solid fa-plus"></i> New
-                    note</button>
-                
+                <button class="btn-new-note-main" id="btnNewNoteMain"><i class="fa-solid fa-plus"></i> New note</button>
             </div>
         </div>
 
-        <div id="notesListArea"></div>
+        <div id="notesListArea">
+            @forelse ($notes as $n)
+                @include('admin.tasknote.partials.note-card', ['note' => $n, 'topics' => $topics])
+            @empty
+                <div class="empty-state">
+                    <i class="fa-regular fa-note-sticky"></i>
+                    <h6>Nothing here yet</h6>
+                    <p>Try a different topic, search term or date range — or create your first note.</p>
+                </div>
+            @endforelse
+        </div>
 
-        <div id="notesLoadMoreWrap" style="text-align:center; margin-top:18px; display:none;">
-            <button class="btn-cancel-edit" id="btnLoadMore" type="button">Load more</button>
+        <div class="card-footer py-3">
+            @include('admin.layout.components.pagination', ['items' => $notes])
         </div>
     </div>
 
-    
     <div class="modal fade" id="editorModal" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
@@ -94,10 +203,22 @@
                         <div class="topic-picker dropdown">
                             <button class="topic-picker-btn dropdown-toggle" type="button" id="topicPickerBtn"
                                 data-bs-toggle="dropdown" aria-expanded="false">
-                                <span class="topic-dot dot-topic-pink" id="topicPickerDot"></span>
+                                <span class="topic-dot dot-topic-0" id="topicPickerDot"></span>
                                 <span id="topicPickerLabel">General</span>
                             </button>
-                            <ul class="dropdown-menu topic-picker-menu" id="topicPickerMenu"></ul>
+                            <ul class="dropdown-menu topic-picker-menu" id="topicPickerMenu">
+                                @foreach ($topics as $t)
+                                    <li><a class="dropdown-item" href="#" data-id="{{ $t->id }}">
+                                            <span class="topic-dot dot-topic-{{ $t->id % 7 }}"></span><span
+                                                class="js-label">{{ $t->name }}</span>
+                                        </a></li>
+                                @endforeach
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" href="#" id="pickerAddTopic"><i
+                                            class="fa-solid fa-plus" style="width:9px;"></i> New topic</a></li>
+                            </ul>
                         </div>
                     </div>
 
@@ -108,7 +229,14 @@
                                 <span class="status-dot dot-status-todo" id="statusPickerDot"></span>
                                 <span id="statusPickerLabel">To do</span>
                             </button>
-                            <ul class="dropdown-menu topic-picker-menu" id="statusPickerMenu"></ul>
+                            <ul class="dropdown-menu topic-picker-menu" id="statusPickerMenu">
+                                @foreach ([['key' => 'todo', 'label' => 'To do'], ['key' => 'progress', 'label' => 'In progress'], ['key' => 'done', 'label' => 'Done']] as $s)
+                                    <li><a class="dropdown-item" href="#" data-key="{{ $s['key'] }}">
+                                            <span class="status-dot dot-status-{{ $s['key'] }}"></span><span
+                                                class="js-label">{{ $s['label'] }}</span>
+                                        </a></li>
+                                @endforeach
+                            </ul>
                         </div>
 
                         <div class="topic-picker dropdown">
@@ -117,7 +245,14 @@
                                 <i class="fa-solid fa-flag dot-priority-medium" id="priorityPickerIcon"></i>
                                 <span id="priorityPickerLabel">Medium</span>
                             </button>
-                            <ul class="dropdown-menu topic-picker-menu" id="priorityPickerMenu"></ul>
+                            <ul class="dropdown-menu topic-picker-menu" id="priorityPickerMenu">
+                                @foreach ([['key' => 'low', 'label' => 'Low'], ['key' => 'medium', 'label' => 'Medium'], ['key' => 'high', 'label' => 'High'], ['key' => 'urgent', 'label' => 'Urgent']] as $p)
+                                    <li><a class="dropdown-item" href="#" data-key="{{ $p['key'] }}">
+                                            <i class="fa-solid fa-flag dot-priority-{{ $p['key'] }}"
+                                                style="width:11px;"></i><span class="js-label">{{ $p['label'] }}</span>
+                                        </a></li>
+                                @endforeach
+                            </ul>
                         </div>
 
                         <div class="reminder-control">
@@ -144,7 +279,6 @@
         </div>
     </div>
 
-    
     <div class="modal fade" id="topicModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -155,8 +289,6 @@
                 <div class="modal-body">
                     <label class="form-label">Topic name</label>
                     <input type="text" class="form-control" id="newTopicName" placeholder="e.g. Client work">
-                    <label class="form-label d-block mt-3 mb-1">Color</label>
-                    <div class="swatch-row" id="colorSwatchRow"></div>
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-outline-soft" data-bs-dismiss="modal">Cancel</button>
@@ -165,43 +297,9 @@
             </div>
         </div>
     </div>
-
-    
-    <div class="modal fade" id="deleteModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Delete this?</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p id="deleteModalText" style="font-size:13.5px; color:var(--ink-soft);">This action can't be
-                        undone.</p>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-outline-soft" data-bs-dismiss="modal">Cancel</button>
-                    <button class="btn btn-dark-primary" id="btnConfirmDelete"
-                        style="background:var(--a-coral); border-color:var(--a-coral);">Delete</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- TOAST -->
-    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index:2000;">
-        <div id="appToast" class="toast align-items-center border-0" style="background:var(--ink); color:#fff;">
-            <div class="d-flex">
-                <div class="toast-body" id="appToastMsg">Saved</div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
-        </div>
-    </div>
-    @include('admin.tasknote.templates')
 @endsection
 
-
 @push('css')
-    {{-- Quill isn't loaded elsewhere in the app yet, so it's added here --}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.css">
 
     <style>
@@ -313,12 +411,17 @@
             font-size: 12px;
         }
 
+        /* Base topic-dot shape/color — shared by filter bar dropdown,
+                   editor topic picker, AND the note-card partial. Kept here
+                   (not in note-card.blade.php) because the filter bar renders
+                   even when there are zero notes. */
         .topic-dot {
             width: 9px;
             height: 9px;
             border-radius: 50%;
             flex-shrink: 0;
             display: inline-block;
+            background: #9a12eda1;
         }
 
         .topic-count {
@@ -394,21 +497,11 @@
             display: none;
             align-items: center;
             gap: 6px;
+            text-decoration: none;
         }
 
         .filter-clear-all:hover {
             border-color: var(--a-coral);
-            color: var(--a-coral);
-        }
-
-        .filter-item-remove {
-            color: var(--ink-faint);
-            font-size: 11px;
-            padding: 2px 4px;
-            margin-left: auto;
-        }
-
-        .filter-item-remove:hover {
             color: var(--a-coral);
         }
 
@@ -574,39 +667,6 @@
             color: var(--a-coral);
         }
 
-        .note-card-meta {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 8px;
-        }
-
-        .meta-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 11px;
-            font-weight: 600;
-            padding: 3px 9px;
-            border-radius: 20px;
-            white-space: nowrap;
-        }
-
-        .meta-pill i {
-            font-size: 10px;
-        }
-
-        .pill-reminder {
-            background: #eef0ff;
-            color: #5b5fef;
-        }
-
-        .pill-reminder.overdue {
-            background: #fdeceb !important;
-            color: #b91c1c !important;
-        }
-
         #editor-container {
             border: 1px solid var(--line);
             border-radius: 10px;
@@ -686,7 +746,6 @@
             cursor: default;
         }
 
-        
         .list-meta-row {
             display: flex;
             align-items: center;
@@ -700,107 +759,6 @@
             font-weight: 500;
         }
 
-        .date-group-label {
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--ink-faint);
-            margin: 26px 0 12px;
-            letter-spacing: 0.01em;
-        }
-
-        .date-group-label:first-of-type {
-            margin-top: 0;
-        }
-
-        .note-card {
-            border: 1px solid var(--line);
-            border-radius: 12px;
-            padding: 16px 18px;
-            margin-bottom: 10px;
-            background: var(--paper);
-            transition: border-color .12s ease, box-shadow .12s ease;
-            cursor: pointer;
-        }
-
-        .note-card:hover {
-            border-color: var(--line-strong);
-            box-shadow: 0 4px 14px rgba(16, 16, 20, 0.06);
-        }
-
-        .note-card-top {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 6px;
-        }
-
-        .note-topic-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 11px;
-            font-weight: 600;
-            padding: 3px 9px 3px 7px;
-            border-radius: 20px;
-        }
-
-        .note-card-title {
-            font-size: 15.5px;
-            font-weight: 600;
-            color: var(--ink);
-            flex: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .note-card-time {
-            font-size: 11.5px;
-            color: var(--ink-faint);
-            font-weight: 500;
-            flex-shrink: 0;
-        }
-
-        .note-card-preview {
-            font-size: 13px;
-            color: var(--ink-soft);
-            line-height: 1.5;
-            overflow: hidden;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-        }
-
-        .note-card-preview p {
-            margin: 0;
-        }
-
-        .note-card-actions {
-            display: flex;
-            gap: 6px;
-            margin-left: 8px;
-        }
-
-        .note-card-actions button {
-            width: 28px;
-            height: 28px;
-            border: none;
-            background: transparent;
-            color: var(--ink-faint);
-            border-radius: 6px;
-            font-size: 12px;
-        }
-
-        .note-card-actions button:hover {
-            background: var(--panel-deep);
-            color: var(--ink);
-        }
-
-        .note-card-actions .del-btn:hover {
-            color: var(--a-coral);
-            background: #fdeceb;
-        }
-
         .empty-state {
             text-align: center;
             padding: 70px 20px;
@@ -810,7 +768,6 @@
         .empty-state i {
             font-size: 30px;
             margin-bottom: 14px;
-            display: block;
             color: var(--line-strong);
         }
 
@@ -826,80 +783,42 @@
             margin: 0;
         }
 
-        
-        .swatch-row {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 8px;
+        .dot-all {
+            background: var(--ink);
         }
 
-        .swatch {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid transparent;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-size: 11px;
+        .dot-status-todo {
+            background: #9a9aa2;
         }
 
-        .swatch.selected {
-            border-color: var(--ink);
-            box-shadow: 0 0 0 2px var(--paper);
+        .dot-status-progress {
+            background: var(--a-indigo);
         }
 
-        .swatch-row .swatch:nth-child(1) { background: var(--a-indigo); }
-        .swatch-row .swatch:nth-child(2) { background: var(--a-teal); }
-        .swatch-row .swatch:nth-child(3) { background: var(--a-amber); }
-        .swatch-row .swatch:nth-child(4) { background: var(--a-coral); }
-        .swatch-row .swatch:nth-child(5) { background: var(--a-violet); }
-        .swatch-row .swatch:nth-child(6) { background: var(--a-pink); }
-        .swatch-row .swatch:nth-child(7) { background: var(--a-slate); }
+        .dot-status-done {
+            background: var(--a-teal);
+        }
 
-        
+        .dot-priority-all {
+            color: var(--ink);
+        }
 
-        .dot-all { background: var(--ink); }
+        .dot-priority-low {
+            color: #9a9aa2;
+        }
 
-        .dot-topic-indigo, .tag-topic-indigo .topic-dot { background: var(--a-indigo); }
-        .dot-topic-teal,   .tag-topic-teal   .topic-dot { background: var(--a-teal); }
-        .dot-topic-amber,  .tag-topic-amber  .topic-dot { background: var(--a-amber); }
-        .dot-topic-coral,  .tag-topic-coral  .topic-dot { background: var(--a-coral); }
-        .dot-topic-violet, .tag-topic-violet .topic-dot { background: var(--a-violet); }
-        .dot-topic-pink,   .tag-topic-pink   .topic-dot { background: var(--a-pink); }
-        .dot-topic-slate,  .tag-topic-slate  .topic-dot { background: var(--a-slate); }
+        .dot-priority-medium {
+            color: var(--a-amber);
+        }
 
-        .tag-topic-indigo { background: rgba(91, 95, 239, 0.1);  color: var(--a-indigo); }
-        .tag-topic-teal   { background: rgba(18, 165, 148, 0.1); color: var(--a-teal); }
-        .tag-topic-amber  { background: rgba(220, 155, 48, 0.1); color: var(--a-amber); }
-        .tag-topic-coral  { background: rgba(230, 96, 76, 0.1);  color: var(--a-coral); }
-        .tag-topic-violet { background: rgba(139, 92, 246, 0.1); color: var(--a-violet); }
-        .tag-topic-pink   { background: rgba(232, 119, 154, 0.1); color: var(--a-pink); }
-        .tag-topic-slate  { background: rgba(113, 113, 122, 0.1); color: var(--a-slate); }
+        .dot-priority-high {
+            color: var(--a-coral);
+        }
 
-        .dot-status-todo     { background: #9a9aa2; }
-        .dot-status-progress { background: var(--a-indigo); }
-        .dot-status-done     { background: var(--a-teal); }
+        .dot-priority-urgent {
+            color: #b91c1c;
+        }
 
-        .pill-status-todo     { background: rgba(154, 154, 162, 0.1); color: #9a9aa2; }
-        .pill-status-progress { background: rgba(91, 95, 239, 0.1);  color: var(--a-indigo); }
-        .pill-status-done     { background: rgba(18, 165, 148, 0.1); color: var(--a-teal); }
-
-        .dot-priority-all    { color: var(--ink); }
-        .dot-priority-low    { color: #9a9aa2; }
-        .dot-priority-medium { color: var(--a-amber); }
-        .dot-priority-high   { color: var(--a-coral); }
-        .dot-priority-urgent { color: #b91c1c; }
-
-        .pill-priority-low    { background: rgba(154, 154, 162, 0.1); color: #9a9aa2; }
-        .pill-priority-medium { background: rgba(220, 155, 48, 0.1); color: var(--a-amber); }
-        .pill-priority-high   { background: rgba(230, 96, 76, 0.1);  color: var(--a-coral); }
-        .pill-priority-urgent { background: rgba(185, 28, 28, 0.1); color: #b91c1c; }
-
-        
         .date-filter-box {
             padding: 14px;
             min-width: 230px;
@@ -1011,12 +930,6 @@
             background: var(--paper);
         }
 
-        .toast {
-            font-family: 'Poppins', sans-serif;
-            border-radius: 10px;
-        }
-
-        
         .kebab-menu .dropdown-item {
             font-size: 13px;
             display: flex;
@@ -1031,463 +944,411 @@
             }
         }
     </style>
+
+    <style>
+        .note-card {
+            position: relative;
+            min-height: 120px;
+            border: 1px solid #c7c7ce;
+            border-radius: 6px;
+            padding: 16px 18px;
+            margin-bottom: 10px;
+            background: #fafafa;
+            transition: border-color .12s ease, box-shadow .12s ease;
+            cursor: pointer;
+            box-shadow: 0px 0px 3px #00000010;
+        }
+
+        .note-card:hover {
+            border-color: var(--line-strong);
+            box-shadow: 0 4px 14px rgba(16, 16, 20, 0.06);
+        }
+
+        .note-card-done {
+            border-color: #1b7f4d;
+            background: #ecfdf5;
+        }
+
+        .note-card-done:hover {
+            border-color: #1b7f4d;
+            box-shadow: 0 4px 14px rgba(27, 127, 77, 0.1);
+        }
+
+        .note-card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .note-card-left {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 0;
+        }
+
+        .note-card-time {
+            font-size: 13px;
+            color: #333333;
+            font-weight: 500;
+            line-height: 2.5;
+        }
+
+        .note-card-title {
+            font-size: 15.5px;
+            font-weight: 600;
+            color: var(--ink);
+            max-width: 420px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .note-card-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            flex-shrink: 0;
+        }
+
+        .meta-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12.5px;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: 20px;
+            border: 1px solid #aaa;
+            white-space: nowrap;
+        }
+
+        .meta-pill i {
+            font-size: 10px;
+        }
+
+        .pill-reminder {
+            background: #eef0ff;
+            color: #5b5fef;
+            border: 1px solid #5b5fef;
+        }
+
+        .pill-reminder.overdue {
+            background: #fdeceb !important;
+            color: #b91c1c !important;
+            border: 1px solid #b91c1c;
+        }
+
+        .pill-status-todo,
+        .pill-status-progress,
+        .pill-status-done {
+            background: var(--panel-deep);
+            color: var(--ink-soft);
+        }
+
+        .pill-priority-low {
+            background: rgba(154, 154, 162, 0.1);
+            color: #9a9aa2;
+            border: 1px solid #9a9aa2;
+        }
+
+        .pill-priority-medium {
+            background: rgba(220, 155, 48, 0.1);
+            color: var(--a-amber);
+            border: 1px solid var(--a-amber);
+        }
+
+        .pill-priority-high {
+            background: rgba(230, 96, 76, 0.1);
+            color: var(--a-coral);
+            border: 1px solid var(--a-coral);
+        }
+
+        .pill-priority-urgent {
+            background: rgba(185, 28, 28, 0.1);
+            color: #b91c1c;
+            border: 1px solid #b91c1c;
+        }
+
+        .note-topic-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12.5px;
+            font-weight: 600;
+            padding: 3px 9px 3px 7px;
+            border-radius: 20px;
+            background: #9a12ed1a;
+            color: #9a12ed;
+            border: 1px solid #9a12ed;
+        }
+
+        .note-card-actions {
+            position: absolute;
+            bottom: 16px;
+            right: 18px;
+
+        }
+
+        .note-card-actions .done-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid var(--a-teal);
+            border-radius: 5px;
+            padding: 6px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--a-teal);
+            background: rgba(18, 165, 148, 0.1);
+        }
+
+        .note-card-actions .revert-btn {
+            color: #eb970b;
+            background: rgb(255 248 214);
+            border-color: #e6940c;
+        }
+
+        .note-card-actions .done-btn:hover,
+        .note-card-actions .revert-btn:hover {
+            background: var(--paper);
+        }
+
+        .note-card-preview {
+            width: 80%;
+            font-size: 13px;
+            color: #414141;
+            line-height: 1.7;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .note-card-preview p {
+            margin: 0;
+            line-height: inherit;
+        }
+    </style>
 @endpush
 
 @push('js')
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
 
     <script>
-        
-        $(function () {
-
-            
-            const API = {
-                notes: '/admin/notes',
-                topics: '/admin/topics'
-            };
+        $(function() {
 
             $.ajaxSetup({
-                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
             });
 
-            
-            const PALETTE_KEYS = ['indigo', 'teal', 'amber', 'coral', 'violet', 'pink', 'slate'];
+            let topics = @json($topics->map(fn($t) => ['id' => $t->id, 'name' => $t->name, 'colorClass' => 'dot-topic-' . $t->id % 7]));
 
-            const STATUS_DEFS = [
-                { key: 'todo', label: 'To do' },
-                { key: 'progress', label: 'In progress' },
-                { key: 'done', label: 'Done' }
-            ];
-            const PRIORITY_DEFS = [
-                { key: 'low', label: 'Low' },
-                { key: 'medium', label: 'Medium' },
-                { key: 'high', label: 'High' },
-                { key: 'urgent', label: 'Urgent' }
-            ];
-            function statusDef(key) { return STATUS_DEFS.find(s => s.key === key) || STATUS_DEFS[0]; }
-            function priorityDef(key) { return PRIORITY_DEFS.find(p => p.key === key) || PRIORITY_DEFS[1]; }
-            
-            
-            
-            function cloneTemplate(id) {
-                return $(document.getElementById(id).content.firstElementChild.cloneNode(true));
+            function topicById(id) {
+                return topics.find(t => t.id == id);
             }
 
-            
-            let topics = [];
-            let notes = [];
-            let meta = { current_page: 1, last_page: 1, total: 0 };
-            let counts = { all: 0, topics: {}, statuses: {}, priorities: {} };
-            let lastGroupLabel = null;
+            function toInputDateTime(ts) {
+                const d = new Date(ts);
+                const pad = n => String(n).padStart(2, '0');
+                return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+            }
 
-            let activeTopicId = 'all';
-            let activeStatusFilter = 'all';
-            let activePriorityFilter = 'all';
-            let searchQuery = '';
-            let dateFrom = null;
-            let dateTo = null;
-            let currentPage = 1;
+            function formatReminder(ts) {
+                return new Date(ts).toLocaleString(undefined, {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit'
+                });
+            }
 
-            let editingNoteId = null;
-            let pickedTopicId = null;
-            let pickedStatus = 'todo';
-            let pickedPriority = 'medium';
-            let reminderAt = null;
-            let pendingDelete = null;
+            function bumpListCount(delta) {
+                const $count = $('#listCount');
+                const n = Math.max(0, (parseInt($count.text(), 10) || 0) + delta);
+                $count.text(`${n} note${n === 1 ? '' : 's'}`);
+            }
 
-            
+            let searchTimer = null;
+            $('#searchInput').on('input', function() {
+                clearTimeout(searchTimer);
+                const $form = $(this).closest('form');
+                searchTimer = setTimeout(function() {
+                    $form.trigger('submit');
+                }, 500);
+            });
+
+            $('#btnClearDate').on('click', function() {
+                $('#filterForm input[name="from"]').val('');
+                $('#filterForm input[name="to"]').val('');
+                $('#filterForm').trigger('submit');
+            });
+
+            function openAddTopicModal() {
+                $('#newTopicName').val('');
+                new bootstrap.Modal('#topicModal').show();
+                setTimeout(() => $('#newTopicName').focus(), 250);
+            }
+            $(document).on('click', '#filterAddTopic, #pickerAddTopic', function(e) {
+                e.preventDefault();
+                openAddTopicModal();
+            });
+
+            $('#btnConfirmAddTopic').on('click', function() {
+                const name = $('#newTopicName').val().trim();
+                if (!name) {
+                    $('#newTopicName').focus();
+                    return;
+                }
+                const $btn = $(this).prop('disabled', true);
+
+                $.ajax({
+                    url: "{{ route('admin.notes.add.topic') }}",
+                    method: 'POST',
+                    dataType: 'json',
+                    data: {
+                        name
+                    },
+                    success: function(data) {
+                        if (data.success) {
+                            bootstrap.Modal.getInstance(document.getElementById('topicModal'))
+                                .hide();
+                            notify('success', data.message || `Topic "${name}" created`,
+                                'toast');
+                            // window.location.reload();
+                            // TODO - ADD THE TOPIC WITHOUT LOADING THE PAGE.
+                        } else {
+                            notify('error', data.message, 'toast');
+                        }
+                    },
+                    error: function(error) {
+                        notify('error', error.responseJSON?.message || 'Could not create topic',
+                            'toast');
+                    },
+                    complete: function() {
+                        $btn.prop('disabled', false);
+                    }
+                });
+            });
+
+            $(document).on('click', '.done-btn', function(e) {
+                e.stopPropagation();
+                const $card = $(this).closest('.note-card');
+                const id = $card.data('id');
+                const currentStatus = $card.data('status') || 'todo';
+                const targetStatus = currentStatus === 'done' ? 'todo' : 'done';
+
+                $.ajax({
+                    url: "{{ route('admin.notes.mark-done') }}",
+                    method: 'POST',
+                    dataType: 'json',
+                    data: {
+                        id,
+                        status: targetStatus
+                    },
+                    success: function(data) {
+                        if (data.success) {
+                            notify('success', data.message || (targetStatus === 'done' ?
+                                'Marked as done' : 'Moved back to To do'), 'toast');
+                            if (data.html) $card.replaceWith($(data.html));
+                        } else {
+                            notify('error', data.message, 'toast');
+                        }
+                    },
+                    error: function(error) {
+                        notify('error', error.responseJSON?.message || 'Could not update note',
+                            'toast');
+                    }
+                });
+            });
+
             const quill = new Quill('#editor-container', {
                 theme: 'snow',
                 placeholder: 'Write what you need to remember...',
                 modules: {
                     toolbar: [
                         ['bold', 'italic', 'underline', 'strike'],
-                        [{ list: 'ordered' }, { list: 'bullet' }],
-                        [{ color: [] }],
+                        [{
+                            list: 'ordered'
+                        }, {
+                            list: 'bullet'
+                        }],
+                        [{
+                            color: []
+                        }],
                         ['blockquote', 'link'],
                         ['clean']
                     ]
                 }
             });
 
-            
-            function topicById(id) { return topics.find(t => t.id == id); }
-            function isSameDay(a, b) {
-                return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
-            }
-            
-            
-            function friendlyDateLabel(ts) {
-                const d = new Date(ts);
-                const now = new Date();
-                const yest = new Date(now); yest.setDate(now.getDate() - 1);
-                if (isSameDay(d, now)) return 'Today';
-                if (isSameDay(d, yest)) return 'Yesterday';
-                return d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short', year: d.getFullYear() !== now.getFullYear() ? 'numeric' : undefined });
-            }
-            function timeLabel(ts) {
-                return new Date(ts).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
-            }
-            function toInputDateTime(ts) {
-                const d = new Date(ts);
-                const pad = n => String(n).padStart(2, '0');
-                return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-            }
-            function formatReminder(ts) {
-                return new Date(ts).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
-            }
-            
-            
-            function showToast(msg, fallback) {
-                $('#appToastMsg').text(msg || fallback || 'Done');
-                new bootstrap.Toast(document.getElementById('appToast'), { delay: 2200 }).show();
-            }
-            
-            
-            
-            
-            function firstValidationError(xhr, fallback) {
-                const body = xhr.responseJSON;
-                if (body && body.errors) {
-                    const firstKey = Object.keys(body.errors)[0];
-                    if (firstKey && body.errors[firstKey] && body.errors[firstKey][0]) {
-                        return body.errors[firstKey][0];
-                    }
-                }
-                return (body && body.message) || fallback;
+            let editingNoteId = null;
+            let pickedTopicId = null;
+            let pickedStatus = 'todo';
+            let pickedPriority = 'medium';
+            let reminderAt = null;
+
+            function statusLabel(key) {
+                return ({
+                    todo: 'To do',
+                    progress: 'In progress',
+                    done: 'Done'
+                })[key] || 'To do';
             }
 
-            
-            function fetchTopics() {
-                return $.get(API.topics).then(function (res) {
-                    topics = (res.data || res).map(t => ({ id: t.id, name: t.name, colorKey: t.color_key }));
-                    renderTopicPickerMenu();
-                });
+            function priorityLabel(key) {
+                return ({
+                    low: 'Low',
+                    medium: 'Medium',
+                    high: 'High',
+                    urgent: 'Urgent'
+                })[key] || 'Medium';
             }
 
-            function renderTopicPickerMenu() {
-                const $menu = $('#topicPickerMenu').empty();
-                topics.forEach(t => {
-                    const $item = cloneTemplate('tpl-topic-item');
-                    $item.find('.js-count, .js-remove').remove();
-                    $item.find('a').toggleClass('active', t.id === pickedTopicId).attr('data-id', t.id);
-                    $item.find('.topic-dot').addClass('dot-topic-' + t.colorKey);
-                    $item.find('.js-label').text(t.name);
-                    $menu.append($item);
-                });
-                $menu.append(`<li><hr class="dropdown-divider"></li>`);
-                $menu.append(`<li><a class="dropdown-item" href="#" id="pickerAddTopic"><i class="fa-solid fa-plus" style="width:9px;"></i> New topic</a></li>`);
-                if (pickedTopicId != null) setPickedTopic(pickedTopicId);
-            }
             function setPickedTopic(id) {
                 const t = topicById(id) || topics[0];
                 if (!t) return;
                 pickedTopicId = t.id;
-                $('#topicPickerDot').attr('class', 'topic-dot dot-topic-' + t.colorKey);
+                $('#topicPickerDot').attr('class', 'topic-dot ' + t.colorClass);
                 $('#topicPickerLabel').text(t.name);
                 $('#topicPickerMenu .dropdown-item').removeClass('active');
                 $(`#topicPickerMenu .dropdown-item[data-id="${t.id}"]`).addClass('active');
             }
-            $(document).on('click', '#topicPickerMenu .dropdown-item[data-id]', function (e) {
+            $(document).on('click', '#topicPickerMenu .dropdown-item[data-id]', function(e) {
                 e.preventDefault();
                 setPickedTopic($(this).data('id'));
             });
-            $(document).on('click', '#pickerAddTopic', function (e) {
-                e.preventDefault();
-                openAddTopicModal();
-            });
 
-            
-            function renderTopicList() {
-                const $list = $('#topicFilterMenu').empty();
-                $list.append(`
-                    <li><a class="dropdown-item ${activeTopicId === 'all' ? 'active' : ''}" href="#" data-id="all">
-                      <span class="topic-dot dot-all"></span> All notes <span class="topic-count" style="margin-left:auto;">${counts.all || 0}</span>
-                    </a></li>
-                `);
-                topics.forEach(t => {
-                    const count = (counts.topics && counts.topics[t.id]) || 0;
-                    const $item = cloneTemplate('tpl-topic-item');
-                    $item.find('a').toggleClass('active', activeTopicId == t.id).attr('data-id', t.id);
-                    $item.find('.topic-dot').addClass('dot-topic-' + t.colorKey);
-                    $item.find('.js-label').text(t.name);
-                    $item.find('.js-count').text(count);
-                    $item.find('.js-remove').attr('data-remove-topic', t.id);
-                    $list.append($item);
-                });
-                $list.append(`<li><hr class="dropdown-divider"></li>`);
-                $list.append(`<li><a class="dropdown-item" href="#" id="filterAddTopic"><i class="fa-solid fa-plus" style="width:9px;"></i> New topic</a></li>`);
-                $('#topicFilterValue').text(activeTopicId === 'all' ? 'All' : (topicById(activeTopicId)?.name || 'All'));
-                $('#topicFilterBtn').toggleClass('is-active', activeTopicId !== 'all');
-            }
-            $(document).on('click', '#topicFilterMenu .dropdown-item[data-id]', function (e) {
-                if ($(e.target).closest('[data-remove-topic]').length) return;
-                e.preventDefault();
-                activeTopicId = $(this).data('id');
-                fetchNotes(1, false);
-            });
-            $(document).on('click', '#filterAddTopic', function (e) {
-                e.preventDefault();
-                openAddTopicModal();
-            });
-            $(document).on('click', '[data-remove-topic]', function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-                const id = $(this).data('remove-topic');
-                const t = topicById(id);
-                if (!t) return;
-                const count = (counts.topics && counts.topics[id]) || 0;
-                $('#deleteModalText').text(
-                    count > 0
-                        ? `"${t.name}" has ${count} note${count > 1 ? 's' : ''}. Deleting it will move ${count > 1 ? 'them' : 'it'} to General.`
-                        : `Delete the topic "${t.name}"? This can't be undone.`
-                );
-                pendingDelete = { type: 'topic', id };
-                new bootstrap.Modal('#deleteModal').show();
-            });
-
-            
-            let selectedSwatch = PALETTE_KEYS[0];
-            function renderSwatches() {
-                const $row = $('#colorSwatchRow').empty();
-                PALETTE_KEYS.forEach(key => {
-                    $row.append(`<div class="swatch ${key === selectedSwatch ? 'selected' : ''}" data-key="${key}"></div>`);
-                });
-            }
-            $(document).on('click', '.swatch', function () {
-                selectedSwatch = $(this).data('key');
-                renderSwatches();
-            });
-            function openAddTopicModal() {
-                $('#newTopicName').val('');
-                selectedSwatch = PALETTE_KEYS[Math.floor(Math.random() * PALETTE_KEYS.length)];
-                renderSwatches();
-                new bootstrap.Modal('#topicModal').show();
-                setTimeout(() => $('#newTopicName').focus(), 250);
-            }
-            $('#btnConfirmAddTopic').on('click', function () {
-                const name = $('#newTopicName').val().trim();
-                if (!name) { $('#newTopicName').focus(); return; }
-                const $btn = $(this).prop('disabled', true);
-                $.ajax({ url: API.topics, method: 'POST', data: { name, color_key: selectedSwatch } })
-                    .done(function (res) {
-                        bootstrap.Modal.getInstance(document.getElementById('topicModal')).hide();
-                        showToast(res.message, `Topic "${name}" created`);
-                        
-                        
-                        fetchTopics().then(function () {
-                            const created = topics.find(t => t.name === name);
-                            if (created) setPickedTopic(created.id);
-                            renderTopicList();
-                        });
-                    })
-                    
-                    
-                    .fail(function (xhr) {
-                        showToast(firstValidationError(xhr, 'Could not create topic'));
-                    })
-                    .always(function () { $btn.prop('disabled', false); });
-            });
-
-            
-            function buildNotesParams(page) {
-                const params = { page: page || currentPage };
-                if (activeTopicId !== 'all') params.topic = activeTopicId;
-                if (activeStatusFilter !== 'all') params.status = activeStatusFilter;
-                if (activePriorityFilter !== 'all') params.priority = activePriorityFilter;
-                if (searchQuery) params.q = searchQuery;
-                if (dateFrom) params.from = dateFrom;
-                if (dateTo) params.to = dateTo;
-                return params;
-            }
-
-            function fetchNotes(page, append) {
-                page = page || 1;
-                const $area = $('#notesListArea');
-                if (!append) $area.css('opacity', 0.55);
-
-                return $.get(API.notes, buildNotesParams(page))
-                    .done(function (res) {
-                        meta = res.meta;
-                        counts = res.counts;
-                        currentPage = res.meta.current_page;
-
-                        if (append) {
-                            notes = notes.concat(res.data);
-                        } else {
-                            notes = res.data;
-                            lastGroupLabel = null;
-                            $area.empty();
-                        }
-
-                        $('#listCount').text(`${meta.total} note${meta.total === 1 ? '' : 's'}`);
-
-                        if (notes.length === 0) {
-                            $area.append(cloneTemplate('tpl-empty-state'));
-                        } else {
-                            res.data.forEach(renderNoteCard);
-                        }
-
-                        renderTopicList();
-                        renderStatusFilterList();
-                        renderPriorityFilterList();
-                        updateClearAllVisibility();
-                        updateLoadMoreUI();
-                    })
-                    .fail(function () {
-                        showToast(null, "Couldn't load notes — check your connection");
-                    })
-                    .always(function () {
-                        $area.css('opacity', 1);
-                    });
-            }
-
-            function renderNoteCard(n) {
-                const label = friendlyDateLabel(n.created_at);
-                if (label !== lastGroupLabel) {
-                    $('#notesListArea').append(`<div class="date-group-label">${label}</div>`);
-                    lastGroupLabel = label;
-                }
-                const t = topicById(n.topic_id) || { name: 'General', colorKey: 'slate' };
-                const s = statusDef(n.status || 'todo');
-                const p = priorityDef(n.priority || 'medium');
-                
-                const isOverdue = !!n.is_overdue;
-
-                const $card = cloneTemplate('tpl-note-card').attr('data-id', n.id);
-                $card.find('.topic-dot').addClass('dot-topic-' + t.colorKey);
-                $card.find('.note-topic-tag').addClass('tag-topic-' + t.colorKey);
-                $card.find('.js-topic-name').text(t.name);
-                $card.find('.js-title').text(n.title);
-                $card.find('.js-time').text(timeLabel(n.created_at));
-                $card.find('.js-status-pill').addClass('pill-status-' + s.key);
-                $card.find('.js-status-label').text(s.label);
-                $card.find('.js-priority-pill').addClass('pill-priority-' + p.key);
-                $card.find('.js-priority-label').text(p.label);
-                if (n.reminder_at) {
-                    $card.find('.js-reminder-pill').toggleClass('overdue', isOverdue).show();
-                    $card.find('.js-reminder-label').text(formatReminder(n.reminder_at));
-                }
-                
-                
-                $card.find('.js-preview').html(n.content);
-
-                $('#notesListArea').append($card);
-            }
-
-            function updateLoadMoreUI() {
-                if (meta.current_page < meta.last_page) {
-                    $('#notesLoadMoreWrap').show();
-                    $('#btnLoadMore').text(`Load more (${meta.total - notes.length} remaining)`);
-                } else {
-                    $('#notesLoadMoreWrap').hide();
-                }
-            }
-            $('#btnLoadMore').on('click', function () {
-                fetchNotes(currentPage + 1, true);
-            });
-
-            
-            function renderStatusFilterList() {
-                const $list = $('#statusFilterMenu').empty();
-                $list.append(`
-                    <li><a class="dropdown-item ${activeStatusFilter === 'all' ? 'active' : ''}" href="#" data-key="all">
-                      <span class="status-dot dot-all"></span> All <span class="topic-count" style="margin-left:auto;">${counts.all || 0}</span>
-                    </a></li>
-                `);
-                STATUS_DEFS.forEach(s => {
-                    const count = (counts.statuses && counts.statuses[s.key]) || 0;
-                    const $item = cloneTemplate('tpl-status-item');
-                    $item.find('a').toggleClass('active', activeStatusFilter === s.key).attr('data-key', s.key);
-                    $item.find('.status-dot').addClass('dot-status-' + s.key);
-                    $item.find('.js-label').text(s.label);
-                    $item.find('.js-count').text(count);
-                    $list.append($item);
-                });
-                $('#statusFilterValue').text(activeStatusFilter === 'all' ? 'All' : statusDef(activeStatusFilter).label);
-                $('#statusFilterBtn').toggleClass('is-active', activeStatusFilter !== 'all');
-            }
-            function renderPriorityFilterList() {
-                const $list = $('#priorityFilterMenu').empty();
-                $list.append(`
-                    <li><a class="dropdown-item ${activePriorityFilter === 'all' ? 'active' : ''}" href="#" data-key="all">
-                      <i class="fa-solid fa-flag dot-priority-all" style="width:9px; font-size:10px;"></i> All <span class="topic-count" style="margin-left:auto;">${counts.all || 0}</span>
-                    </a></li>
-                `);
-                PRIORITY_DEFS.forEach(p => {
-                    const count = (counts.priorities && counts.priorities[p.key]) || 0;
-                    const $item = cloneTemplate('tpl-priority-item');
-                    $item.find('a').toggleClass('active', activePriorityFilter === p.key).attr('data-key', p.key);
-                    $item.find('i').addClass('dot-priority-' + p.key).attr('style', 'width:9px; font-size:10px;');
-                    $item.find('.js-label').text(p.label);
-                    $item.find('.js-count').text(count);
-                    $list.append($item);
-                });
-                $('#priorityFilterValue').text(activePriorityFilter === 'all' ? 'All' : priorityDef(activePriorityFilter).label);
-                $('#priorityFilterBtn').toggleClass('is-active', activePriorityFilter !== 'all');
-            }
-            $(document).on('click', '#statusFilterMenu .dropdown-item[data-key]', function (e) {
-                e.preventDefault();
-                activeStatusFilter = $(this).data('key');
-                fetchNotes(1, false);
-            });
-            $(document).on('click', '#priorityFilterMenu .dropdown-item[data-key]', function (e) {
-                e.preventDefault();
-                activePriorityFilter = $(this).data('key');
-                fetchNotes(1, false);
-            });
-
-            
-            function renderStatusPickerMenu() {
-                const $menu = $('#statusPickerMenu').empty();
-                STATUS_DEFS.forEach(s => {
-                    const $item = cloneTemplate('tpl-status-item');
-                    $item.find('.js-count').remove();
-                    $item.find('a').toggleClass('active', s.key === pickedStatus).attr('data-key', s.key);
-                    $item.find('.status-dot').addClass('dot-status-' + s.key);
-                    $item.find('.js-label').text(s.label);
-                    $menu.append($item);
-                });
-            }
             function setPickedStatus(key) {
-                const s = statusDef(key);
-                pickedStatus = s.key;
-                $('#statusPickerDot').attr('class', 'status-dot dot-status-' + s.key);
-                $('#statusPickerLabel').text(s.label);
+                pickedStatus = key;
+                $('#statusPickerDot').attr('class', 'status-dot dot-status-' + key);
+                $('#statusPickerLabel').text(statusLabel(key));
                 $('#statusPickerMenu .dropdown-item').removeClass('active');
-                $(`#statusPickerMenu .dropdown-item[data-key="${s.key}"]`).addClass('active');
+                $(`#statusPickerMenu .dropdown-item[data-key="${key}"]`).addClass('active');
             }
-            $(document).on('click', '#statusPickerMenu .dropdown-item[data-key]', function (e) {
+            $(document).on('click', '#statusPickerMenu .dropdown-item[data-key]', function(e) {
                 e.preventDefault();
                 setPickedStatus($(this).data('key'));
             });
 
-            function renderPriorityPickerMenu() {
-                const $menu = $('#priorityPickerMenu').empty();
-                PRIORITY_DEFS.forEach(p => {
-                    const $item = cloneTemplate('tpl-priority-item');
-                    $item.find('.js-count').remove();
-                    $item.find('a').toggleClass('active', p.key === pickedPriority).attr('data-key', p.key);
-                    $item.find('i').addClass('dot-priority-' + p.key).attr('style', 'width:11px;');
-                    $item.find('.js-label').text(p.label);
-                    $menu.append($item);
-                });
-            }
             function setPickedPriority(key) {
-                const p = priorityDef(key);
-                pickedPriority = p.key;
-                $('#priorityPickerIcon').attr('class', 'fa-solid fa-flag dot-priority-' + p.key);
-                $('#priorityPickerLabel').text(p.label);
+                pickedPriority = key;
+                $('#priorityPickerIcon').attr('class', 'fa-solid fa-flag dot-priority-' + key);
+                $('#priorityPickerLabel').text(priorityLabel(key));
                 $('#priorityPickerMenu .dropdown-item').removeClass('active');
-                $(`#priorityPickerMenu .dropdown-item[data-key="${p.key}"]`).addClass('active');
+                $(`#priorityPickerMenu .dropdown-item[data-key="${key}"]`).addClass('active');
             }
-            $(document).on('click', '#priorityPickerMenu .dropdown-item[data-key]', function (e) {
+            $(document).on('click', '#priorityPickerMenu .dropdown-item[data-key]', function(e) {
                 e.preventDefault();
                 setPickedPriority($(this).data('key'));
             });
 
-            
             function updateReminderUI() {
                 if (reminderAt) {
                     $('#reminderLabel').text(formatReminder(reminderAt));
@@ -1499,56 +1360,23 @@
                     $('#reminderInput').val('');
                 }
             }
-            $('#reminderBtn').on('click', function () {
+            $('#reminderBtn').on('click', function() {
                 $('#reminderInput').toggle();
-                if ($('#reminderInput').is(':visible')) $('#reminderInput').trigger('focus').trigger('click');
+                if ($('#reminderInput').is(':visible')) $('#reminderInput').trigger('focus').trigger(
+                    'click');
             });
-            $('#reminderInput').on('change', function () {
+            $('#reminderInput').on('change', function() {
                 const val = $(this).val();
                 reminderAt = val ? new Date(val).getTime() : null;
                 updateReminderUI();
             });
-            $('#reminderClearBtn').on('click', function (e) {
+            $('#reminderClearBtn').on('click', function(e) {
                 e.stopPropagation();
                 reminderAt = null;
                 updateReminderUI();
                 $('#reminderInput').hide();
             });
 
-            
-            $('#btnConfirmDelete').on('click', function () {
-                if (!pendingDelete) return;
-                const $btn = $(this).prop('disabled', true);
-
-                if (pendingDelete.type === 'note') {
-                    $.ajax({ url: `${API.notes}/${pendingDelete.id}`, method: 'DELETE' })
-                        .done(function (res) {
-                            if (editingNoteId === pendingDelete.id) resetEditor();
-                            showToast(res.message, 'Note deleted');
-                            fetchNotes(1, false);
-                        })
-                        .fail(function (xhr) { showToast(firstValidationError(xhr, 'Could not delete note')); })
-                        .always(finishDelete);
-                } else if (pendingDelete.type === 'topic') {
-                    
-                    $.ajax({ url: `${API.topics}/${pendingDelete.id}`, method: 'DELETE' })
-                        .done(function (res) {
-                            if (activeTopicId === pendingDelete.id) activeTopicId = 'all';
-                            showToast(res.message, 'Topic deleted');
-                            fetchTopics().then(function () { fetchNotes(1, false); });
-                        })
-                        .fail(function (xhr) { showToast(firstValidationError(xhr, 'Could not delete topic')); })
-                        .always(finishDelete);
-                }
-
-                function finishDelete() {
-                    $btn.prop('disabled', false);
-                    pendingDelete = null;
-                    bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
-                }
-            });
-
-            
             const editorModalEl = document.getElementById('editorModal');
             const editorModal = new bootstrap.Modal(editorModalEl);
 
@@ -1556,7 +1384,7 @@
                 editingNoteId = null;
                 $('#noteTitle').val('');
                 quill.setContents([]);
-                setPickedTopic(activeTopicId !== 'all' ? activeTopicId : (topics[0] ? topics[0].id : null));
+                setPickedTopic(topics[0] ? topics[0].id : null);
                 setPickedStatus('todo');
                 setPickedPriority('medium');
                 reminderAt = null;
@@ -1565,37 +1393,38 @@
                 $('#editorCardTitle').text('New note');
                 $('#btnSaveNote').text('Save note');
             }
+
             function openEditor() {
                 editorModal.show();
                 setTimeout(() => $('#noteTitle').focus(), 300);
             }
+
             function closeEditor() {
                 editorModal.hide();
             }
-            
-            
+
             editorModalEl.addEventListener('hidden.bs.modal', resetEditor);
-            function openNewNote() {
+            $('#btnNewNoteMain').on('click', function() {
                 resetEditor();
                 openEditor();
-            }
-            $('#btnNewNoteMain').on('click', openNewNote);
+            });
             $('#btnCloseEditor').on('click', closeEditor);
-            $('#btnCancelEdit').on('click', function () {
+            $('#btnCancelEdit').on('click', function() {
                 resetEditor();
                 closeEditor();
             });
 
-            $('#btnSaveNote').on('click', function () {
+            $('#btnSaveNote').on('click', function() {
                 const title = $('#noteTitle').val().trim();
                 const html = quill.root.innerHTML;
                 const isEmpty = quill.getText().trim().length === 0;
-                if (!title && isEmpty) { $('#noteTitle').focus(); return; }
+                if (!title && isEmpty) {
+                    $('#noteTitle').focus();
+                    return;
+                }
 
                 const payload = {
                     title: title || 'Untitled note',
-                    
-                    
                     content: html,
                     topic_id: pickedTopicId,
                     status: pickedStatus,
@@ -1604,37 +1433,57 @@
                 };
 
                 const $btn = $(this).prop('disabled', true);
-                
-                
-                const url = editingNoteId ? `${API.notes}/${editingNoteId}` : API.notes;
+                const wasEditing = editingNoteId;
+                const url = wasEditing ?
+                    "{{ route('admin.notes.save', ':id') }}".replace(':id', wasEditing) :
+                    "{{ route('admin.notes.save') }}";
 
-                $.ajax({ url, method: 'POST', data: payload })
-                    .done(function (res) {
-                        showToast(res.message, editingNoteId ? 'Note updated' : 'Note saved');
-                        resetEditor();
-                        closeEditor();
-                        fetchNotes(1, false);
-                    })
-                    
-                    
-                    .fail(function (xhr) {
-                        showToast(firstValidationError(xhr, 'Could not save note'));
-                    })
-                    .always(function () { $btn.prop('disabled', false); });
+                $.ajax({
+                    url: url,
+                    method: 'POST',
+                    dataType: 'json',
+                    data: payload,
+                    success: function(data) {
+                        if (data.success) {
+                            notify('success', data.message || (wasEditing ? 'Note updated' :
+                                'Note saved'), 'toast');
+
+                            if (data.html) {
+                                const $new = $(data.html);
+                                if (wasEditing) {
+                                    $(`.note-card[data-id="${wasEditing}"]`).replaceWith($new);
+                                } else {
+                                    $('#notesListArea .empty-state').remove();
+                                    $('#notesListArea').prepend($new);
+                                    bumpListCount(1);
+                                }
+                            }
+
+                            resetEditor();
+                            closeEditor();
+                        } else {
+                            notify('error', data.message, 'toast');
+                        }
+                    },
+                    error: function(error) {
+                        notify('error', error.responseJSON?.message || 'Could not save note',
+                            'toast');
+                    },
+                    complete: function() {
+                        $btn.prop('disabled', false);
+                    }
+                });
             });
 
-            function loadNoteIntoEditor(id) {
-                
-                
-                const n = notes.find(x => x.id == id);
-                if (!n) return;
-                editingNoteId = id;
-                $('#noteTitle').val(n.title);
-                quill.root.innerHTML = n.content;
-                setPickedTopic(n.topic_id);
-                setPickedStatus(n.status || 'todo');
-                setPickedPriority(n.priority || 'medium');
-                reminderAt = n.reminder_at ? new Date(n.reminder_at).getTime() : null;
+            function loadNoteIntoEditor($card) {
+                editingNoteId = $card.data('id');
+                $('#noteTitle').val($card.data('title'));
+                quill.root.innerHTML = $card.data('content') || '';
+                setPickedTopic($card.data('topic-id'));
+                setPickedStatus($card.data('status') || 'todo');
+                setPickedPriority($card.data('priority') || 'medium');
+                const rem = $card.data('reminder-at');
+                reminderAt = rem ? new Date(rem).getTime() : null;
                 updateReminderUI();
                 $('#reminderInput').toggle(!!reminderAt);
                 $('#editorCardTitle').text('Editing note');
@@ -1642,83 +1491,15 @@
                 openEditor();
             }
 
-            $(document).on('click', '.note-card', function (e) {
+            // Clicking the card body now opens the editor directly —
+            // no separate view-only modal step. Clicks on the action
+            // buttons (Done/Undo) are excluded so they don't also open it.
+            $(document).on('click', '.note-card', function(e) {
                 if ($(e.target).closest('.note-card-actions').length) return;
-                loadNoteIntoEditor($(this).data('id'));
-            });
-            $(document).on('click', '.edit-btn', function (e) {
-                e.stopPropagation();
-                loadNoteIntoEditor($(this).closest('.note-card').data('id'));
-            });
-            $(document).on('click', '.del-btn', function (e) {
-                e.stopPropagation();
-                const id = $(this).closest('.note-card').data('id');
-                const n = notes.find(x => x.id == id);
-                pendingDelete = { type: 'note', id };
-                $('#deleteModalText').text(`Delete "${n ? n.title : 'this note'}"? This can't be undone.`);
-                new bootstrap.Modal('#deleteModal').show();
+                loadNoteIntoEditor($(this));
             });
 
-            
-            let searchTimer = null;
-            $('#searchInput').on('input', function () {
-                clearTimeout(searchTimer);
-                const val = $(this).val();
-                searchTimer = setTimeout(function () {
-                    searchQuery = val.trim();
-                    fetchNotes(1, false);
-                }, 150);
-            });
-
-            
-            function updateDateFilterLabel() {
-                let label = 'Any time';
-                if (dateFrom && dateTo) label = `${dateFrom} → ${dateTo}`;
-                else if (dateFrom) label = `From ${dateFrom}`;
-                else if (dateTo) label = `Until ${dateTo}`;
-                $('#dateFilterValue').text(label);
-                $('#dateFilterBtn').toggleClass('is-active', !!(dateFrom || dateTo));
-            }
-            $('#btnApplyDate').on('click', function () {
-                dateFrom = $('#filterFrom').val() || null;
-                dateTo = $('#filterTo').val() || null;
-                updateDateFilterLabel();
-                fetchNotes(1, false);
-                bootstrap.Dropdown.getOrCreateInstance(document.getElementById('dateFilterBtn')).hide();
-            });
-            $('#btnClearDate').on('click', function () {
-                dateFrom = null; dateTo = null;
-                $('#filterFrom').val(''); $('#filterTo').val('');
-                updateDateFilterLabel();
-                fetchNotes(1, false);
-            });
-
-            
-            function updateClearAllVisibility() {
-                const anyActive = activeTopicId !== 'all' || activeStatusFilter !== 'all' || activePriorityFilter !== 'all' || dateFrom || dateTo || searchQuery;
-                $('#btnClearAllFilters').css('display', anyActive ? 'inline-flex' : 'none');
-            }
-            $('#btnClearAllFilters').on('click', function () {
-                activeTopicId = 'all';
-                activeStatusFilter = 'all';
-                activePriorityFilter = 'all';
-                dateFrom = null; dateTo = null;
-                searchQuery = '';
-                $('#searchInput').val('');
-                $('#filterFrom').val(''); $('#filterTo').val('');
-                updateDateFilterLabel();
-                fetchNotes(1, false);
-            });
-
-            
-            renderStatusPickerMenu();
-            renderPriorityPickerMenu();
-            updateDateFilterLabel();
-
-            fetchTopics().then(function () {
-                resetEditor();
-                fetchNotes(1, false);
-            });
+            resetEditor();
         });
     </script>
 @endpush

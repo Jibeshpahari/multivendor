@@ -502,16 +502,16 @@ body.collapsed #main {
 
 .search-box input {
     width: 100%;
-    height: 34px;
-    border: 1.5px solid #e4e6f0;
-    border-radius: 20px;
+    height: 40px;
+    border: 1.5px solid #c4c6d0;
+    border-radius: 5px;
     padding: 0 60px 0 36px;
     font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    color: #333;
+    font-size: 14px;
+    color: #111;
     background: #f8f9fc;
     outline: 0;
-    transition: all .2s
+    transition: all .2s;
 }
 
 .search-box input::placeholder {
@@ -1124,8 +1124,8 @@ body.collapsed #main {
 
 .toast-item {
     background: #fff;
-    border: 1px solid #e4e6f0;
-    border-radius: 10px;
+    border: 1px solid #d9dae2;
+    border-radius: 5px;
     padding: 12px 16px 12px 22px;
     min-width: 320px;
     max-width: 400px;

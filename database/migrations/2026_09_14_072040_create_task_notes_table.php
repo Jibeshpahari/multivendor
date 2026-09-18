@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('task_notes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('topic_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('topic_id')->nullable()->constrained('task_note_topics')->nullOnDelete();
             $table->string('title');
             $table->longText('content')->nullable();
             $table->enum('status', ['todo', 'progress', 'done'])->default('todo');

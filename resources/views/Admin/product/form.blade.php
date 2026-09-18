@@ -1293,6 +1293,10 @@
 
 @push('css')
     <style>
+        #content{
+            padding-bottom: 0px;
+        }
+
         .card {
             box-shadow: 1px 4px 15px 0px rgb(0 0 0 / 15%);
             border-radius: 5px;
@@ -1622,9 +1626,9 @@
             justify-content: flex-end;
             gap: 10px;
             padding: 14px 20px;
-            border: 1px solid #00000050;
-            box-shadow: 0px 0px 10px #00000040;
-            border-radius: 5px;
+            border: 1px solid #00000035;
+            box-shadow: 0px 0px 10px #00000020;
+            border-radius: 5px 5px 0px 0px;
         }
 
         .modal-overlay {
