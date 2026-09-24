@@ -5,7 +5,6 @@ $(document).on('click', '[data-pw-toggle-btn]', function () {
     $(this).children('i').toggleClass('bi-eye bi-eye-slash');
 });
 
-
 $(function () {
     $('[data-select-all]').each(function () {
         const $master = $(this);

@@ -4,6 +4,7 @@ namespace App\Models\Admin;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TaskNote extends Model
@@ -31,5 +32,14 @@ class TaskNote extends Model
     {
         return $this->belongsTo(TaskNoteTopic::class);
     }
+
+    protected function isOverdue(): Attribute {
+        return Attribute::make(
+            get: fn() => $this->reminder_at && $this->status !== 'done' && $this->reminder_at->isPast(),
+        );
+    }
+
+
+
 
 }

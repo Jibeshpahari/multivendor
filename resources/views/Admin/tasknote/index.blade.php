@@ -172,8 +172,13 @@
         </div>
 
         <div id="notesListArea">
-            @forelse ($notes as $n)
-                @include('admin.tasknote.partials.note-card', ['note' => $n, 'topics' => $topics])
+            @forelse ($grouped as $label => $notesGroup)
+                <div class="note-group">
+                    <h6 class="note-group-label">{{ $label }}</h6>
+                    @foreach ($notesGroup as $n)
+                        @include('admin.tasknote.partials.note-card', ['note' => $n, 'topics' => $topics])
+                    @endforeach
+                </div>
             @empty
                 <div class="empty-state">
                     <i class="fa-regular fa-note-sticky"></i>
@@ -315,7 +320,7 @@
 
             --a-indigo: #5b5fef;
             --a-teal: #12a594;
-            --a-amber: #dc9b30;
+            --a-amber: #cc820a;
             --a-coral: #e6604c;
             --a-violet: #8b5cf6;
             --a-slate: #71717a;
@@ -412,9 +417,9 @@
         }
 
         /* Base topic-dot shape/color — shared by filter bar dropdown,
-                   editor topic picker, AND the note-card partial. Kept here
-                   (not in note-card.blade.php) because the filter bar renders
-                   even when there are zero notes. */
+                                               editor topic picker, AND the note-card partial. Kept here
+                                               (not in note-card.blade.php) because the filter bar renders
+                                               even when there are zero notes. */
         .topic-dot {
             width: 9px;
             height: 9px;
@@ -946,6 +951,20 @@
     </style>
 
     <style>
+        /* Date group headers (Today / Yesterday / <date>) */
+        .note-group {
+            margin-bottom: 18px;
+        }
+
+        .note-group-label {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--ink-faint);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0 0 10px 2px;
+        }
+
         .note-card {
             position: relative;
             min-height: 120px;
@@ -961,7 +980,7 @@
 
         .note-card:hover {
             border-color: var(--line-strong);
-            box-shadow: 0 4px 14px rgba(16, 16, 20, 0.06);
+            box-shadow: 0 0px 14px #d4550030;
         }
 
         .note-card-done {
@@ -989,17 +1008,33 @@
             min-width: 0;
         }
 
+        .note-title-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+        }
+
         .note-card-time {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
             font-size: 13px;
-            color: #333333;
+            color: #344661;
             font-weight: 500;
-            line-height: 2.5;
+            white-space: nowrap;
+            flex-shrink: 0;
+            background: #3446611a;
+            padding: 2.5px 5px;
+            border-radius: 4px;
+            border: 1px solid #34466110;
         }
 
         .note-card-title {
             font-size: 15.5px;
             font-weight: 600;
             color: var(--ink);
+            text-transform: capitalize;
             max-width: 420px;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -1020,9 +1055,9 @@
             align-items: center;
             gap: 5px;
             font-size: 12.5px;
-            font-weight: 600;
+            font-weight: 500;
             padding: 3px 9px;
-            border-radius: 20px;
+            border-radius: 3px;
             border: 1px solid #aaa;
             white-space: nowrap;
         }
@@ -1043,11 +1078,22 @@
             border: 1px solid #b91c1c;
         }
 
-        .pill-status-todo,
-        .pill-status-progress,
+        .pill-status-todo {
+            background: #e2e8f0;
+            color: #475569;
+            border: 1px solid #475569;
+        }
+
+        .pill-status-progress {
+            background: #5b5fef21;
+            color: #5b5fef;
+            border: 1px solid #5b5fef;
+        }
+
         .pill-status-done {
-            background: var(--panel-deep);
-            color: var(--ink-soft);
+            background: #dcfce7;
+            color: #15803d;
+            border: 1px solid #15803d;
         }
 
         .pill-priority-low {
@@ -1079,12 +1125,12 @@
             align-items: center;
             gap: 6px;
             font-size: 12.5px;
-            font-weight: 600;
+            font-weight: 500;
             padding: 3px 9px 3px 7px;
             border-radius: 20px;
-            background: #9a12ed1a;
-            color: #9a12ed;
-            border: 1px solid #9a12ed;
+            background: #982ed91a;
+            color: #982ed9;
+            border: 1px solid #982ed9;
         }
 
         .note-card-actions {
@@ -1100,9 +1146,10 @@
             gap: 6px;
             border: 1px solid var(--a-teal);
             border-radius: 5px;
-            padding: 6px 12px;
-            font-size: 13px;
-            font-weight: 600;
+            padding: 4px 10px;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
             color: var(--a-teal);
             background: rgba(18, 165, 148, 0.1);
         }
@@ -1256,7 +1303,8 @@
                         if (data.success) {
                             notify('success', data.message || (targetStatus === 'done' ?
                                 'Marked as done' : 'Moved back to To do'), 'toast');
-                            if (data.html) $card.replaceWith($(data.html));
+                            if (data.html) $card.closest('.note-item').replaceWith($(data
+                                .html));
                         } else {
                             notify('error', data.message, 'toast');
                         }
@@ -1451,10 +1499,35 @@
                             if (data.html) {
                                 const $new = $(data.html);
                                 if (wasEditing) {
-                                    $(`.note-card[data-id="${wasEditing}"]`).replaceWith($new);
+                                    $(`.note-card[data-id="${wasEditing}"]`).closest(
+                                            '.note-item')
+                                        .replaceWith($new);
                                 } else {
                                     $('#notesListArea .empty-state').remove();
-                                    $('#notesListArea').prepend($new);
+
+                                    // Find an existing "Today" group in the DOM so the
+                                    // new note lands under the right date header instead
+                                    // of floating outside all groups.
+                                    let $todayGroup = $('#notesListArea .note-group')
+                                        .filter(function() {
+                                            return $(this).find('.note-group-label').first()
+                                                .text().trim() === 'Today';
+                                        })
+                                        .first();
+
+                                    if ($todayGroup.length) {
+                                        // "Today" group already exists — insert right after its label
+                                        $todayGroup.find('.note-group-label').first().after(
+                                            $new);
+                                    } else {
+                                        // No "Today" group yet (first note of the day) — create one
+                                        const $group = $(
+                                            '<div class="note-group"><h6 class="note-group-label">Today</h6></div>'
+                                        );
+                                        $group.append($new);
+                                        $('#notesListArea').prepend($group);
+                                    }
+
                                     bumpListCount(1);
                                 }
                             }

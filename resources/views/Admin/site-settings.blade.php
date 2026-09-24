@@ -2,18 +2,44 @@
 
 @push('css')
     <style>
+        .col-8 {
+            width: 70%;
+        }
+
+        .col-4 {
+            width: 30%;
+        }
+
         .input-group-text {
             font-size: 18px;
         }
 
-        /* //TODO - Use Poopins for siddebar  */
+        .maintenance {
+            background-color: #f3f3f3 !important;
+            border: 1px solid #e1e1e1;
+            border-radius: 6px;
+            padding: 8px 10px 12px 6px;
+        }
+
+        .maintenance.active {
+            background-color: #f0fbf4 !important;
+            border: 1px solid #c8dfd0;
+        }
+
+        .maintenance sub {
+            font-size: 12.5px;
+            color: #4f4f4f;
+            line-height: 1.3;
+            display: block;
+            font-family: 'Public Sans';
+        }
     </style>
 @endpush
 
 @section('content')
-    <div class="row">
-        <div class="col-9">
-            <div class="card p-3">
+    <div class="row g-3">
+        <div class="col-8">
+            <div class="card py-3 px-2">
                 <div class="container">
                     <ul class="nav nav-tabs" id="myTab" role="tablist">
                         <li class="nav-item" role="presentation">
@@ -43,8 +69,8 @@
                         <div class="tab-pane fade show active" id="site-identity" role="tabpanel"
                             aria-labelledby="site-identity">
                             {{-- Site Settings Identity --}}
-                            <form action="{{ route('admin.settings.site-setting.store') }}" method="POST" id="site-identity"
-                                enctype="multipart/form-data">
+                            <form action="{{ route('admin.settings.site-setting.store') }}" method="POST"
+                                id="site-identity" enctype="multipart/form-data">
                                 @csrf
                                 {{-- Tab Name --}}
                                 <input type="hidden" name="tab_name" value="site_identity" data-tab="site-identity">
@@ -512,49 +538,53 @@
                 </div>
             </div>
         </div>
-        <div class="col-3">
-            <div class="card p-3">
-                <h5 class="card-title mb-3 ps-2">Useful settings</h5>
-                <div class="form-group">
-                    <label for="city">User Pagination Per Page</label>
-                    <input type="number" class="form-control" id="city" name="city" min="1"
-                        step="1" value="{{ $s?->city ?? '' }}">
-                    @error('city')
-                        <span class="error">{{ $message }}</span>
-                    @enderror
+        <div class="col-4">
+
+            <div class="card p-3 mb-3">
+                <h5 class="card-title mb-3">Useful settings</h5>
+
+                <div class="form-group px-1">
+                    <label for="user_per_page">User Pagination Per Page</label>
+                    <input type="number" class="form-control setting-input" id="user_per_page" name="user_per_page"
+                        data-key="user_per_page" min="1" step="1" value="{{ $s?->user_per_page ?? '' }}">
+                    <span class="error setting-error" data-key="user_per_page"></span>
                 </div>
-                <div class="form-group">
-                    <label for="city">Admin Pagination Per Page</label>
-                    <input type="number" class="form-control" id="city" name="city" min="1"
-                        step="1" value="{{ $s?->city ?? '' }}">
-                    @error('city')
-                        <span class="error">{{ $message }}</span>
-                    @enderror
+
+                <div class="form-group px-1">
+                    <label for="admin_per_page">Admin Pagination Per Page</label>
+                    <input type="number" class="form-control setting-input" id="admin_per_page" name="admin_per_page"
+                        data-key="admin_per_page" min="1" step="1"
+                        value="{{ $s?->admin_per_page ?? '' }}">
+                    <span class="error setting-error" data-key="admin_per_page"></span>
                 </div>
-                <div class="form-group">
-                    <div class="form-check form-switch">
-                        <label class="form-check-label" for="switchCheckDefault">Default switch checkbox input</label>
+            </div>
+
+            <div class="card p-3 mb-3">
+                <div class="row g-1 align-items-center maintenance">
+                    <div class="col-3 d-flex justify-content-center">
                         <input class="form-check-input switch switch-lg" type="checkbox" role="switch"
                             id="switchCheckDefault">
+                    </div>
+                    <div class="col-9 ps-3">
+                        <label class="form-check-label d-block fs-6 fw-semibold" for="switchCheckDefault">Maintenance
+                            Mode</label>
+                        <sub>Your site is live and accessible to all users.</sub>
+                    </div>
+                    <div class="col-12 d-none">
                         <span class="error d-block mt-1"> </span>
                     </div>
                 </div>
-                <div class="form-group text-center">
-                    <button class="primary-btn btn btn-primary">
-                        Clear Cache
-                        <svg viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg"
-                            transform="rotate(0 0 0)" width="22" height="22">
-                            <path
-                                d="M22.2815 2.21576C22.5744 2.50866 22.5744 2.98353 22.2815 3.27642L14.9502 10.6077C16.3493 12.1876 16.4673 14.5469 15.1982 16.2639L13.3497 18.7649L5.7346 11.1498L8.23557 9.30129C9.95171 8.03284 12.3095 8.15011 13.8894 9.54722L21.2208 2.21576C21.5137 1.92287 21.9886 1.92287 22.2815 2.21576Z"
-                                fill="#ffffff"></path>
-                            <path
-                                d="M4.51484 12.0514L2.80372 13.3161C2.62814 13.4459 2.51783 13.6458 2.50159 13.8635C2.48535 14.0812 2.5648 14.2952 2.71918 14.4496L10.0499 21.7803C10.2043 21.9347 10.4183 22.0142 10.636 21.9979C10.8538 21.9817 11.0536 21.8714 11.1834 21.6958L12.4481 19.9847L4.51484 12.0514Z"
-                                fill="#ffffff"></path>
-                        </svg>
-                    </button>
-                </div>
             </div>
+
+            <div class="card p-3">
+                    <button class="primary-btn btn btn-dark bg-black-gradient w-100">
+                        Clear Cache
+                        
+                    </button>
+            </div>
+
         </div>
+
     </div>
 @endsection
 
@@ -572,6 +602,52 @@
 
             $('#myTab button').on('shown.bs.tab', function(e) {
                 localStorage.setItem(storageKey, $(e.target).data('tab'));
+            });
+        });
+
+        $(function() {
+            var liveText = 'Your site is live and accessible to all users.';
+            var offlineText = 'Your site is offline for maintenance.';
+
+            $('#switchCheckDefault').on('change', function() {
+                var $wrapper = $(this).closest('.maintenance');
+                var isChecked = $(this).is(':checked');
+
+                $wrapper.toggleClass('active', isChecked);
+                $wrapper.find('sub').text(isChecked ? liveText : offlineText);
+            });
+        });
+
+        $(document).on('change', '.setting-input', function() {
+            const $input = $(this);
+            const key = $input.data('key');
+            const value = $input.val();
+            const $error = $(`.setting-error[data-key="${key}"]`);
+
+            $error.text(''); // clear previous error
+
+            $.ajax({
+                url: "{{ route('admin.settings.save.pagination') }}",
+                method: 'POST',
+                dataType: 'json',
+                data: {
+                    key,
+                    value,
+                },
+                success: function(data) {
+                    if (data.success) {
+                        notify('success', data.message || 'Setting updated', 'toast');
+                    } else {
+                        notify('error', data.message, 'toast');
+                    }
+                },
+                error: function(error) {
+                    const message = error.responseJSON?.message || 'Could not update setting';
+                    notify('error', message, 'toast');
+                    if (error.responseJSON?.errors?.[key]) {
+                        $error.text(error.responseJSON.errors[key][0]);
+                    }
+                }
             });
         });
     </script>

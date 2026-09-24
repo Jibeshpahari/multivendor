@@ -2099,12 +2099,12 @@ label.status-toggle-item {
     margin: 5px 4px;
 }
 
-.card-header .form-control,
-.card-header .form-select {
+.filter-option-card .form-control,
+.filter-option-card .form-select {
     padding-block: 0.465rem !important;
 }
 
-.card-header .btn-sm {
+.filter-option-card .btn-sm {
     height: 36px;
     font-size: 12px;
     align-content: center;
@@ -2174,9 +2174,9 @@ label.status-toggle-item {
 }
 
 #bulkBar .btn {
-    padding: 7px 13px;
+    padding: 6.5px 13px;
     border-radius: 4px;
-    font-size: 12px;
+    font-size: 12.7px;
     background: #ffffff38;
     border: 1px solid #FFFFFF50;
 }

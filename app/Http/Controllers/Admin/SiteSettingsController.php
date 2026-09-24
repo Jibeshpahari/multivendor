@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\SettingKey;
 use App\Http\Controllers\Controller;
 use App\Models\Admin\SiteSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class SiteSettingsController extends Controller
 {
@@ -89,7 +92,7 @@ class SiteSettingsController extends Controller
             DB::commit();
 
             return redirect()->back()->with('success', 'Site identity settings updated successfully.');
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             DB::rollBack();
 
             return redirect()->back()
@@ -98,14 +101,15 @@ class SiteSettingsController extends Controller
         }
     }
 
-    public function storeAddress(Request $request) {
+    public function storeAddress(Request $request)
+    {
         $validated = $request->validate([  //TODO - Remove rules from here and add Requests
             'address'  => ['required', 'string', 'max:255'],
             'city'     => ['required', 'string', 'max:100'],
             'state'    => ['required', 'string', 'max:100'],
             'country'  => ['required', 'string', 'max:100'],
             'zip_code' => ['required', 'string', 'max:20'],
-            'map_link' => ['nullable', 'url', 'max:500'],    
+            'map_link' => ['nullable', 'url', 'max:500'],
         ]);
 
         DB::beginTransaction();
@@ -121,7 +125,7 @@ class SiteSettingsController extends Controller
             DB::commit();
 
             return redirect()->back()->with('success', 'Site identity settings updated successfully.');
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             DB::rollBack();
 
             return redirect()->back()
@@ -130,7 +134,8 @@ class SiteSettingsController extends Controller
         }
     }
 
-    public function storeSocialLinks(Request $request) {
+    public function storeSocialLinks(Request $request)
+    {
         $validated = $request->validate([ //TODO - Remove rules from here and add Requests
             'facebook_link'  => ['nullable', 'url', 'max:500'],
             'instagram_link' => ['nullable', 'url', 'max:500'],
@@ -154,12 +159,40 @@ class SiteSettingsController extends Controller
             DB::commit();
 
             return redirect()->back()->with('success', 'Social links updated successfully.');
-            
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Something went wrong, no changes were saved.')->withInput();
         }
     }
 
-    public function storeSEO(Request $request) {}  //TODO - Site setting Seo When needed
+    public function storeSEO(Request $request) {}  // TODO - Site setting Seo When needed
+
+    public function savePagination(Request $request)
+    {
+        $validated = $request->validate([
+            'key'   => 'required|in:user_per_page,admin_per_page',
+            'value' => 'required|integer|min:1|max:100',
+        ]);
+
+        $settingKey = $validated['key'] === 'user_per_page'? SettingKey::PaginationPerPage : SettingKey::AdminPaginationPerPage;
+
+        try {
+            SiteSetting::updateOrCreate(
+                ['key' => $settingKey->value],
+                ['value' => $validated['value']]
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => $validated['key'] === 'user_per_page' ? 'User Pagination Updated' : 'Admin Pagination Updated',
+            ]);
+        } catch (Throwable $th) {
+            Log::error('Pagination update failed', ['error' => $th->getMessage()]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Update failed, try again',
+            ], 500);
+        }
+    }
 }

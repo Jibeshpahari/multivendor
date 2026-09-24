@@ -44,55 +44,56 @@
 @endpush
 
 @section('content')
-    <div class="card p-3">
-
-        <div class="card-header py-3 px-0 pt-0">
-            <form action="" method="GET" class="" autocomplete="off">
-                <div class="row">
-                    <div class="col-2">
-                        <select class="form-select" name="status" id="status">
-                            <option value="" disabled selected hidden>Status</option>
-                            <option value="approved">Approved</option>
-                            <option value="pending_approval">Pending Approval</option>
-                            <option value="rejected">Rejected</option>
-                        </select>
-                    </div>
-                    <div class="col-2">
-                        <select class="form-select" name="date_sort" id="sort">
-                            <option value="" disabled selected hidden>Sort By</option>
-                            <option value="date_asc">Date (Oldest First)</option>
-                            <option value="date_desc">Date (Newest First)</option>
-                            <option value="name_asc">Name (A-Z)</option>
-                            <option value="name_desc">Name (Z-A)</option>
-                        </select>
-                    </div>
-                    <div class="col-2">
-                        <input type="date" class="form-control datepicker" value="{{ request()->start_date }}"
-                            name="start_date" data-bs-toggle="tooltip" data-bs-placement="top"
-                            data-bs-title="Added From (Start Date)">
-                    </div>
-                    <div class="col-2">
-                        <input type="date" class="form-control datepicker" value="{{ request()->end_date }}"
-                            name="end_date" data-bs-toggle="tooltip" data-bs-placement="top"
-                            data-bs-title="Added To (End Date)">
-                    </div>
-                    <div class="col-2">
-                        <button type="submit" class="btn btn-secondary bg-secondary-gradient btn-sm">
-                            <i class="fa-solid fa-filter me-1"></i>
-                            Filter
-                        </button>
-                    </div>
-                    <div class="col-2">
-                        <div class="text-end">
-                            <a href="{{ route('admin.categories.add') }}"
-                                class="btn btn-primary bg-primary-gradient btn-sm">
-                                <i class="fa-solid fa-plus me-1"></i>
-                                Add Category
-                            </a>
-                        </div>
-                    </div>
+    <div class="card filter-option-card p-3 mb-3">
+        <form action="" method="GET" class="" autocomplete="off">
+            <div class="row">
+                <div class="col-2">
+                    <select class="form-select" name="status" id="status">
+                        <option value="" disabled selected hidden>Status</option>
+                        <option value="approved">Approved</option>
+                        <option value="pending_approval">Pending Approval</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
                 </div>
-            </form>
+                <div class="col-2">
+                    <select class="form-select" name="date_sort" id="sort">
+                        <option value="" disabled selected hidden>Sort By</option>
+                        <option value="date_asc">Date (Oldest First)</option>
+                        <option value="date_desc">Date (Newest First)</option>
+                        <option value="name_asc">Name (A-Z)</option>
+                        <option value="name_desc">Name (Z-A)</option>
+                    </select>
+                </div>
+                <div class="col-2">
+                    <input type="date" class="form-control datepicker" value="{{ request()->start_date }}"
+                        name="start_date" data-bs-toggle="tooltip" data-bs-placement="top"
+                        data-bs-title="Added From (Start Date)">
+                </div>
+                <div class="col-2">
+                    <input type="date" class="form-control datepicker" value="{{ request()->end_date }}" name="end_date"
+                        data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Added To (End Date)">
+                </div>
+                <div class="col-2">
+                    <button type="submit" class="btn btn-secondary bg-secondary-gradient btn-sm">
+                        <i class="fa-solid fa-filter me-1"></i>
+                        Filter
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="card p-3">
+        <div class="card-header py-3 px-0 pt-0">
+            <div class="text-end">
+                <a href="{{ route('admin.categories.export') }}" class="btn btn-secondary btn-sm" id="exportBtn">Export
+                    All</button>
+
+                    <a href="{{ route('admin.categories.add') }}" class="btn btn-primary bg-primary-gradient btn-sm">
+                        <i class="fa-solid fa-plus me-1"></i>
+                        Add Category
+                    </a>
+            </div>
         </div>
 
         <div class="card-body px-0 py-3">
@@ -105,8 +106,8 @@
                     <button class="btn btn-sm btn-dark bulk-archive">
                         <i class="fa-solid fa-box-archive"></i> Archive
                     </button>
-                    <button class="btn btn-sm btn-dark bulk-export" id="exportBtn">
-                        <i class="fa-solid fa-file-export"></i> Export
+                    <button class="btn btn-sm btn-dark bulk-export" id="exporAlltBtn">
+                        <i class="fa-solid fa-file-export"></i> Export All
                     </button>
                     <button class="btn btn-sm btn-danger bulk-delete">
                         <i class="fa-solid fa-trash"></i> Delete
@@ -135,7 +136,8 @@
                     @foreach ($categories as $cate)
                         <tr>
                             <td>
-                                <input type="checkbox" class="form-check-input row-checkbox">
+                                <input type="checkbox" class="form-check-input row-checkbox"
+                                    data-slug="{{ $cate->slug }}">
                             </td>
                             <td>
                                 <p class="mb-0">
@@ -176,7 +178,8 @@
                                         <li>
                                             <a class="do-item do-item--edit edit-action"
                                                 href="{{ route('admin.categories.edit', $cate) }}" data-id="1">
-                                                <span class="do-badge do-badge--edit"><i class="fa-solid fa-pen"></i></span>
+                                                <span class="do-badge do-badge--edit"><i
+                                                        class="fa-solid fa-pen"></i></span>
                                                 <span>Edit</span>
                                             </a>
                                         </li>
@@ -337,8 +340,51 @@
             });
         });
 
-        $(document).on('click', '#exportBtn', function() {
-            
+        $(document).on('click', '#exporAlltBtn', function() {
+            const $btn = $(this);
+            const slugs = $('.row-checkbox:checked').map(function() {
+                return $(this).data('slug');
+            }).get();
+
+            if (slugs.length === 0) {
+                alert('Please select at least one category to export.');
+                return;
+            }
+
+            $btn.prop('disabled', true);
+
+            $.ajax({
+                url: "{{ route('admin.categories.export') }}",
+                method: 'POST',
+                data: {
+                    slugs: slugs
+                },
+                xhrFields: {
+                    responseType: 'blob'
+                },
+                success: function(data, status, xhr) {
+                    const disposition = xhr.getResponseHeader('Content-Disposition');
+                    let filename = 'export.csv';
+                    if (disposition && disposition.indexOf('filename=') !== -1) {
+                        filename = disposition.split('filename=')[1].replace(/["']/g, '').trim();
+                    }
+
+                    const blob = new Blob([data]);
+                    const link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                },
+                error: function(xhr) {
+                    alert('Export failed. Please try again.');
+                    console.error(xhr.responseText);
+                },
+                complete: function() {
+                    $btn.prop('disabled', false);
+                }
+            });
         });
     </script>
 @endpush

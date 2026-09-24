@@ -22,13 +22,11 @@ class SiteSetting extends Model
         $key = $key instanceof SettingKey ? $key->value : $key;
 
         $settings = Cache::rememberForever('settings', function () {
-            return static::all()
-                ->keyBy('key')
-                ->map(fn($setting) => [
-                    'value' => $setting->value,
-                    'type' => $setting->type,
-                ])
-                ->toArray();
+            return static::all()->keyBy('key')->map(fn($setting) =>
+            [
+                'value' => $setting->value,
+                'type' => $setting->type,
+            ])->toArray();
         });
 
         if (! isset($settings[$key])) {

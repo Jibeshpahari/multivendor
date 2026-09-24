@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\SettingKey;
 use App\Http\Controllers\Controller;
 use App\Models\Admin\TaskNote;
 use App\Models\Admin\TaskNoteTopic;
@@ -33,14 +34,17 @@ class NoteController extends Controller
             ->when($request->filled('from'), fn($q) => $q->whereDate('created_at', '>=', $request->from))
             ->when($request->filled('to'), fn($q) => $q->whereDate('created_at', '<=', $request->to))
             ->orderByDesc('created_at')
-            ->paginate($request->integer('per_page', 20))
+            ->paginate($request->integer('per_page', setting(SettingKey::AdminPaginationPerPage)))
             ->withQueryString();
 
-        $notes->getCollection()->transform(function ($note) {
-            $note->is_overdue = $note->reminder_at
-                && $note->status !== 'done'
-                && Carbon::parse($note->reminder_at)->isPast();
-            return $note;
+        $grouped = $notes->getCollection()->groupBy(function ($note) {
+            if ($note->created_at->isToday()) {
+                return 'Today';
+            }
+            if ($note->created_at->isYesterday()) {
+                return 'Yesterday';
+            }
+            return $note->created_at->format('F j, Y');
         });
 
         $counts = [
@@ -54,8 +58,7 @@ class NoteController extends Controller
         ];
 
         $filters = $request->only(['topic', 'status', 'priority', 'q', 'from', 'to']);
-
-        return view('admin.tasknote.index', compact('title', 'nav', 'topics', 'notes', 'counts', 'filters'));
+        return view('admin.tasknote.index', compact('title', 'nav', 'topics', 'notes', 'grouped', 'counts', 'filters'));
     }
 
     public function save(Request $request, $id = null)

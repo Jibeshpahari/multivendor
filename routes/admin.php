@@ -46,6 +46,7 @@ Route::controller(VendorController::class)->prefix('vendors')->name('vendors.')-
 Route::controller(SiteSettingsController::class)->prefix('settings')->name('settings.')->group(function () {
     Route::get('site-settings', 'index')->name('site-settings');
     Route::post('/settings/site-identity', 'storeSiteSettings')->name('site-setting.store');
+    Route::post('/save/pagination', 'savePagination')->name('save.pagination');
     // Route::put('/settings/site-identity/{setting}', 'updateSiteIdentity')->name('site-identity.update');
 });
 

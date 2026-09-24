@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\SettingKey;
 use App\Exports\CategoriesExport;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
@@ -32,7 +33,7 @@ class CategoryController extends Controller
                     default     => $query->orderByDesc('updated_at'),
                 }
             )
-            ->paginate($request->integer('per_page', 20));
+            ->paginate($request->integer('per_page', setting(SettingKey::AdminPaginationPerPage)));
 
             // dd($categories);
         return view('admin.category.index', compact('title', 'nav', 'categories'));
