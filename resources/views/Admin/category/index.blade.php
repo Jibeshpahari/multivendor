@@ -40,6 +40,10 @@
             background: #b6d4fe;
             border-color: #6ea8fe;
         }
+
+        #content {
+            padding-bottom: 20px;
+        }
     </style>
 @endpush
 
@@ -86,37 +90,19 @@
     <div class="card p-3">
         <div class="card-header py-3 px-0 pt-0">
             <div class="text-end">
-                <a href="{{ route('admin.categories.export') }}" class="btn btn-secondary btn-sm" id="exportBtn">Export
-                    All</button>
+                <button type="button" class="btn btn-secondary bg-secondary-gradient btn-sm" id="exportBtn">
+                    <i class="fa-regular fa-file-excel"></i>
+                    Export All
+                </button>
 
-                    <a href="{{ route('admin.categories.add') }}" class="btn btn-primary bg-primary-gradient btn-sm">
-                        <i class="fa-solid fa-plus me-1"></i>
-                        Add Category
-                    </a>
+                <a href="{{ route('admin.categories.add') }}" class="btn btn-primary bg-primary-gradient btn-sm">
+                    <i class="fa-solid fa-plus me-1"></i>
+                    Add Category
+                </a>
             </div>
         </div>
 
         <div class="card-body px-0 py-3">
-            {{-- Bulk Edit Bar --}}
-            <div class="bg-dark text-white rounded-3 mb-3 bulk-bar d-flex justify-conent-between d-none" id="bulkBar">
-                <div class="align-content-center">
-                    <span class="me-auto fw-semibold bulk-count" id="bulkCount"></span>
-                </div>
-                <div class="btn-group ms-auto" role="group" aria-label="Bulk actions">
-                    <button class="btn btn-sm btn-dark bulk-archive">
-                        <i class="fa-solid fa-box-archive"></i> Archive
-                    </button>
-                    <button class="btn btn-sm btn-dark bulk-export" id="exporAlltBtn">
-                        <i class="fa-solid fa-file-export"></i> Export All
-                    </button>
-                    <button class="btn btn-sm btn-danger bulk-delete">
-                        <i class="fa-solid fa-trash"></i> Delete
-                    </button>
-                    <button class="btn btn-sm btn-link text-white text-decoration-underline" id="bulkClear"> Clear
-                    </button>
-                </div>
-            </div>
-
             <table class="table table-bordered table-hover align-middle mb-0" id="categoryTable">
                 <thead>
                     <tr>
@@ -178,15 +164,13 @@
                                         <li>
                                             <a class="do-item do-item--edit edit-action"
                                                 href="{{ route('admin.categories.edit', $cate) }}" data-id="1">
-                                                <span class="do-badge do-badge--edit"><i
-                                                        class="fa-solid fa-pen"></i></span>
+                                                <span class="do-badge do-badge--edit"><i class="fa-solid fa-pen"></i></span>
                                                 <span>Edit</span>
                                             </a>
                                         </li>
                                         <li>
                                             <a class="do-item edit-action" href="#" data-id="1">
-                                                <span class="do-badge do-badge--edit"><i
-                                                        class="fa-solid fa-pen"></i></span>
+                                                <span class="do-badge do-badge--edit"><i class="fa-solid fa-pen"></i></span>
                                                 <span>Edit</span>
                                                 {{-- #eff4ff --}}
                                             </a>
@@ -213,6 +197,26 @@
 
         <div class="card-footer py-3">
             @include('admin.layout.components.pagination', ['items' => $categories])
+        </div>
+    </div>
+
+    {{-- Bulk Edit Bar --}}
+    <div class="bg-dark text-white rounded-3 bulk-bar d-flex justify-conent-between d-none" id="bulkBar">
+        <div class="align-content-center">
+            <span class="me-auto fw-semibold bulk-count" id="bulkCount"></span>
+        </div>
+        <div class="btn-group ms-auto" role="group" aria-label="Bulk actions">
+            <button class="btn btn-sm btn-dark bulk-archive">
+                <i class="fa-solid fa-box-archive"></i> Archive
+            </button>
+            <button class="btn btn-sm btn-dark bulk-export" id="exporAlltBtn">
+                <i class="fa-solid fa-file-export"></i> Export Selected
+            </button>
+            <button class="btn btn-sm btn-danger bulk-delete">
+                <i class="fa-solid fa-trash"></i> Delete
+            </button>
+            <button class="btn btn-sm btn-link text-white text-decoration-underline" id="bulkClear"> Clear
+            </button>
         </div>
     </div>
 
@@ -340,51 +344,49 @@
             });
         });
 
-        $(document).on('click', '#exporAlltBtn', function() {
-            const $btn = $(this);
-            const slugs = $('.row-checkbox:checked').map(function() {
-                return $(this).data('slug');
-            }).get();
-
-            if (slugs.length === 0) {
-                alert('Please select at least one category to export.');
-                return;
-            }
-
-            $btn.prop('disabled', true);
-
+        function exportCategories(slugs) {
             $.ajax({
                 url: "{{ route('admin.categories.export') }}",
                 method: 'POST',
                 data: {
-                    slugs: slugs
+                    slugs
                 },
                 xhrFields: {
                     responseType: 'blob'
                 },
                 success: function(data, status, xhr) {
                     const disposition = xhr.getResponseHeader('Content-Disposition');
-                    let filename = 'export.csv';
-                    if (disposition && disposition.indexOf('filename=') !== -1) {
-                        filename = disposition.split('filename=')[1].replace(/["']/g, '').trim();
-                    }
+                    const filename = disposition?.split('filename=')[1]?.replace(/["']/g, '').trim() ||
+                        'categories.xlsx';
 
-                    const blob = new Blob([data]);
                     const link = document.createElement('a');
-                    link.href = window.URL.createObjectURL(blob);
+                    link.href = URL.createObjectURL(new Blob([data]));
                     link.download = filename;
-                    document.body.appendChild(link);
                     link.click();
-                    link.remove();
+                    URL.revokeObjectURL(link.href);
+
+                    notify('success', 'Export downloaded', 'toast');
                 },
                 error: function(xhr) {
-                    alert('Export failed. Please try again.');
-                    console.error(xhr.responseText);
-                },
-                complete: function() {
-                    $btn.prop('disabled', false);
+                    new Response(xhr.responseText || xhr.response).text().then(text => {
+                        let msg = 'Could not export categories';
+                        try {
+                            msg = JSON.parse(text).message || msg;
+                        } catch (e) {}
+                        notify('error', msg, 'toast');
+                    });
                 }
             });
+        }
+
+        $(document).on('click', '#exportBtn', function() {
+            exportCategories([]);
+        });
+
+        $(document).on('click', '#exporAlltBtn', function() {
+            const slugs = $('.row-checkbox:checked').map((_, el) => $(el).data('slug')).get();
+            if (!slugs.length) return notify('error', 'Please select at least one category to export.', 'toast');
+            exportCategories(slugs);
         });
     </script>
 @endpush

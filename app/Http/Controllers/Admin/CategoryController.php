@@ -170,7 +170,8 @@ class CategoryController extends Controller
 
     public function export(Request $request)
     {
-        $slugs = $request->input('slugs');
+        $slugs = $request->input('slugs', []);
+        $slugs = is_array($slugs) ? $slugs : [];
 
         return Excel::download(new CategoriesExport($slugs), 'categories-' . now()->format('Y-m-d') . '.xlsx');
     }
