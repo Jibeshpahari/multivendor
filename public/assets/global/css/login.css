@@ -157,8 +157,8 @@ body {
 .custom-check input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
-    width: 17px;
-    height: 17px;
+    width: 18px;
+    height: 18px;
     background: #f9fafb;
     border: 1.5px solid #d1d5db;
     border-radius: 5px;
@@ -176,8 +176,8 @@ body {
 .custom-check input:checked::after {
     content: '';
     position: absolute;
-    left: 5px;
-    top: 1.5px;
+    left: 6px;
+    top: 2px;
     width: 5px;
     height: 9px;
     border: 2px solid #fff;
