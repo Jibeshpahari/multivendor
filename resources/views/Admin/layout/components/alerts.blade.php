@@ -1,5 +1,5 @@
 <div class="toast-strip" id="toastStrip"></div>
-
+ 
 <div class="alert-overlay" id="alertOverlay">
     <div class="alert-popup" id="alertPopup"></div>
 </div>

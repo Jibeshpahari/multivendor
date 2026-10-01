@@ -14,7 +14,7 @@
 
 body {
     font-family: var(--font-body);
-    background: #ffffff;
+    background: #efefe8;
     color: #111111;
     min-height: 100vh;
     display: flex;
@@ -25,7 +25,9 @@ body {
 
 .login-card {
     width: 100%;
-    max-width: 420px;
+    max-width: 480px;
+    padding: 30px;
+    box-shadow: 0px 0px 5px #00000020;
 }
 
 .card-header-text {
@@ -157,8 +159,8 @@ body {
 .custom-check input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
-    width: 18px;
-    height: 18px;
+    width: 17px;
+    height: 17px;
     background: #f9fafb;
     border: 1.5px solid #d1d5db;
     border-radius: 5px;
@@ -176,8 +178,8 @@ body {
 .custom-check input:checked::after {
     content: '';
     position: absolute;
-    left: 6px;
-    top: 2px;
+    left: 5px;
+    top: 1.5px;
     width: 5px;
     height: 9px;
     border: 2px solid #fff;
@@ -333,5 +335,180 @@ body {
 @keyframes spin {
     to {
         transform: rotate(360deg);
+    }
+}
+
+/* =====================================================
+   Forgot password / OTP / Reset password pages
+   ===================================================== */
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #333;
+    text-decoration: none;
+    margin-bottom: 1.75rem;
+    transition: color 0.15s;
+}
+
+.back-link:hover {
+    color: #111111;
+    text-decoration: underline;
+}
+
+.card-header-text p strong {
+    color: #111111;
+    font-weight: 600;
+}
+
+.alert-success-custom {
+    background: rgba(34, 197, 94, 0.08);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    border-radius: var(--radius-input);
+    color: #15803d;
+    font-size: 0.85rem;
+    padding: 0.7rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 1.25rem;
+}
+
+.field-error {
+    color: #dc2626;
+    font-size: 0.8rem;
+    margin-top: 0.4rem;
+}
+
+/* OTP boxes */
+.otp-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+}
+
+.otp-input {
+    width: 100%;
+    aspect-ratio: 1 / 1.1;
+    text-align: center;
+    background: #f9fafb;
+    border: 1.5px solid #e5e7eb;
+    border-radius: var(--radius-input);
+    color: #111111;
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 700;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    caret-color: #111111;
+}
+
+.otp-input:focus {
+    border-color: #111111;
+    background: #ffffff;
+}
+
+.otp-input.filled {
+    border-color: #111111;
+    background: #ffffff;
+}
+
+.otp-input.error {
+    border-color: #dc2626;
+    background: rgba(248, 113, 113, 0.06);
+}
+
+.resend-row {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #333;
+    margin-top: 1.5rem;
+}
+
+.resend-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    font-weight: 600;
+    color: #111111;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+}
+
+.resend-btn:disabled {
+    color: #9ca3af;
+    text-decoration: none;
+    cursor: default;
+}
+
+/* Password strength */
+.strength {
+    display: flex;
+    gap: 6px;
+    margin-top: 0.6rem;
+}
+
+.strength span {
+    flex: 1;
+    height: 4px;
+    border-radius: 4px;
+    background: #e5e7eb;
+    transition: background 0.2s;
+}
+
+.strength[data-level="1"] span:nth-child(-n+1) {
+    background: #dc2626;
+}
+
+.strength[data-level="2"] span:nth-child(-n+2) {
+    background: #f59e0b;
+}
+
+.strength[data-level="3"] span:nth-child(-n+3) {
+    background: #84cc16;
+}
+
+.strength[data-level="4"] span:nth-child(-n+4) {
+    background: #16a34a;
+}
+
+.strength-text {
+    font-size: 0.78rem;
+    color: #333;
+    margin-top: 0.4rem;
+    min-height: 1.1em;
+}
+
+.pw-rules {
+    list-style: none;
+    margin: 0.75rem 0 0;
+    padding: 0;
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.pw-rules li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 0.25rem;
+}
+
+.pw-rules li.ok {
+    color: #15803d;
+}
+
+@media (max-width: 380px) {
+    .otp-grid {
+        gap: 6px;
+    }
+
+    .otp-input {
+        font-size: 1.15rem;
     }
 }

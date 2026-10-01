@@ -1127,8 +1127,8 @@ body.collapsed #main {
     border: 1px solid #d9dae2;
     border-radius: 5px;
     padding: 12px 16px 12px 22px;
-    min-width: 320px;
-    max-width: 400px;
+    min-width: 330px;
+    max-width: 420px;
     display: flex;
     align-items: center;
     gap: 12px;
@@ -1174,14 +1174,14 @@ body.collapsed #main {
 }
 
 .toast-title {
-    font-size: 13px;
+    font-size: 13.5px;
     font-weight: 600;
     color: #111;
     margin-bottom: 1px
 }
 
 .toast-msg {
-    font-size: 12px;
+    font-size: 12.5px;
     color: #8c8fa5
 }
 
