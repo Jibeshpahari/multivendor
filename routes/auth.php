@@ -13,5 +13,5 @@ Route::controller(AuthController::class)->group(function () {
     Route::get('admin/verify-otp', 'adminVerifyOtpView')->name('admin.verify-otp.view');
     Route::post('admin/verify-otp', 'adminVerifyOtpPost')->name('admin.verify-otp.post');
     Route::get('admin/reset-password', 'adminResetPasswordView')->name('admin.reset-password.view');
-    Route::Post('admin/reset-password', 'adminResetPasswordPost')->name('admin.reset-password.Post');
+    Route::Post('admin/reset-password', 'adminResetPasswordPost')->name('admin.reset-password.post');
 });

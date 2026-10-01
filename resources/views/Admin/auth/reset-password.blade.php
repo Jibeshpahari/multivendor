@@ -17,7 +17,7 @@
             <p>Your code is <strong>verified</strong>. Choose a strong password you haven't used before.</p>
         </div>
 
-        <form id="resetForm" action="#" method="POST" novalidate>
+        <form id="resetForm" action="{{ route('admin.reset-password.post') }}" method="POST" novalidate>
             @csrf
 
             <div class="form-group">

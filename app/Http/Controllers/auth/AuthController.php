@@ -64,7 +64,10 @@ class AuthController extends Controller
     public function adminForgotPasswordPost(Request $request)
     {
         $validated = $request->validate([
-            'email' => ['required', 'email', Rule::exists('users', 'email')->where(function ($query) {
+            'email' => [
+                'required',
+                'email',
+                Rule::exists('users', 'email')->where(function ($query) {
                     $query->where('role', 'admin');
                 }),
             ]
@@ -73,7 +76,7 @@ class AuthController extends Controller
         $admin = User::where('email', $validated['email'])->where('role', 'admin')->first();
         $otp = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
-        Otp::where('identifier', $validated['email'])->delete(); 
+        Otp::where('identifier', $validated['email'])->delete();
 
         Otp::create([
             'identifier' => $validated['email'],
@@ -88,7 +91,8 @@ class AuthController extends Controller
         return redirect()->route('admin.verify-otp.view')->with('success', 'We sent a 6-digit code to your email.');
     }
 
-    public function adminVerifyOtpView() {
+    public function adminVerifyOtpView()
+    {
         $email = session('admin_reset_email');
         return view('admin.auth.verify-otp', compact('email'));
     }
@@ -110,9 +114,7 @@ class AuthController extends Controller
 
         $otpRecord = Otp::where('identifier', $email)->latest()->first();
 
-        // dd($otpRecord->expires_at);
-
-        if($otpRecord->expires_at < now()){
+        if ($otpRecord->expires_at < now()) {
             return back()->withErrors(['otp' => 'The OTP has expired.'])->withInput();
         }
         if (!$otpRecord || !Hash::check((string) $request->input('otp'), $otpRecord->otp)) {
@@ -126,7 +128,42 @@ class AuthController extends Controller
     }
 
 
-    public function adminResetPasswordView() {
+    public function adminResetPasswordView()
+    {
         return view('admin.auth.reset-password');
+    }
+
+    public function adminResetPasswordPost(Request $request)
+    {
+        if (!session('admin_reset_email') || !session('admin_reset_otp_verified')) {
+            return redirect()->route('admin.forgot-password.view')
+                ->withErrors(['error' => 'Your password reset session has expired.']);
+        }
+
+        $validated = $request->validate([
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ], [
+            'password.required' => 'Password is required.',
+            'password.min' => 'Password must be at least 8 characters.',
+            'password.confirmed' => 'Password confirmation does not match.',
+        ]);
+
+        $admin = User::where('email', session('admin_reset_email'))
+            ->where('role', 'admin')
+            ->first();
+
+        if (!$admin) {
+            session()->forget(['admin_reset_email', 'admin_reset_otp_verified']);
+
+            return redirect()->route('admin.forgot-password.view')
+                ->withErrors(['error' => 'The password reset request is invalid.']);
+        }
+
+        $admin->update(['password' => Hash::make($validated['password'])]);
+        Otp::where('identifier', $admin->email)->delete();
+        session()->forget(['admin_reset_email', 'admin_reset_otp_verified']);
+
+        return redirect()->route('admin.login.view')
+            ->with('success', 'Your password has been reset successfully.');
     }
 }
