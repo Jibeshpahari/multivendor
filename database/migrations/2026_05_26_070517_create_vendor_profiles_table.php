@@ -13,43 +13,44 @@ return new class extends Migration
     {
         Schema::create('vendor_profiles', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid')->unique();
+            
             $table->foreignId('user_id')->unique()->constrained()->cascadeOnDelete();
 
-            // Store Info
             $table->string('store_name');
             $table->string('store_slug')->unique();
-            $table->text('store_description')->nullable();
             $table->string('store_logo')->nullable();
-            $table->string('store_banner')->nullable();
 
-            // Contact
+            $table->string('contact_role', 100)->nullable();
             $table->string('store_email')->nullable();
-            $table->string('store_phone')->nullable();
-            $table->string('store_address')->nullable();
-            $table->string('store_city')->nullable();
-            $table->string('store_country')->nullable();
+            $table->string('store_phone', 30)->nullable();
+            $table->string('alt_phone', 30)->nullable();
+            $table->string('whatsapp_number', 30)->nullable();
 
-            // Business
-            $table->string('business_name')->nullable();
-            $table->string('tax_number')->nullable();
+            $table->string('address_line')->nullable();
+            $table->string('city', 100)->nullable();
+            $table->string('state', 100)->nullable();
+            $table->string('postal_code', 20)->nullable();
+            $table->char('country', 2)->nullable();
 
-            // Status
-            $table->enum('status', ['pending', 'approved', 'rejected', 'suspended'])->default('pending');
-            $table->enum('verification_status', ['unverified', 'verified'])->default('unverified');
+            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
+            $table->boolean('is_active')->default(true);
 
-            // Ratings (cached for performance)
-            $table->decimal('rating', 3, 2)->default(0.00);
-            $table->unsignedInteger('total_reviews')->default(0);
-            $table->unsignedInteger('total_sales')->default(0);
+            $table->timestamp('approved_at')->nullable();
+            $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
 
-            // Commission (per vendor override)
-            $table->decimal('commission_rate', 5, 2)->nullable(); // null = use global default
+            $table->unsignedInteger('total_orders')->default(0);
+            $table->decimal('total_revenue', 12, 2)->default(0.00);
 
             $table->timestamps();
             $table->softDeletes();
+
+            $table->index('store_name');
+            $table->index(['status', 'created_at']);
+            $table->index(['status', 'store_name']);
+            $table->index('approved_by');
         });
     }
-
     /**
      * Reverse the migrations.
      */

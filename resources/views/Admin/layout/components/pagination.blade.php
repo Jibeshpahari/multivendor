@@ -107,7 +107,9 @@
     </div>
 @endif
 
+
 @once
+@push('js')
     <script>
         function pgChangePerPage(selectEl) {
             const url = new URL(window.location.href);
@@ -116,4 +118,5 @@
             window.location.href = url.toString();
         }
     </script>
+@endpush
 @endonce
