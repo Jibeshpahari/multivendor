@@ -1,23 +1,19 @@
 <div class="toast-strip" id="toastStrip"></div>
- 
+
 <div class="alert-overlay" id="alertOverlay">
     <div class="alert-popup" id="alertPopup"></div>
 </div>
 
-@if (session('success') || session('error') || session('warning') || session('info') || $errors->any())
+@if (session()->hasAny(['success', 'error', 'warning', 'info']))
     @push('js')
     <script>
         $(function () {
-            @if ($errors->any())
-                notify('error', @json($errors->first()), '{{ session('notify_mode', 'toast') }}');
-            @else
-                @php
-                    $flashType = collect(['success', 'error', 'warning', 'info'])
-                        ->first(fn ($t) => session()->has($t));
-                    $flashMode = session('notify_mode', 'toast');
-                @endphp
-                notify('{{ $flashType }}', @json(session($flashType)), '{{ $flashMode }}');
-            @endif
+            @php
+                $flashType = collect(['success', 'error', 'warning', 'info'])
+                    ->first(fn ($t) => session()->has($t));
+                $flashMode = session('notify_mode', 'toast');
+            @endphp
+            notify('{{ $flashType }}', @json(session($flashType)), '{{ $flashMode }}');
         });
     </script>
     @endpush

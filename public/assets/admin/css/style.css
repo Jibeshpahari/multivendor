@@ -1685,11 +1685,6 @@ body.collapsed #main {
     padding: .668rem 1rem
 }
 
-.form-check label,
-.form-group label {
-    font-size: 1.05rem !important
-}
-
 .status-toggle {
     position: relative;
     display: inline-flex;
@@ -2233,4 +2228,19 @@ table td .form-check-input[type="checkbox"]:focus-visible {
     color: #fff !important;
     background: #252525 !important;
     border-color: #252525 !important;
+}
+
+
+.form-select {
+    border: 2px solid #dee2e6;
+    padding: .6rem 1rem;
+}
+
+.form-label {
+    font-weight: 500;
+}
+
+.form-control:disabled,
+.form-control[readonly]{
+    opacity: 1 !important;
 }

@@ -347,7 +347,8 @@
         .product-badge.is-empty {
             background: #f3f4f6;
             border-color: #e5e7eb;
-            color: #6b7280;
+            /* color: #6b7280; */
+            color: #505050;
             cursor: default;
         }
 

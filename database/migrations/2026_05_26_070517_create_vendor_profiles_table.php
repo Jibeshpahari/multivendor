@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('vendor_profiles', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
-            
+
             $table->foreignId('user_id')->unique()->constrained()->cascadeOnDelete();
 
             $table->string('store_name');
@@ -33,22 +33,13 @@ return new class extends Migration
             $table->string('postal_code', 20)->nullable();
             $table->char('country', 2)->nullable();
 
-            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
-            $table->boolean('is_active')->default(true);
-
             $table->timestamp('approved_at')->nullable();
             $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
-
-            $table->unsignedInteger('total_orders')->default(0);
-            $table->decimal('total_revenue', 12, 2)->default(0.00);
 
             $table->timestamps();
             $table->softDeletes();
 
             $table->index('store_name');
-            $table->index(['status', 'created_at']);
-            $table->index(['status', 'store_name']);
-            $table->index('approved_by');
         });
     }
     /**

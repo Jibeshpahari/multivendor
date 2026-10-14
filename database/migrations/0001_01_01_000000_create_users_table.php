@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('avatar')->nullable();
             $table->rememberToken();
             $table->enum('role', ['admin', 'user', 'vendor'])->default('user');
-            $table->enum('status', ['active', 'inactive', 'banned', 'pending'])->default('active');
+            $table->enum('status', ['pending', 'active', 'rejected', 'suspended', 'banned'])->default('pending');
             $table->timestamps();
             $table->softDeletes();
         });

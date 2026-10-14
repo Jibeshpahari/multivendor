@@ -39,8 +39,8 @@ Route::controller(CategoryController::class)->prefix('product/categories')->name
 Route::controller(VendorController::class)->prefix('vendors')->name('vendors.')->group( function () {
     Route::get('/', 'index')->name('index');
     Route::get('/add', 'add')->name('add');
-    // Route::get('/edit/{category}', 'edit')->name('edit');
-    // Route::post('/save/{category?}', 'save')->name('save');
+    Route::get('/edit/{vendor}', 'edit')->name('edit');
+    Route::post('/save/{vendor?}', 'save')->name('save');
 });
 
 Route::controller(SiteSettingsController::class)->prefix('settings')->name('settings.')->group(function () {

@@ -1484,18 +1484,19 @@
             right: 14px;
             z-index: 5;
             display: flex;
+            flex-direction: column;
             gap: 2px;
         }
 
         .card-move-btn {
-            width: 26px;
-            height: 26px;
+            width: 24px;
+            height: 22px;
             display: flex;
             align-items: center;
             justify-content: center;
             border: none;
-            border-radius: 6px;
-            background: transparent;
+            border-radius: 5px;
+            background: linear-gradient(45deg, #0000001a, transparent);
             color: #a1a5ab;
             cursor: pointer;
         }
@@ -1528,7 +1529,7 @@
         .card-move-wrap--inline {
             position: static;
             flex-shrink: 0;
-            align-items: center;
+            justify-content: center;
             padding: 0 12px;
             border-left: 1px solid #eee;
         }
