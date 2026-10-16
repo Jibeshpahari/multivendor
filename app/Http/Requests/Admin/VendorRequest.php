@@ -5,6 +5,8 @@ namespace App\Http\Requests\Admin;
 use App\Models\VendorProfile;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class VendorRequest extends FormRequest
@@ -17,19 +19,10 @@ class VendorRequest extends FormRequest
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
-        $vendor = $this->route('vendor');
-        $isEdit = !empty($vendor);
-
-        $profile = $vendor instanceof VendorProfile ? $vendor : ($isEdit ? VendorProfile::withTrashed()->find($vendor) : null);
-
-        $profileId = $profile?->getKey();
+        /** @var VendorProfile|null $profile */
+        $profile = $this->route('vendor');
         $userId    = $profile?->user_id;
 
         return [
@@ -38,14 +31,11 @@ class VendorRequest extends FormRequest
             'email'           => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($userId),],
             'phone'           => ['nullable', 'string', 'max:20', 'regex:/^[0-9+\-\s()]+$/'],
             'avatar'          => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-            'status'          => ['required', Rule::in(['pending', 'active', 'rejected', 'suspended', 'banned'])],
-
+            'status'          => ['required', 'in:pending,active,rejected,suspended,banned'],
             // vendor_profiles table
             'store_name'      => ['required', 'string', 'max:255'],
-            'store_slug'      => ['nullable', 'string', 'max:255',
-                Rule::unique('vendor_profiles', 'store_slug')->ignore($profileId),
-            ],
-            'store_logo'      => [$isEdit ? 'nullable' : 'required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'store_slug'      => ['required', 'string', 'max:255', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/'],
+            'store_logo'      => [$profile ? 'nullable' : 'required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'contact_role'    => ['nullable', 'string', 'max:100'],
             'store_email'     => ['nullable', 'email', 'max:255'],
             'store_phone'     => ['nullable', 'string', 'max:20', 'regex:/^[0-9+\-\s()]+$/'],
@@ -55,7 +45,7 @@ class VendorRequest extends FormRequest
             'city'            => ['required', 'string', 'max:100'],
             'state'           => ['required', 'string', 'max:100'],
             'postal_code'     => ['required', 'string', 'max:20'],
-            'country'         => ['required', Rule::in(['IN', 'US', 'GB', 'AE', 'BD', 'NP'])],
+            'country'         => ['required', 'in:IN,US,GB,AE,BD,NP'],
         ];
     }
 
@@ -83,8 +73,27 @@ class VendorRequest extends FormRequest
         ];
     }
 
-    public function passedValidation(): void {
-            
 
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'store_slug' => Str::slug((string) $this->input('store_name')),
+        ]);
     }
+
+
+    public function validated($key = null, $default = null)
+    {
+        $data = parent::validated();
+
+        if (! $this->route('vendor')) {
+            $data['password'] = Hash::make(Str::random(16));
+            $data['role']     = 'vendor';
+        }
+
+        return $key ? data_get($data, $key, $default) : $data;
+    }
+
+
+    protected function passedValidation(): void {}
 }

@@ -67,11 +67,23 @@
                 </a>
             </li>
 
-            <li class="nav-item" data-tip="Customers">
-                <a href="#">
+            <li class="nav-item has-sub {{ isActive('admin.customers.*') ? 'active open' : '' }}" data-tip="Customers">
+                <a href="javascript:void(0)">
                     <span class="nav-icon"><i class="fa-solid fa-users"></i></span>
                     <span class="nav-text">Customers</span>
+                    <i class="fa-solid fa-chevron-right nav-arrow"></i>
                 </a>
+                <ul class="sub-menu {{ isActive('admin.customers.*') ? 'open' : '' }}">
+                    <li class="sub-item">
+                        <a href="{{ route('admin.customers.index') }}">Listing</a>
+                    </li>
+                    <li class="sub-item">
+                        <a href="">Add New</a>
+                    </li>
+                    <li class="sub-item">
+                        <a href="">Reports</a>
+                    </li>
+                </ul>
             </li>
 
             <li class="nav-item has-sub {{ isActive('admin.vendors.*') ? 'active open' : '' }}" data-tip="Vendors">
@@ -80,7 +92,6 @@
                     <span class="nav-text">Vendors</span>
                     <i class="fa-solid fa-chevron-right nav-arrow"></i>
                 </a>
-
                 <ul class="sub-menu {{ isActive('admin.vendors.*') ? 'open' : '' }}">
                     <li class="sub-item">
                         <a href="{{ route('admin.vendors.index') }}">Listing</a>

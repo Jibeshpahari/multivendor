@@ -7,7 +7,10 @@ use App\Http\Requests\Admin\VendorRequest;
 use App\Models\User;
 use App\Models\VendorProfile;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class VendorController extends Controller
 {
@@ -24,72 +27,74 @@ class VendorController extends Controller
         return view('admin.vendor.form');
     }
 
-    public function save(VendorRequest $request, $id = null)
+    public function save(VendorRequest $request, ?VendorProfile $vendor = null)
     {
-        $data = $request->validated();
+        $data   = $request->validated();
+        $isEdit = $vendor !== null;
+        $user   = $vendor?->user;
 
-        $user       = $id ? User::with('vendorProfile')->findOrFail($id) : null;
-        $oldLogo    = $user?->vendorProfile?->store_logo;
-        $newLogo    = null;
+        $oldLogo   = $vendor?->store_logo;
+        $oldAvatar = $user?->avatar;
+        $newLogo   = null;
+        $newAvatar = null;
 
         DB::beginTransaction();
 
         try {
-            // 1. Upload new logo if one was sent
             if ($request->hasFile('store_logo')) {
                 $newLogo = $request->file('store_logo')->store('vendors/logos', 'public');
             }
 
-            // 2. Split the data
-            $userData = [
-                'name'  => $data['name'],
-                'email' => $data['email'],
-            ];
+            if ($request->hasFile('avatar')) {
+                $newAvatar = $request->file('avatar')->store('vendors/avatars', 'public');
+            }
 
-            $profileData = Arr::except($data, ['name', 'email', 'store_logo']);
+            $userData = Arr::only($data, ['name', 'email', 'phone', 'status', 'password', 'role']);
 
-            // Only touch store_logo if a new file was uploaded
+            if ($newAvatar) {
+                $userData['avatar'] = $newAvatar;
+            }
+
+            $profileData = Arr::except($data, ['name', 'email', 'phone', 'avatar', 'status', 'password', 'role', 'store_logo']);
+
             if ($newLogo) {
                 $profileData['store_logo'] = $newLogo;
             }
 
-            // 3. Create or update
-            if ($user) {
+            if ($isEdit) {
                 $user->update($userData);
-                $user->vendorProfile()->update($profileData);
+                $vendor->update($profileData);
             } else {
-                $user = User::create($userData + [
-                    'password' => Hash::make(Str::random(16)),
-                    'role'     => 'vendor',
-                ]);
-                $user->vendorProfile()->create($profileData);
+                User::create($userData)->vendorProfile()->create($profileData);
             }
 
             DB::commit();
 
-            // 4. Delete the OLD logo only after a successful commit
-            if ($newLogo && $oldLogo) {
-                Storage::disk('public')->delete($oldLogo);
-            }
+            // Delete old images
+            if ($newLogo) $this->deleteFile($oldLogo);
+            if ($newAvatar) $this->deleteFile($oldAvatar);
 
-            return redirect()
-                ->route('admin.vendors.index')
-                ->with('success', $id ? 'Vendor updated successfully.' : 'Vendor created successfully.');
+            return back()->with('success', $isEdit ? 'Vendor updated successfully.' : 'Vendor created successfully.');
         } catch (\Throwable $th) {
             DB::rollBack();
 
-            // Remove the NEW upload, since the DB changes were rolled back
-            if ($newLogo) {
-                Storage::disk('public')->delete($newLogo);
-            }
+            $this->deleteFile($newLogo);
+            $this->deleteFile($newAvatar);
 
             Log::error('Vendor save failed: ' . $th->getMessage(), [
                 'trace' => $th->getTraceAsString(),
             ]);
 
-            return back()
-                ->withInput()
-                ->with('error', 'Something went wrong while saving the vendor.');
+            return back()->withInput()->with('error', 'Something went wrong while saving the vendor.');
         }
     }
+
+    private function deleteFile(?string $path): void
+    {
+        if ($path) {
+            Storage::disk('public')->delete($path);
+        }
+    }
+
+
 }
