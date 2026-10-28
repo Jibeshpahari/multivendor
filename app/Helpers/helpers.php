@@ -63,3 +63,16 @@ if (!function_exists('format_date')) {
     }
 }
 
+if (! function_exists('getStatusRing')) {
+    function getStatusRing(?string $status): string
+    {
+        return match (strtolower((string) $status)) {
+            'active'    => 'avatar-active',
+            'pending'   => 'avatar-pending',
+            'rejected'  => 'avatar-rejected',
+            'suspended' => 'avatar-suspended',
+            'banned'    => 'avatar-banned',
+            default     => '',
+        };
+    }
+}

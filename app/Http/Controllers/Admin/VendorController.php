@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\SettingKey;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\VendorRequest;
 use App\Models\User;
-use App\Models\VendorProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -14,11 +14,39 @@ use Illuminate\Support\Facades\Storage;
 
 class VendorController extends Controller
 {
-    public function index() {
-        return view('admin.vendor.index');
+    public function index(Request $request)
+    {
+        $title = 'Product Categories';
+        $nav = [];
+
+        $vendors = User::with('vendorProfile')
+            ->where('role', 'vendor')
+            ->when($request->filled('status'), fn($q) => $q->where('status', $request->status))
+            ->when($request->filled('sort_by'), fn($q) => match($request->sort_by) {
+                'date_asc'  => $q->orderBy('updated_at'),
+                'date_desc' => $q->orderByDesc('updated_at'),
+                'name_asc'  => $q->orderBy('name'),
+                'name_desc' => $q->orderByDesc('name'),
+            })->get()->toArray();
+            dd($vendors);
+            // ->paginate($request->integer('per_page', setting(SettingKey::AdminPaginationPerPage)));
+
+        return view('admin.vendor.index', compact('vendors'));
     }
 
-    public function add() {
+    public function details(User $vendor)
+    {
+        abort_unless($vendor->role === 'vendor', 404);
+
+        $vendor->load('vendorProfile');
+        $profile  = $vendor->vendorProfile;
+        $approver = $profile?->approved_by ? User::find($profile->approved_by) : null;
+
+        return view('admin.vendors.partials.contact-canvas', compact('vendor', 'profile', 'approver'));
+    }
+
+    public function add()
+    {
         return view('admin.vendor.form');
     }
 
@@ -27,14 +55,12 @@ class VendorController extends Controller
         return view('admin.vendor.form');
     }
 
-    public function save(VendorRequest $request, ?VendorProfile $vendor = null)
+    public function save(VendorRequest $request, ?User $vendor = null)
     {
-        $data   = $request->validated();
-        $isEdit = $vendor !== null;
-        $user   = $vendor?->user;
-
-        $oldLogo   = $vendor?->store_logo;
-        $oldAvatar = $user?->avatar;
+        $data      = $request->validated();
+        $profile   = $vendor?->vendorProfile;
+        $oldLogo   = $profile?->store_logo;
+        $oldAvatar = $vendor?->avatar;
         $newLogo   = null;
         $newAvatar = null;
 
@@ -61,20 +87,19 @@ class VendorController extends Controller
                 $profileData['store_logo'] = $newLogo;
             }
 
-            if ($isEdit) {
-                $user->update($userData);
-                $vendor->update($profileData);
+            if ($vendor) {
+                $vendor->update($userData);
+                $vendor->vendorProfile()->updateOrCreate([], $profileData);
             } else {
                 User::create($userData)->vendorProfile()->create($profileData);
             }
 
             DB::commit();
 
-            // Delete old images
-            if ($newLogo) $this->deleteFile($oldLogo);
+            if ($newLogo)   $this->deleteFile($oldLogo);
             if ($newAvatar) $this->deleteFile($oldAvatar);
 
-            return back()->with('success', $isEdit ? 'Vendor updated successfully.' : 'Vendor created successfully.');
+            return back()->with('success', $vendor ? 'Vendor updated successfully.' : 'Vendor created successfully.');
         } catch (\Throwable $th) {
             DB::rollBack();
 
@@ -95,6 +120,4 @@ class VendorController extends Controller
             Storage::disk('public')->delete($path);
         }
     }
-
-
 }

@@ -35,6 +35,7 @@ Route::controller(CategoryController::class)->prefix('product/categories')->name
 Route::controller(UserController::class)->prefix('customers')->name('customers.')->group( function () {
     Route::get('/', 'index')->name('index');
     Route::get('/add', 'add')->name('add');
+    Route::get('/details', 'add')->name('add');
     Route::get('/edit/{customers}', 'edit')->name('edit')->withTrashed();
     Route::post('/save/{customers?}', 'save')->name('save')->withTrashed();
 });
@@ -42,6 +43,7 @@ Route::controller(UserController::class)->prefix('customers')->name('customers.'
 Route::controller(VendorController::class)->prefix('vendors')->name('vendors.')->group( function () {
     Route::get('/', 'index')->name('index');
     Route::get('/add', 'add')->name('add');
+    Route::get('/details/{vendor}', 'details')->name('details');
     Route::get('/edit/{vendor}', 'edit')->name('edit')->withTrashed();
     Route::post('/save/{vendor?}', 'save')->name('save')->withTrashed();
 });

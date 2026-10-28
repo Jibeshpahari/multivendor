@@ -21,8 +21,11 @@
             padding: 10px 15px !important;
         }
 
-        /* ---------- Vendor cell ---------- */
-        /* Kaiadmin .avatar + status classes; only the ring colour and the rejected dot are custom */
+        #content {
+            padding-bottom: 80px;
+        }
+
+        /* ---------- Avatar with status ring ---------- */
         .avatar {
             position: relative;
             flex-shrink: 0;
@@ -36,266 +39,75 @@
             font-size: 14px;
         }
 
-        .avatar-away::before,
-        .avatar-offline::before,
-        .avatar-online::before,
-        .avatar-rejected:before {
-            width: 27%;
-            height: 27%;
-        }
+        .avatar-active    { --ring: #16a34a; }
+        .avatar-pending   { --ring: #f59e0b; }
+        .avatar-suspended { --ring: #9ca3af; }
+        .avatar-rejected  { --ring: #dc2626; }
+        .avatar-banned    { --ring: #7f1d1d; }
 
-        .avatar-online {
-            --ring: #16a34a;
-            /* box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--ring), 0 0 0 8px rgba(22, 163, 74, .16); */
-        }
-
-        .avatar-away {
-            --ring: #f59e0b;
-        }
-
-        .avatar-offline {
-            --ring: #9ca3af;
-        }
-
-        .avatar-rejected {
-            --ring: #dc2626;
-        }
-
-        .avatar-rejected:before {
+        .avatar-active::before,
+        .avatar-pending::before,
+        .avatar-suspended::before,
+        .avatar-rejected::before,
+        .avatar-banned::before {
             content: '';
             position: absolute;
             right: 0;
             bottom: 0;
+            width: 27%;
+            height: 27%;
             border-radius: 50%;
             border: 2px solid #fff;
-            background: #dc2626;
+            background: var(--ring);
         }
 
+        /* The avatar itself loads + opens the contact panel */
+        .avatar-trigger {
+            display: inline-flex;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform .15s;
+        }
+
+        .avatar-trigger .avatar {
+            display: inline-block;
+            transition: box-shadow .15s;
+        }
+
+        .avatar-trigger:hover,
+        .avatar-trigger:focus-visible {
+            transform: translateY(-1px);
+        }
+
+        .avatar-trigger:hover .avatar,
+        .avatar-trigger:focus-visible .avatar {
+            box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--ring), 0 6px 14px rgba(15, 23, 42, .28);
+        }
+
+        .avatar-trigger:focus-visible {
+            outline: 2px solid #c7d2fe;
+            outline-offset: 4px;
+        }
+
+        .avatar-trigger.is-loading {
+            cursor: progress;
+            opacity: .6;
+        }
+
+        /* ---------- Vendor cell ---------- */
         .vendor-name {
             font-weight: 600;
             line-height: 1.2;
         }
 
-        .vendor-meta {
-            font-size: 12px;
-            color: #6c757d;
-        }
-
-        /* ---------- Contact trigger ---------- */
-        .contact-trigger {
-            width: 22px;
-            height: 22px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid #c7d2fe;
-            border-radius: 8px;
-            background: #eef2ff;
-            color: #4338ca;
-            font-size: 14px;
-            transition: background .15s, color .15s, border-color .15s;
-        }
-
-        .vendor-name+.contact-trigger {
-            margin-left: -4px;
-        }
-
-        .contact-trigger:hover,
-        .contact-trigger:focus-visible {
-            background: #4338ca;
-            border-color: #4338ca;
-            color: #fff;
-        }
-
-        /* ---------- Contact side panel ---------- */
-        .contact-canvas {
-            width: 400px !important;
-            max-width: 100%;
-            background: #f6f7fb;
-        }
-
-        .contact-head {
-            position: relative;
-            padding: 22px 22px 56px;
-            color: #fff;
-            background: linear-gradient(135deg, #1e1b4b 0%, #3730a3 55%, #4f46e5 100%);
-        }
-
-        .contact-head .btn-close {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-        }
-
-
-        .contact-vendor {
-            font-size: 18px;
-            font-weight: 600;
-            line-height: 1.2;
-        }
-
-        .contact-sub {
-            font-size: 13px;
-            color: rgba(255, 255, 255, .75);
-        }
-
-
-        .contact-quick {
-            display: flex;
-            gap: 10px;
-            margin: -28px 22px 0;
-            position: relative;
-            z-index: 1;
-        }
-
-        .contact-quick a {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            padding: 10px 6px;
-            border-radius: 12px;
-            background: #fff;
-            font-size: 12px;
-            font-weight: 500;
-            text-decoration: none;
-            box-shadow: 0 4px 14px rgba(30, 27, 75, .12);
-            transition: transform .15s;
-        }
-
-        .contact-quick a:hover {
-            transform: translateY(-2px);
-        }
-
-        .contact-quick a i {
-            font-size: 16px;
-        }
-
-        .contact-quick .q-mail {
-            color: #1d4ed8;
-        }
-
-        .contact-quick .q-call {
-            color: #047857;
-        }
-
-        .contact-quick .q-wa {
-            color: #15803d;
-        }
-
-        .contact-section {
-            margin: 22px 22px 8px;
-            font-size: 13px;
-            font-weight: 600;
-            color: #4b5563;
-        }
-
-        .contact-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin: 0 22px 10px;
-            padding: 12px;
-            background: #fff;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-        }
-
-        .contact-item .ci-icon {
-            width: 38px;
-            height: 38px;
-            flex-shrink: 0;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 10px;
-            font-size: 15px;
-        }
-
-        .contact-item .ci-body {
-            min-width: 0;
-            flex: 1;
-        }
-
-        .contact-item .ci-label {
-            font-size: 11.5px;
-            color: #6b7280;
-            line-height: 1.2;
-        }
-
-        .contact-item .ci-value {
-            display: block;
-            font-size: 14px;
-            font-weight: 500;
-            color: #111827;
-            text-decoration: none;
-            word-break: break-word;
-        }
-
-        a.ci-value:hover {
-            text-decoration: underline;
-        }
-
-        .ci-copy {
-            border: 0;
-            background: transparent;
-            color: #9ca3af;
-            width: 30px;
-            height: 30px;
-            border-radius: 8px;
-        }
-
-        .ci-copy:hover {
-            background: #f3f4f6;
-            color: #374151;
-        }
-
-        .ci-copy.copied {
-            color: #059669;
-        }
-
-        .ci-indigo {
-            background: #e0e7ff;
-            color: #3730a3;
-        }
-
-        .ci-violet {
-            background: #ede9fe;
-            color: #6d28d9;
-        }
-
-        .ci-blue {
-            background: #dbeafe;
-            color: #1d4ed8;
-        }
-
-        .ci-green {
-            background: #d1fae5;
-            color: #047857;
-        }
-
-        .ci-teal {
-            background: #cffafe;
-            color: #0e7490;
-        }
-
-        .ci-lime {
-            background: #dcfce7;
-            color: #15803d;
-        }
-
-        .ci-amber {
-            background: #fef3c7;
-            color: #b45309;
-        }
-
         .order-icon {
             color: saddlebrown;
-            /* alternatives: darkmagenta, darkslategray, olive */
         }
 
-        /* ---------- Product badge (icon chip + count) ---------- */
+        /* ---------- Product badge ---------- */
         .product-badge {
             display: inline-flex;
             align-items: center;
@@ -344,18 +156,6 @@
             background: #0a58ca;
         }
 
-        .product-badge.is-empty {
-            background: #f3f4f6;
-            border-color: #e5e7eb;
-            /* color: #6b7280; */
-            color: #505050;
-            cursor: default;
-        }
-
-        .product-badge.is-empty .pb-icon {
-            background: #cbd5e1;
-        }
-
         /* ---------- Bulk bar ---------- */
         .bulk-bar {
             position: fixed;
@@ -368,9 +168,152 @@
             box-shadow: 0 8px 24px rgba(0, 0, 0, .25);
         }
 
-        #content {
-            padding-bottom: 80px;
+        /* ---------- Contact panel (HTML is injected via AJAX) ---------- */
+        .contact-canvas {
+            width: 400px !important;
+            max-width: 100%;
+            background: #f6f7fb;
         }
+
+        .contact-head {
+            position: relative;
+            padding: 22px 22px 50px;
+            color: #1e2a4a;
+            background: linear-gradient(135deg, #c2eeff 0%, #a2c8e6 100%);
+        }
+
+        .contact-head .avatar {
+            --ring: #fff;
+            box-shadow: 0 0 0 3px #fff;
+        }
+
+        .contact-head .btn-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+        }
+
+        .contact-vendor {
+            font-size: 18px;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .contact-joined,
+        .contact-verified {
+            font-size: 12.5px;
+            color: #303030;
+        }
+
+        .contact-joined { margin-top: 6px; }
+        .contact-verified { margin-top: 4px; }
+
+        .contact-quick {
+            display: flex;
+            gap: 10px;
+            margin: -28px 22px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .contact-quick a {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 10px 6px;
+            border-radius: 12px;
+            background: #fff;
+            font-size: 12px;
+            font-weight: 500;
+            text-decoration: none;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, .12);
+            transition: transform .15s;
+        }
+
+        .contact-quick a:hover { transform: translateY(-2px); }
+        .contact-quick a i { font-size: 16px; }
+        .contact-quick .q-mail { color: #1d4ed8; }
+        .contact-quick .q-call { color: #047857; }
+        .contact-quick .q-wa { color: #15803d; }
+
+        .contact-section {
+            margin: 22px 22px 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #4b5563;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0 22px 10px;
+            padding: 12px;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+        }
+
+        .ci-icon {
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-size: 15px;
+        }
+
+        .ci-body {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .ci-label {
+            font-size: 11.5px;
+            color: #6b7280;
+            line-height: 1.2;
+        }
+
+        .ci-value {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #111827;
+            text-decoration: none;
+            word-break: break-word;
+        }
+
+        a.ci-value:hover { text-decoration: underline; }
+
+        .ci-copy {
+            border: 0;
+            background: transparent;
+            color: #9ca3af;
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+        }
+
+        .ci-copy:hover {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .ci-copy.copied,
+        .ci-copy.copied i { color: #16a34a; }
+        .ci-copy.copied i { font-size: 16px; }
+
+        .ci-indigo { background: #e0e7ff; color: #3730a3; }
+        .ci-violet { background: #ede9fe; color: #6d28d9; }
+        .ci-blue   { background: #dbeafe; color: #1d4ed8; }
+        .ci-green  { background: #d1fae5; color: #047857; }
+        .ci-teal   { background: #cffafe; color: #0e7490; }
+        .ci-lime   { background: #dcfce7; color: #15803d; }
+        .ci-amber  { background: #fef3c7; color: #b45309; }
     </style>
 @endpush
 
@@ -381,14 +324,16 @@
             <div class="row g-2">
                 <div class="col-md-2 col-6">
                     <select class="form-select" name="status" id="status">
-                        <option value="" disabled selected hidden>Status</option>
-                        <option value="approved">Approved</option>
-                        <option value="pending_approval">Pending</option>
+                        <option value="" selected>All</option>
+                        <option value="pending">Pending</option>
+                        <option value="active">Active</option>
                         <option value="rejected">Rejected</option>
+                        <option value="suspended">Suspended</option>
+                        <option value="banned">Banned</option>
                     </select>
                 </div>
                 <div class="col-md-2 col-6">
-                    <select class="form-select" name="date_sort" id="sort">
+                    <select class="form-select" name="sort_by" id="sort_by">
                         <option value="" disabled selected hidden>Sort By</option>
                         <option value="date_asc">Date (Oldest First)</option>
                         <option value="date_desc">Date (Newest First)</option>
@@ -418,17 +363,15 @@
     <div class="card p-3">
         <div class="card-header py-3 px-0 pt-0">
             <div class="text-end">
-                <div>
-                    <button type="button" class="btn btn-secondary bg-secondary-gradient btn-sm" id="exportBtn">
-                        <i class="fa-regular fa-file-excel"></i>
-                        Export All
-                    </button>
+                <button type="button" class="btn btn-secondary bg-secondary-gradient btn-sm" id="exportBtn">
+                    <i class="fa-regular fa-file-excel"></i>
+                    Export All
+                </button>
 
-                    <a href="{{ route('admin.vendors.add') }}" class="btn btn-primary bg-primary-gradient btn-sm">
-                        <i class="fa-solid fa-plus me-1"></i>
-                        Add Vendor
-                    </a>
-                </div>
+                <a href="{{ route('admin.vendors.add') }}" class="btn btn-primary bg-primary-gradient btn-sm">
+                    <i class="fa-solid fa-plus me-1"></i>
+                    Add Vendor
+                </a>
             </div>
         </div>
 
@@ -447,449 +390,100 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr data-name="Green Basket Traders">
-                            <td><input type="checkbox" class="form-check-input row-checkbox" data-id="1"></td>
-                            <td>
-                                <div class="d-flex align-items-center gap-3">
-                                    <div class="avatar avatar-online" title="Active"><span class="avatar-title rounded-circle" style="background:#198754;">GB</span></div>
-                                    <div>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="vendor-name">Green Basket Traders</div>
-                                            <button type="button" class="contact-trigger" data-bs-toggle="offcanvas"
-                                                data-bs-target="#contactCanvas" title="View contact details"
-                                                aria-label="View contact details for Anita Sharma"
-                                                data-vendor="Green Basket Traders" data-initials="GB" data-color="#198754"
-                                                data-status="Approved" data-status-class="approved"
-                                                data-person="Anita Sharma" data-role="Owner"
-                                                data-personal-email="anita.sharma@gmail.com" data-org-email="anita@greenbasket.in"
-                                                data-phone="+91 98300 12345" data-alt-phone="+91 33 4001 2200"
-                                                data-whatsapp="+91 98300 12345" data-address="12 Park Street, Kolkata, West Bengal 700016">
-                                                <i class="fa-solid fa-address-card"></i>
-                                            </button>
+                        @forelse ($vendors as $vendor)
+                            <tr data-name="{{ $vendor->name }}">
+                                <td>
+                                    <input type="checkbox" class="form-check-input row-checkbox"
+                                        data-id="{{ $vendor->id }}">
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <button type="button" class="avatar-trigger js-contact-trigger"
+                                            data-url="{{ '' }}"
+                                            title="{{ ucfirst($vendor->status) }} &middot; View contact details"
+                                            aria-label="View contact details for {{ $vendor->name }}">
+                                            <span class="avatar {{ getStatusRing($vendor->status) }}">
+                                                <span class="avatar-title rounded-circle">
+                                                    {{ strtoupper(substr($vendor->name ?? 'V', 0, 2)) }}
+                                                </span>
+                                            </span>
+                                        </button>
+                                        <div>
+                                            <div class="vendor-name">{{ $vendor->name }}</div>
+                                            <a href="{{ '' }}" class="product-badge" title="View products">
+                                                <span class="pb-icon"><i class="fa-solid fa-box"></i></span>
+                                                <span class="pb-count">{{ $vendor->products_count ?? 0 }}</span>
+                                                <span>products</span>
+                                            </a>
                                         </div>
-                                        <a href="{{ '' }}" class="product-badge" title="View products">
-                                            <span class="pb-icon"><i class="fa-solid fa-box"></i></span>
-                                            <span class="pb-count">48</span><span>products</span>
-                                        </a>
                                     </div>
-                                </div>
-                            </td>
-                            <td>
-                                <div title="Avg. order $36.49">
-                                    <div class="fw-bold fs-6">
-                                        $12,480
+                                </td>
+                                <td>
+                                    <div class="fw-bold fs-6">${{ number_format($vendor->revenue ?? 0, 2) }}</div>
+                                    <div class="small text-muted">
+                                        <i class="fa-solid fa-bag-shopping order-icon me-1"></i>{{ $vendor->orders_count ?? 0 }} orders
                                     </div>
-                                    <div class="small text-muted"><i class="fa-solid fa-bag-shopping order-icon me-1"></i>342 orders</div>
-                                </div>
-                            </td>
-                            <td>4th Nov 2025</td>
-                            <td>
-                                <div class="dropdown-options dropdown text-center">
-                                    <button class="do-kebab-btn" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fa-solid fa-ellipsis-vertical"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end do-menu">
-                                        <li>
-                                            <a class="do-item do-item--amber flag-action" href="{{ '' }}">
-                                                <span class="do-badge do-badge--amber"><i class="fa-solid fa-eye"></i></span>
-                                                <span>View</span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="do-item do-item--edit edit-action" href="{{ '' }}">
-                                                <span class="do-badge do-badge--edit"><i class="fa-solid fa-pen"></i></span>
-                                                <span>Edit</span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <div class="do-divider"></div>
-                                        </li>
-                                        <li>
-                                            <a class="do-item do-item--delete delete-action" href="{{ '' }}">
-                                                <span class="do-badge do-badge--delete"><i class="fa-solid fa-trash"></i></span>
-                                                <span>Delete</span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <tr data-name="Kolkata Spice House">
-                            <td><input type="checkbox" class="form-check-input row-checkbox" data-id="2"></td>
-                            <td>
-                                <div class="d-flex align-items-center gap-3">
-                                    <div class="avatar avatar-online" title="Active"><span class="avatar-title rounded-circle" style="background:#d63384;">KS</span></div>
-                                    <div>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="vendor-name">Kolkata Spice House</div>
-                                            <button type="button" class="contact-trigger" data-bs-toggle="offcanvas"
-                                                data-bs-target="#contactCanvas" title="View contact details"
-                                                aria-label="View contact details for Rahul Dutta"
-                                                data-vendor="Kolkata Spice House" data-initials="KS" data-color="#d63384"
-                                                data-status="Approved" data-status-class="approved"
-                                                data-person="Rahul Dutta" data-role="Managing Partner"
-                                                data-personal-email="rahul.dutta@gmail.com" data-org-email="rahul@spicehouse.in"
-                                                data-phone="+91 98310 55421" data-alt-phone="+91 33 2245 8890"
-                                                data-whatsapp="+91 98310 55421" data-address="45 Burrabazar Road, Kolkata, West Bengal 700007">
-                                                <i class="fa-solid fa-address-card"></i>
-                                            </button>
-                                        </div>
-                                        <a href="{{ '' }}" class="product-badge" title="View products">
-                                            <span class="pb-icon"><i class="fa-solid fa-box"></i></span>
-                                            <span class="pb-count">126</span><span>products</span>
-                                        </a>
+                                </td>
+                                <td>{{ optional($vendor->created_at)->format('jS M Y') }}</td>
+                                <td>
+                                    <div class="dropdown-options dropdown text-center">
+                                        <button class="do-kebab-btn" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end do-menu">
+                                            <li>
+                                                <a class="do-item do-item--amber view-action" href="{{ '' }}">
+                                                    <span class="do-badge do-badge--amber"><i class="fa-solid fa-eye"></i></span>
+                                                    <span>View</span>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="do-item do-item--edit edit-action" href="{{ '' }}">
+                                                    <span class="do-badge do-badge--edit"><i class="fa-solid fa-pen"></i></span>
+                                                    <span>Edit</span>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <div class="do-divider"></div>
+                                            </li>
+                                            <li>
+                                                <a class="do-item do-item--delete delete-action" href="{{ '' }}">
+                                                    <span class="do-badge do-badge--delete"><i class="fa-solid fa-trash"></i></span>
+                                                    <span>Delete</span>
+                                                </a>
+                                            </li>
+                                        </ul>
                                     </div>
-                                </div>
-                            </td>
-                            <td>
-                                <div title="Avg. order $35.52">
-                                    <div class="fw-bold fs-6">
-                                        $28,950
-                                    </div>
-                                    <div class="small text-muted"><i class="fa-solid fa-bag-shopping order-icon me-1"></i>815 orders</div>
-                                </div>
-                            </td>
-                            <td>18th Sep 2025</td>
-                            <td>
-                                <div class="dropdown-options dropdown text-center">
-                                    <button class="do-kebab-btn" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fa-solid fa-ellipsis-vertical"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end do-menu">
-                                        <li>
-                                            <a class="do-item do-item--amber flag-action" href="{{ '' }}">
-                                                <span class="do-badge do-badge--amber"><i class="fa-solid fa-eye"></i></span>
-                                                <span>View</span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="do-item do-item--edit edit-action" href="{{ '' }}">
-                                                <span class="do-badge do-badge--edit"><i class="fa-solid fa-pen"></i></span>
-                                                <span>Edit</span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <div class="do-divider"></div>
-                                        </li>
-                                        <li>
-                                            <a class="do-item do-item--delete delete-action" href="{{ '' }}">
-                                                <span class="do-badge do-badge--delete"><i class="fa-solid fa-trash"></i></span>
-                                                <span>Delete</span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <tr data-name="Urban Loom Textiles">
-                            <td><input type="checkbox" class="form-check-input row-checkbox" data-id="3"></td>
-                            <td>
-                                <div class="d-flex align-items-center gap-3">
-                                    <div class="avatar avatar-away" title="Pending approval"><span class="avatar-title rounded-circle" style="background:#fd7e14;">UL</span></div>
-                                    <div>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="vendor-name">Urban Loom Textiles</div>
-                                            <button type="button" class="contact-trigger" data-bs-toggle="offcanvas"
-                                                data-bs-target="#contactCanvas" title="View contact details"
-                                                aria-label="View contact details for Meera Iyer"
-                                                data-vendor="Urban Loom Textiles" data-initials="UL" data-color="#fd7e14"
-                                                data-status="Pending" data-status-class="pending"
-                                                data-person="Meera Iyer" data-role="Founder"
-                                                data-personal-email="meera.iyer@outlook.com" data-org-email="meera@urbanloom.in"
-                                                data-phone="+91 98765 43210" data-alt-phone="+91 44 2811 7700"
-                                                data-whatsapp="+91 98765 43210" data-address="8 Anna Salai, Chennai, Tamil Nadu 600002">
-                                                <i class="fa-solid fa-address-card"></i>
-                                            </button>
-                                        </div>
-                                        <span class="product-badge is-empty">
-                                            <span class="pb-icon"><i class="fa-solid fa-box"></i></span>
-                                            <span>No products</span>
-                                        </span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <div title="No orders yet">
-                                    <div class="fw-bold fs-6 text-muted">
-                                        $0
-                                    </div>
-                                    <div class="small text-muted"><i class="fa-solid fa-bag-shopping order-icon me-1"></i>0 orders</div>
-                                </div>
-                            </td>
-                            <td>11th Feb 2026</td>
-                            <td>
-                                <div class="dropdown-options dropdown text-center">
-                                    <button class="do-kebab-btn" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fa-solid fa-ellipsis-vertical"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end do-menu">
-                                        <li>
-                                            <a class="do-item do-item--amber flag-action" href="{{ '' }}">
-                                                <span class="do-badge do-badge--amber"><i class="fa-solid fa-eye"></i></span>
-                                                <span>View</span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="do-item do-item--edit edit-action" href="{{ '' }}">
-                                                <span class="do-badge do-badge--edit"><i class="fa-solid fa-pen"></i></span>
-                                                <span>Edit</span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <div class="do-divider"></div>
-                                        </li>
-                                        <li>
-                                            <a class="do-item do-item--delete delete-action" href="{{ '' }}">
-                                                <span class="do-badge do-badge--delete"><i class="fa-solid fa-trash"></i></span>
-                                                <span>Delete</span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <tr data-name="Sunrise Electronics">
-                            <td><input type="checkbox" class="form-check-input row-checkbox" data-id="4"></td>
-                            <td>
-                                <div class="d-flex align-items-center gap-3">
-                                    <div class="avatar avatar-offline" title="Inactive"><span class="avatar-title rounded-circle" style="background:#0d6efd;">SE</span></div>
-                                    <div>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="vendor-name">Sunrise Electronics</div>
-                                            <button type="button" class="contact-trigger" data-bs-toggle="offcanvas"
-                                                data-bs-target="#contactCanvas" title="View contact details"
-                                                aria-label="View contact details for Sourav Ghosh"
-                                                data-vendor="Sunrise Electronics" data-initials="SE" data-color="#0d6efd"
-                                                data-status="Approved" data-status-class="approved"
-                                                data-person="Sourav Ghosh" data-role="Director"
-                                                data-personal-email="sourav.ghosh@gmail.com" data-org-email="sourav@sunrise.in"
-                                                data-phone="+91 97330 88120" data-alt-phone="+91 33 4015 6600"
-                                                data-whatsapp="+91 97330 88120" data-address="Sector V, Salt Lake, Kolkata, West Bengal 700091">
-                                                <i class="fa-solid fa-address-card"></i>
-                                            </button>
-                                        </div>
-                                        <a href="{{ '' }}" class="product-badge" title="View products">
-                                            <span class="pb-icon"><i class="fa-solid fa-box"></i></span>
-                                            <span class="pb-count">72</span><span>products</span>
-                                        </a>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <div title="Avg. order $144.44">
-                                    <div class="fw-bold fs-6">
-                                        $18,200
-                                    </div>
-                                    <div class="small text-muted"><i class="fa-solid fa-bag-shopping order-icon me-1"></i>126 orders</div>
-                                </div>
-                            </td>
-                            <td>23rd Dec 2025</td>
-                            <td>
-                                <div class="dropdown-options dropdown text-center">
-                                    <button class="do-kebab-btn" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fa-solid fa-ellipsis-vertical"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end do-menu">
-                                        <li>
-                                            <a class="do-item do-item--amber flag-action" href="{{ '' }}">
-                                                <span class="do-badge do-badge--amber"><i class="fa-solid fa-eye"></i></span>
-                                                <span>View</span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="do-item do-item--edit edit-action" href="{{ '' }}">
-                                                <span class="do-badge do-badge--edit"><i class="fa-solid fa-pen"></i></span>
-                                                <span>Edit</span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <div class="do-divider"></div>
-                                        </li>
-                                        <li>
-                                            <a class="do-item do-item--delete delete-action" href="{{ '' }}">
-                                                <span class="do-badge do-badge--delete"><i class="fa-solid fa-trash"></i></span>
-                                                <span>Delete</span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <tr data-name="Pixel Print Studio">
-                            <td><input type="checkbox" class="form-check-input row-checkbox" data-id="5"></td>
-                            <td>
-                                <div class="d-flex align-items-center gap-3">
-                                    <div class="avatar avatar-rejected" title="Rejected"><span class="avatar-title rounded-circle" style="background:#6f42c1;">PP</span></div>
-                                    <div>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="vendor-name">Pixel Print Studio</div>
-                                            <button type="button" class="contact-trigger" data-bs-toggle="offcanvas"
-                                                data-bs-target="#contactCanvas" title="View contact details"
-                                                aria-label="View contact details for Debjani Roy"
-                                                data-vendor="Pixel Print Studio" data-initials="PP" data-color="#6f42c1"
-                                                data-status="Rejected" data-status-class="rejected"
-                                                data-person="Debjani Roy" data-role="Proprietor"
-                                                data-personal-email="debjani.roy@yahoo.com" data-org-email="debjani@pixelprint.in"
-                                                data-phone="+91 98001 77654" data-alt-phone="+91 33 2466 1010"
-                                                data-whatsapp="+91 98001 77654" data-address="27 College Street, Kolkata, West Bengal 700073">
-                                                <i class="fa-solid fa-address-card"></i>
-                                            </button>
-                                        </div>
-                                        <a href="{{ '' }}" class="product-badge" title="View products">
-                                            <span class="pb-icon"><i class="fa-solid fa-box"></i></span>
-                                            <span class="pb-count">9</span><span>products</span>
-                                        </a>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <div title="Avg. order $47.86">
-                                    <div class="fw-bold fs-6">
-                                        $1,340
-                                    </div>
-                                    <div class="small text-muted"><i class="fa-solid fa-bag-shopping order-icon me-1"></i>28 orders</div>
-                                </div>
-                            </td>
-                            <td>7th Jan 2026</td>
-                            <td>
-                                <div class="dropdown-options dropdown text-center">
-                                    <button class="do-kebab-btn" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fa-solid fa-ellipsis-vertical"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end do-menu">
-                                        <li>
-                                            <a class="do-item do-item--amber flag-action" href="{{ '' }}">
-                                                <span class="do-badge do-badge--amber"><i class="fa-solid fa-eye"></i></span>
-                                                <span>View</span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="do-item do-item--edit edit-action" href="{{ '' }}">
-                                                <span class="do-badge do-badge--edit"><i class="fa-solid fa-pen"></i></span>
-                                                <span>Edit</span>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <div class="do-divider"></div>
-                                        </li>
-                                        <li>
-                                            <a class="do-item do-item--delete delete-action" href="{{ '' }}">
-                                                <span class="do-badge do-badge--delete"><i class="fa-solid fa-trash"></i></span>
-                                                <span>Delete</span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">No vendors found.</td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
         </div>
+
+        <div class="card-footer py-3">
+            @include('admin.layout.components.pagination', ['items' => $vendors])
+        </div>
+
     </div>
 
-    {{-- Contact side panel --}}
-    <div class="offcanvas offcanvas-end contact-canvas" tabindex="-1" id="contactCanvas"
-        aria-labelledby="contactTitle">
-        <div class="contact-head">
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"
-                aria-label="Close"></button>
-            <div class="d-flex align-items-center gap-3">
-                <div class="avatar avatar-xl"><span class="avatar-title rounded-circle" id="cAvatar"></span></div>
-                <div>
-                    <div class="contact-vendor" id="contactTitle"></div>
-                    <div class="contact-sub"><span id="cPerson"></span> &middot; <span id="cRole"></span></div>
-                </div>
-            </div>
-            <div class="mt-3"><span class="badge rounded-pill" id="cStatus"></span></div>
-        </div>
+    {{-- The server-rendered contact offcanvas is injected here --}}
+    <div id="contactCanvasHolder"></div>
 
-        <div class="contact-quick">
-            <a href="#" class="q-mail" id="qMail"><i class="fa-solid fa-envelope"></i>Email</a>
-            <a href="#" class="q-call" id="qCall"><i class="fa-solid fa-phone"></i>Call</a>
-            <a href="#" class="q-wa" id="qWa" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i>WhatsApp</a>
-        </div>
-
-        <div class="offcanvas-body p-0 pb-4">
-            <div class="contact-section">Contact person</div>
-            <div class="contact-item" data-item="person">
-                <span class="ci-icon ci-indigo"><i class="fa-solid fa-user-tie"></i></span>
-                <div class="ci-body">
-                    <div class="ci-label" id="cPersonLabel"></div>
-                    <span class="ci-value" data-field="person"></span>
-                </div>
-                <button type="button" class="ci-copy" title="Copy" aria-label="Copy name"><i class="fa-regular fa-copy"></i></button>
-            </div>
-
-            <div class="contact-section">Email</div>
-        <div class="contact-item" data-item="personalEmail">
-            <span class="ci-icon ci-violet"><i class="fa-solid fa-user"></i></span>
-            <div class="ci-body">
-                <div class="ci-label">Personal email</div>
-                <a class="ci-value" href="#" data-field="personalEmail" data-link="mailto:"></a>
-            </div>
-            <button type="button" class="ci-copy" title="Copy" aria-label="Copy Personal email"><i class="fa-regular fa-copy"></i></button>
-        </div>
-        <div class="contact-item" data-item="orgEmail">
-            <span class="ci-icon ci-blue"><i class="fa-solid fa-building"></i></span>
-            <div class="ci-body">
-                <div class="ci-label">Organization email</div>
-                <a class="ci-value" href="#" data-field="orgEmail" data-link="mailto:"></a>
-            </div>
-            <button type="button" class="ci-copy" title="Copy" aria-label="Copy Organization email"><i class="fa-regular fa-copy"></i></button>
-        </div>
-
-            <div class="contact-section">Phone</div>
-        <div class="contact-item" data-item="phone">
-            <span class="ci-icon ci-green"><i class="fa-solid fa-mobile-screen"></i></span>
-            <div class="ci-body">
-                <div class="ci-label">Mobile</div>
-                <a class="ci-value" href="#" data-field="phone" data-link="tel:"></a>
-            </div>
-            <button type="button" class="ci-copy" title="Copy" aria-label="Copy Mobile"><i class="fa-regular fa-copy"></i></button>
-        </div>
-        <div class="contact-item" data-item="altPhone">
-            <span class="ci-icon ci-teal"><i class="fa-solid fa-phone-volume"></i></span>
-            <div class="ci-body">
-                <div class="ci-label">Alternate / office</div>
-                <a class="ci-value" href="#" data-field="altPhone" data-link="tel:"></a>
-            </div>
-            <button type="button" class="ci-copy" title="Copy" aria-label="Copy Alternate / office"><i class="fa-regular fa-copy"></i></button>
-        </div>
-        <div class="contact-item" data-item="whatsapp">
-            <span class="ci-icon ci-lime"><i class="fa-brands fa-whatsapp"></i></span>
-            <div class="ci-body">
-                <div class="ci-label">WhatsApp</div>
-                <span class="ci-value" data-field="whatsapp"></span>
-            </div>
-            <button type="button" class="ci-copy" title="Copy" aria-label="Copy WhatsApp"><i class="fa-regular fa-copy"></i></button>
-        </div>
-
-            <div class="contact-section">Address</div>
-        <div class="contact-item" data-item="address">
-            <span class="ci-icon ci-amber"><i class="fa-solid fa-location-dot"></i></span>
-            <div class="ci-body">
-                <div class="ci-label">Business address</div>
-                <span class="ci-value" data-field="address"></span>
-            </div>
-            <button type="button" class="ci-copy" title="Copy" aria-label="Copy Business address"><i class="fa-regular fa-copy"></i></button>
-        </div>
-        </div>
-    </div>
-
-    {{-- Bulk Edit Bar --}}
+    {{-- Bulk action bar --}}
     <div class="bg-dark text-white rounded-3 bulk-bar d-flex justify-content-between align-items-center d-none"
         id="bulkBar">
-        <span class="fw-semibold bulk-count" id="bulkCount"></span>
+        <span class="fw-semibold" id="bulkCount"></span>
         <div class="btn-group ms-auto" role="group" aria-label="Bulk actions">
             <button class="btn btn-sm btn-dark bulk-approve">
                 <i class="fa-solid fa-circle-check"></i> Approve
             </button>
-            <button class="btn btn-sm btn-dark bulk-export" id="exportSelectedBtn">
+            <button class="btn btn-sm btn-dark" id="exportSelectedBtn">
                 <i class="fa-solid fa-file-export"></i> Export Selected
             </button>
             <button class="btn btn-sm btn-danger bulk-delete">
@@ -900,13 +494,15 @@
     </div>
 @endsection
 
-
 @push('js')
     <script>
         $(function() {
-            const $table = $('#vendorTable');
-            const $tbody = $table.find('tbody');
+            const $tbody = $('#vendorTable tbody');
             const $bulkBar = $('#bulkBar');
+            const $holder = $('#contactCanvasHolder');
+
+            const selectedIds = () =>
+                $tbody.find('.row-checkbox:checked').map((_, el) => $(el).data('id')).get();
 
             /* ---------- Selection + bulk bar ---------- */
             function refreshBulkBar() {
@@ -932,70 +528,102 @@
                 refreshBulkBar();
             });
 
-            /* ---------- Contact side panel ---------- */
-            $('#contactCanvas').on('show.bs.offcanvas', function(e) {
-                const d = $(e.relatedTarget).data();
-                const digits = String(d.whatsapp).replace(/\D/g, '');
+            /* ---------- Contact panel: load via AJAX, then show ---------- */
+            let contactXhr = null;
 
-                $('#cAvatar').text(d.initials).css('background', d.color);
-                $('#contactTitle').text(d.vendor);
-                $('#cPerson').text(d.person);
-                $('#cRole').text(d.role);
-                $('#cPersonLabel').text(d.role);
-                const badgeMap = {
-                    approved: 'bg-success',
-                    pending: 'bg-warning text-dark',
-                    rejected: 'bg-danger'
-                };
-                $('#cStatus').attr('class', 'badge rounded-pill ' + badgeMap[d.statusClass]).text(d.status);
+            $tbody.on('click', '.js-contact-trigger', function() {
+                const $btn = $(this);
 
-                const values = {
-                    person: d.person,
-                    personalEmail: d.personalEmail,
-                    orgEmail: d.orgEmail,
-                    phone: d.phone,
-                    altPhone: d.altPhone,
-                    whatsapp: d.whatsapp,
-                    address: d.address
-                };
+                if (contactXhr) contactXhr.abort();
+                $btn.addClass('is-loading');
 
-                $.each(values, function(field, value) {
-                    const $item = $('[data-item="' + field + '"]');
-                    const $val = $item.find('[data-field]');
+                contactXhr = $.ajax({
+                        url: $btn.data('url'),
+                        method: 'GET',
+                        dataType: 'html'
+                    })
+                    .done(function(html) {
+                        $holder.html(html);
 
-                    $item.toggle(!!value);
-                    $val.text(value);
-                    if ($val.is('a')) {
-                        $val.attr('href', $val.data('link') + String(value).replace(/\s/g, ''));
+                        const el = $holder.find('.offcanvas')[0];
+                        if (!el) return;
+
+                        // Remove the panel from the DOM once it is closed
+                        el.addEventListener('hidden.bs.offcanvas', function() {
+                            bootstrap.Offcanvas.getInstance(el)?.dispose();
+                            $holder.empty();
+                        }, {
+                            once: true
+                        });
+
+                        bootstrap.Offcanvas.getOrCreateInstance(el).show();
+                    })
+                    .fail(function(xhr, status) {
+                        if (status === 'abort') return;
+                        console.error('Could not load contact details:', xhr.status);
+                        alert('Could not load contact details. Please try again.');
+                    })
+                    .always(function() {
+                        $btn.removeClass('is-loading');
+                    });
+            });
+
+            /* ---------- Copy buttons (delegated, panel is injected) ---------- */
+            const COPIED_MS = 3000;
+
+            function copyText(text, container) {
+                // Modern API (HTTPS / localhost)
+                if (navigator.clipboard && window.isSecureContext) {
+                    return navigator.clipboard.writeText(text);
+                }
+
+                // Fallback (http). The textarea must live inside the offcanvas,
+                // otherwise Bootstrap's focus trap steals focus and the copy fails.
+                return new Promise(function(resolve, reject) {
+                    const ta = document.createElement('textarea');
+                    ta.value = text;
+                    ta.setAttribute('readonly', '');
+                    ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;';
+                    container.appendChild(ta);
+                    ta.select();
+                    ta.setSelectionRange(0, text.length);
+
+                    try {
+                        document.execCommand('copy') ? resolve() : reject(new Error('Copy command failed'));
+                    } catch (err) {
+                        reject(err);
+                    } finally {
+                        ta.remove();
                     }
                 });
+            }
 
-                $('#qMail').attr('href', 'mailto:' + d.orgEmail);
-                $('#qCall').attr('href', 'tel:' + String(d.phone).replace(/\s/g, ''));
-                $('#qWa').attr('href', 'https://wa.me/' + digits);
-            });
-
-            $('#contactCanvas').on('click', '.ci-copy', function() {
+            $holder.on('click', '.ci-copy', function() {
                 const $btn = $(this);
-                const text = $btn.closest('.contact-item').find('[data-field]').text();
+                const text = $.trim($btn.closest('.contact-item').find('.ci-value').text());
 
-                navigator.clipboard.writeText(text).then(function() {
-                    $btn.addClass('copied').find('i').attr('class', 'fa-solid fa-check');
-                    setTimeout(function() {
-                        $btn.removeClass('copied').find('i').attr('class', 'fa-regular fa-copy');
-                    }, 1200);
+                if (!text) return;
+
+                copyText(text, $btn.closest('.offcanvas')[0]).then(function() {
+                    clearTimeout($btn.data('timer')); // restart the timer on repeated clicks
+
+                    $btn.addClass('copied').attr('title', 'Copied')
+                        .find('i').attr('class', 'fa-solid fa-check');
+
+                    $btn.data('timer', setTimeout(function() {
+                        $btn.removeClass('copied').attr('title', 'Copy')
+                            .find('i').attr('class', 'fa-regular fa-copy');
+                    }, COPIED_MS));
+                }).catch(function(err) {
+                    console.error('Copy failed:', err);
                 });
             });
 
-            /* ---------- Export ---------- */
-            $('#exportBtn').on('click', function() {
-                console.log('Export all vendors');
-            });
-
-            $('#exportSelectedBtn').on('click', function() {
-                const ids = $tbody.find('.row-checkbox:checked').map((_, el) => $(el).data('id')).get();
-                console.log('Export selected vendors', ids);
-            });
+            /* ---------- Bulk actions & export (wire these to your routes) ---------- */
+            $bulkBar.on('click', '.bulk-approve', () => console.log('Approve vendors', selectedIds()));
+            $bulkBar.on('click', '.bulk-delete', () => console.log('Delete vendors', selectedIds()));
+            $('#exportBtn').on('click', () => console.log('Export all vendors'));
+            $('#exportSelectedBtn').on('click', () => console.log('Export selected vendors', selectedIds()));
         });
     </script>
 @endpush

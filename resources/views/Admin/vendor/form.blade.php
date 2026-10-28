@@ -42,6 +42,16 @@
             height: 100%;
             object-fit: cover;
         }
+
+        .col-lg-8 {
+            flex: 0 0 auto;
+            width: 67%;
+        }
+
+        .col-lg-4 {
+            flex: 0 0 auto;
+            width: 33%;
+        }
     </style>
 @endpush
 
@@ -74,7 +84,7 @@
         id="vendorForm">
         @csrf
 
-        <div class="row g-4">
+        <div class="row g-3">
 
             <div class="col-lg-8 d-flex flex-column gap-4">
 
@@ -451,7 +461,8 @@
                                     <ul class="small mb-0 ps-3">
                                         <li class="mb-1"><strong>Pending</strong>, <strong>Rejected</strong>,
                                             <strong>Suspended</strong> and <strong>Banned</strong> vendors cannot sign
-                                            in.</li>
+                                            in.
+                                        </li>
                                         <li class="mb-1">Choosing <strong>Active</strong> and saving generates a
                                             temporary password and emails it to the personal email above.</li>
                                         <li class="mb-1">The email asks the vendor to change the password after the first

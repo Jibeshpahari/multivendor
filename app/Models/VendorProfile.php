@@ -19,12 +19,6 @@ class VendorProfile extends Model
         return ['uuid'];
     }
 
-    #[Override]
-    public function getRouteKeyName(): string
-    {
-        return 'uuid';
-    }
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class)->withTrashed();

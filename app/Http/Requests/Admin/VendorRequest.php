@@ -16,7 +16,8 @@ class VendorRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        $vendor = $this->route('vendor');
+        return ! $vendor || $vendor->role === 'vendor';
     }
 
     public function rules(): array
