@@ -10,7 +10,9 @@ class UserController extends Controller
     public function index()
     {
         $title = "Customer Listing";
-        return view('admin.customer.index', compact('title'));
+        $search = true;
+
+        return view('admin.customer.index', compact('title', 'search'));
     }
 
     public function add()

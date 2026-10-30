@@ -93,11 +93,11 @@
                     <i class="fa-solid fa-chevron-right nav-arrow"></i>
                 </a>
                 <ul class="sub-menu {{ isActive('admin.vendors.*') ? 'open' : '' }}">
-                    <li class="sub-item">
+                    <li class="sub-item {{ isActive('admin.vendors.index') ? 'active' : '' }}">
                         <a href="{{ route('admin.vendors.index') }}">Listing</a>
                     </li>
-                    <li class="sub-item">
-                        <a href="">Add New</a>
+                    <li class="sub-item {{ isActive('admin.vendors.add') ? 'active' : '' }}">
+                        <a href="{{ route('admin.vendors.add') }}">Add New</a>
                     </li>
                     <li class="sub-item">
                         <a href="">Reports</a>

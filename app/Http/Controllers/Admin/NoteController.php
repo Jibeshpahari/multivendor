@@ -18,6 +18,7 @@ class NoteController extends Controller
     public function index(Request $request)
     {
         $title = 'Notes';
+        $search = true;
         $nav = [];
         $userId = $request->user()->id;
 
@@ -58,7 +59,7 @@ class NoteController extends Controller
         ];
 
         $filters = $request->only(['topic', 'status', 'priority', 'q', 'from', 'to']);
-        return view('admin.tasknote.index', compact('title', 'nav', 'topics', 'notes', 'grouped', 'counts', 'filters'));
+        return view('admin.tasknote.index', compact('title', 'search', 'nav', 'topics', 'notes', 'grouped', 'counts', 'filters'));
     }
 
     public function save(Request $request, $id = null)

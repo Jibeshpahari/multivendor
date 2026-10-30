@@ -10,14 +10,9 @@ use Override;
 
 class VendorProfile extends Model
 {
-    use HasUuids, SoftDeletes;
+    use SoftDeletes;
 
     protected $guarded = [];
-
-    public function uniqueIds(): array
-    {
-        return ['uuid'];
-    }
 
     public function user(): BelongsTo
     {

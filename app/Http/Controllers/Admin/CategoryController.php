@@ -20,6 +20,7 @@ class CategoryController extends Controller
     public function index(Request $request)
     {
         $title = 'Product Categories';
+        $search = true;
         $nav = [];
 
         $categories = Category::with('parent', 'children')
@@ -36,7 +37,7 @@ class CategoryController extends Controller
             ->paginate($request->integer('per_page', setting(SettingKey::AdminPaginationPerPage)));
 
             // dd($categories);
-        return view('admin.category.index', compact('title', 'nav', 'categories'));
+        return view('admin.category.index', compact('title', 'search', 'nav', 'categories'));
     }
 
     public function add()

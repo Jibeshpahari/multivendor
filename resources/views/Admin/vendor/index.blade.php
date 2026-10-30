@@ -25,7 +25,6 @@
             padding-bottom: 80px;
         }
 
-        /* ---------- Avatar with status ring ---------- */
         .avatar {
             position: relative;
             flex-shrink: 0;
@@ -37,6 +36,14 @@
         .avatar .avatar-title {
             font-weight: 600;
             font-size: 14px;
+        }
+
+        .avatar .avatar-img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
         }
 
         .avatar-active    { --ring: #16a34a; }
@@ -61,7 +68,15 @@
             background: var(--ring);
         }
 
-        /* The avatar itself loads + opens the contact panel */
+        .offcanvas .avatar-active::before,
+        .offcanvas .avatar-pending::before,
+        .offcanvas .avatar-suspended::before,
+        .offcanvas .avatar-rejected::before,
+        .offcanvas .avatar-banned::before {
+            width: 24%;
+            height: 24%;
+        }
+
         .avatar-trigger {
             display: inline-flex;
             padding: 0;
@@ -97,7 +112,6 @@
             opacity: .6;
         }
 
-        /* ---------- Vendor cell ---------- */
         .vendor-name {
             font-weight: 600;
             line-height: 1.2;
@@ -107,7 +121,6 @@
             color: saddlebrown;
         }
 
-        /* ---------- Product badge ---------- */
         .product-badge {
             display: inline-flex;
             align-items: center;
@@ -156,7 +169,6 @@
             background: #0a58ca;
         }
 
-        /* ---------- Bulk bar ---------- */
         .bulk-bar {
             position: fixed;
             left: 50%;
@@ -168,7 +180,6 @@
             box-shadow: 0 8px 24px rgba(0, 0, 0, .25);
         }
 
-        /* ---------- Contact panel (HTML is injected via AJAX) ---------- */
         .contact-canvas {
             width: 400px !important;
             max-width: 100%;
@@ -178,13 +189,19 @@
         .contact-head {
             position: relative;
             padding: 22px 22px 50px;
-            color: #1e2a4a;
-            background: linear-gradient(135deg, #c2eeff 0%, #a2c8e6 100%);
+            color: #0f172a;
+            background-image: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+        }
+
+        .contact-canvas .badge {
+            margin-left: unset;
+            font-weight: 500;
+            font-size: 13px;
         }
 
         .contact-head .avatar {
-            --ring: #fff;
-            box-shadow: 0 0 0 3px #fff;
+            box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--ring);
+            margin: 6px;
         }
 
         .contact-head .btn-close {
@@ -199,14 +216,14 @@
             line-height: 1.2;
         }
 
-        .contact-joined,
-        .contact-verified {
+        .contact-sub,
+        .contact-verified,
+        .contact-joined  {
+            margin-top: 2px;
             font-size: 12.5px;
-            color: #303030;
+            font-weight: 500;
+            color: rgba(15, 23, 42, .8);
         }
-
-        .contact-joined { margin-top: 6px; }
-        .contact-verified { margin-top: 4px; }
 
         .contact-quick {
             display: flex;
@@ -256,7 +273,8 @@
             border-radius: 12px;
         }
 
-        .ci-icon {
+        .contact-item .ci-icon,
+        .contact-item .ci-avatar {
             width: 38px;
             height: 38px;
             flex-shrink: 0;
@@ -267,18 +285,30 @@
             font-size: 15px;
         }
 
-        .ci-body {
+        .contact-item .ci-avatar {
+            overflow: hidden;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .contact-item .ci-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .contact-item .ci-body {
             min-width: 0;
             flex: 1;
         }
 
-        .ci-label {
+        .contact-item .ci-label {
             font-size: 11.5px;
             color: #6b7280;
             line-height: 1.2;
         }
 
-        .ci-value {
+        .contact-item .ci-value {
             display: block;
             font-size: 14px;
             font-weight: 500;
@@ -304,7 +334,7 @@
         }
 
         .ci-copy.copied,
-        .ci-copy.copied i { color: #16a34a; }
+        .ci-copy.copied i { color: #059669; }
         .ci-copy.copied i { font-size: 16px; }
 
         .ci-indigo { background: #e0e7ff; color: #3730a3; }
@@ -314,11 +344,11 @@
         .ci-teal   { background: #cffafe; color: #0e7490; }
         .ci-lime   { background: #dcfce7; color: #15803d; }
         .ci-amber  { background: #fef3c7; color: #b45309; }
+        .ci-rose   { background: #ffe4e6; color: #be123c; }
     </style>
 @endpush
 
 @section('content')
-    {{-- Filters --}}
     <div class="card filter-option-card p-3 mb-3">
         <form action="{{ '' }}" method="GET" autocomplete="off">
             <div class="row g-2">
@@ -359,7 +389,6 @@
         </form>
     </div>
 
-    {{-- Vendor table --}}
     <div class="card p-3">
         <div class="card-header py-3 px-0 pt-0">
             <div class="text-end">
@@ -391,21 +420,32 @@
                     </thead>
                     <tbody>
                         @forelse ($vendors as $vendor)
-                            <tr data-name="{{ $vendor->name }}">
+                            <tr data-name="{{ $vendor->name }}" data-uuid="{{ $vendor->uuid }}">
                                 <td>
                                     <input type="checkbox" class="form-check-input row-checkbox"
-                                        data-id="{{ $vendor->id }}">
+                                        data-uuid="{{ $vendor->uuid }}">
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center gap-3">
                                         <button type="button" class="avatar-trigger js-contact-trigger"
-                                            data-url="{{ '' }}"
+                                            data-uuid="{{ $vendor->uuid }}"
                                             title="{{ ucfirst($vendor->status) }} &middot; View contact details"
                                             aria-label="View contact details for {{ $vendor->name }}">
+                                            @php
+                                                $logo  = getImageUrl($vendor->vendorProfile?->store_logo);
+                                                $color = getAvatarColor($vendor->uuid);
+                                            @endphp
                                             <span class="avatar {{ getStatusRing($vendor->status) }}">
-                                                <span class="avatar-title rounded-circle">
-                                                    {{ strtoupper(substr($vendor->name ?? 'V', 0, 2)) }}
-                                                </span>
+                                                @if ($logo)
+                                                    <span class="avatar-title rounded-circle p-0 overflow-hidden bg-white">
+                                                        <img src="{{ $logo }}" alt="{{ $vendor->name }}" class="avatar-img">
+                                                    </span>
+                                                @else
+                                                    <span class="avatar-title rounded-circle"
+                                                        style="background: {{ $color['bg'] }}; color: {{ $color['text'] }};">
+                                                        {{ getInitials($vendor->name) }}
+                                                    </span>
+                                                @endif
                                             </span>
                                         </button>
                                         <div>
@@ -432,13 +472,15 @@
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end do-menu">
                                             <li>
-                                                <a class="do-item do-item--amber view-action" href="{{ '' }}">
+                                                <a class="do-item do-item--amber view-action" href="{{ '' }}"
+                                                    data-uuid="{{ $vendor->uuid }}">
                                                     <span class="do-badge do-badge--amber"><i class="fa-solid fa-eye"></i></span>
                                                     <span>View</span>
                                                 </a>
                                             </li>
                                             <li>
-                                                <a class="do-item do-item--edit edit-action" href="{{ '' }}">
+                                                <a class="do-item do-item--edit edit-action" href="{{ '' }}"
+                                                    data-uuid="{{ $vendor->uuid }}">
                                                     <span class="do-badge do-badge--edit"><i class="fa-solid fa-pen"></i></span>
                                                     <span>Edit</span>
                                                 </a>
@@ -447,7 +489,8 @@
                                                 <div class="do-divider"></div>
                                             </li>
                                             <li>
-                                                <a class="do-item do-item--delete delete-action" href="{{ '' }}">
+                                                <a class="do-item do-item--delete delete-action" href="{{ '' }}"
+                                                    data-uuid="{{ $vendor->uuid }}">
                                                     <span class="do-badge do-badge--delete"><i class="fa-solid fa-trash"></i></span>
                                                     <span>Delete</span>
                                                 </a>
@@ -472,10 +515,8 @@
 
     </div>
 
-    {{-- The server-rendered contact offcanvas is injected here --}}
     <div id="contactCanvasHolder"></div>
 
-    {{-- Bulk action bar --}}
     <div class="bg-dark text-white rounded-3 bulk-bar d-flex justify-content-between align-items-center d-none"
         id="bulkBar">
         <span class="fw-semibold" id="bulkCount"></span>
@@ -501,10 +542,11 @@
             const $bulkBar = $('#bulkBar');
             const $holder = $('#contactCanvasHolder');
 
-            const selectedIds = () =>
-                $tbody.find('.row-checkbox:checked').map((_, el) => $(el).data('id')).get();
+            const DETAILS_URL = "{{ route('admin.vendors.details', ':uuid') }}";
 
-            /* ---------- Selection + bulk bar ---------- */
+            const selectedUuids = () =>
+                $tbody.find('.row-checkbox:checked').map((_, el) => $(el).data('uuid')).get();
+
             function refreshBulkBar() {
                 const count = $tbody.find('.row-checkbox:checked').length;
                 const total = $tbody.find('.row-checkbox').length;
@@ -528,17 +570,17 @@
                 refreshBulkBar();
             });
 
-            /* ---------- Contact panel: load via AJAX, then show ---------- */
             let contactXhr = null;
 
             $tbody.on('click', '.js-contact-trigger', function() {
                 const $btn = $(this);
+                const uuid = $btn.data('uuid');
 
                 if (contactXhr) contactXhr.abort();
                 $btn.addClass('is-loading');
 
                 contactXhr = $.ajax({
-                        url: $btn.data('url'),
+                        url: DETAILS_URL.replace(':uuid', uuid),
                         method: 'GET',
                         dataType: 'html'
                     })
@@ -548,7 +590,6 @@
                         const el = $holder.find('.offcanvas')[0];
                         if (!el) return;
 
-                        // Remove the panel from the DOM once it is closed
                         el.addEventListener('hidden.bs.offcanvas', function() {
                             bootstrap.Offcanvas.getInstance(el)?.dispose();
                             $holder.empty();
@@ -568,17 +609,13 @@
                     });
             });
 
-            /* ---------- Copy buttons (delegated, panel is injected) ---------- */
             const COPIED_MS = 3000;
 
             function copyText(text, container) {
-                // Modern API (HTTPS / localhost)
                 if (navigator.clipboard && window.isSecureContext) {
                     return navigator.clipboard.writeText(text);
                 }
 
-                // Fallback (http). The textarea must live inside the offcanvas,
-                // otherwise Bootstrap's focus trap steals focus and the copy fails.
                 return new Promise(function(resolve, reject) {
                     const ta = document.createElement('textarea');
                     ta.value = text;
@@ -605,7 +642,7 @@
                 if (!text) return;
 
                 copyText(text, $btn.closest('.offcanvas')[0]).then(function() {
-                    clearTimeout($btn.data('timer')); // restart the timer on repeated clicks
+                    clearTimeout($btn.data('timer'));
 
                     $btn.addClass('copied').attr('title', 'Copied')
                         .find('i').attr('class', 'fa-solid fa-check');
@@ -619,11 +656,10 @@
                 });
             });
 
-            /* ---------- Bulk actions & export (wire these to your routes) ---------- */
-            $bulkBar.on('click', '.bulk-approve', () => console.log('Approve vendors', selectedIds()));
-            $bulkBar.on('click', '.bulk-delete', () => console.log('Delete vendors', selectedIds()));
+            $bulkBar.on('click', '.bulk-approve', () => console.log('Approve vendors', selectedUuids()));
+            $bulkBar.on('click', '.bulk-delete', () => console.log('Delete vendors', selectedUuids()));
             $('#exportBtn').on('click', () => console.log('Export all vendors'));
-            $('#exportSelectedBtn').on('click', () => console.log('Export selected vendors', selectedIds()));
+            $('#exportSelectedBtn').on('click', () => console.log('Export selected vendors', selectedUuids()));
         });
     </script>
 @endpush

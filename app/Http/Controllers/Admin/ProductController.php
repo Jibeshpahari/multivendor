@@ -12,6 +12,7 @@ class ProductController extends Controller
     //Product List
     public function index(Request $request){
         $title = "Product List";
+        $search = true;
         $nav = [
             [
                 'url' => route('admin.login.view'),
@@ -21,9 +22,11 @@ class ProductController extends Controller
                 'name' => $title
             ]
         ];
+
+
         $products = Product::query()
             ->paginate($request->integer('per_page', 20));
-        return view('admin.product.index', compact('title', 'nav', 'products'));
+        return view('admin.product.index', compact('title', 'search', 'nav', 'products'));
 
     }
 

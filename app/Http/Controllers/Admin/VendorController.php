@@ -18,6 +18,7 @@ class VendorController extends Controller
     {
         $title = 'Product Categories';
         $nav = [];
+        $search = true;
 
         $vendors = User::with('vendorProfile')
             ->where('role', 'vendor')
@@ -27,22 +28,19 @@ class VendorController extends Controller
                 'date_desc' => $q->orderByDesc('updated_at'),
                 'name_asc'  => $q->orderBy('name'),
                 'name_desc' => $q->orderByDesc('name'),
-            })->get()->toArray();
-            dd($vendors);
-            // ->paginate($request->integer('per_page', setting(SettingKey::AdminPaginationPerPage)));
+            })
+            ->paginate($request->integer('per_page', setting(SettingKey::AdminPaginationPerPage)));
 
-        return view('admin.vendor.index', compact('vendors'));
+        return view('admin.vendor.index', compact('title', 'nav', 'search', 'vendors'));
     }
 
     public function details(User $vendor)
     {
         abort_unless($vendor->role === 'vendor', 404);
-
         $vendor->load('vendorProfile');
         $profile  = $vendor->vendorProfile;
-        $approver = $profile?->approved_by ? User::find($profile->approved_by) : null;
-
-        return view('admin.vendors.partials.contact-canvas', compact('vendor', 'profile', 'approver'));
+        $approver = $profile?->approved_by ? User::find($profile->approved_by) : 'N?A';
+        return view('admin.vendor.partials.details', compact('vendor', 'profile', 'approver'))->render();
     }
 
     public function add()
