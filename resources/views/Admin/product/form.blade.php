@@ -1,34 +1,37 @@
 @extends('admin.layout.app')
 
 @section('content')
+    @php
+        // Cards that open a side panel (order is saved per user, so keep the ids stable)
+        $triggers = [
+            ['id' => 'variants-trigger', 'target' => 'variantsModal', 'icon' => 'fa-layer-group', 'title' => 'Variants', 'desc' => 'Manage variant types and combinations'],
+            ['id' => 'media-trigger', 'target' => 'mediaLibraryModal', 'icon' => 'fa-images', 'title' => 'Media', 'desc' => 'Upload and manage product images'],
+        ];
+    @endphp
+
+    {{-- Up/down move buttons are injected into every .sortable-card by JS --}}
     <div class="row g-3">
+
+        {{-- ================= LEFT COLUMN ================= --}}
         <div class="col-8">
             <div id="col8SortArea">
+
                 <div class="sortable-card" data-card-id="product-details">
-                    <div class="card-move-wrap" data-move-wrap>
-                        <button type="button" class="card-move-btn" data-move="up" title="Move up" aria-label="Move card up">
-                            <i class="fa-solid fa-caret-up" aria-hidden="true"></i>
-                        </button>
-                        <button type="button" class="card-move-btn" data-move="down" title="Move down"
-                            aria-label="Move card down">
-                            <i class="fa-solid fa-caret-down" aria-hidden="true"></i>
-                        </button>
-                    </div>
                     <div class="card p-4 mb-3">
                         <p class="fs-6 fw-semibold">Product Details</p>
                         <div class="row">
                             <div class="form-group col-12">
-                                <label for="name" class="form-label"> Product Name </label>
-                                <input type="text" class="form-control" name="name" value="{{ '' }}"
-                                    id="name" placeholder="Enter product name">
+                                <label for="name" class="form-label">Product Name</label>
+                                <input type="text" class="form-control" name="name" id="name"
+                                    value="{{ old('name') }}" placeholder="Enter product name">
                                 @error('name')
                                     <span class="error">{{ $message }}</span>
                                 @enderror
                             </div>
 
                             <div class="form-group col-12">
-                                <label for="description" class="form-label"> Description </label>
-                                <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control" id="description" name="description" rows="3">{{ old('description') }}</textarea>
                                 @error('description')
                                     <span class="error">{{ $message }}</span>
                                 @enderror
@@ -59,98 +62,54 @@
                                     <label class="form-check-label" for="chargeTax">Charge tax for this product</label>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
 
-                <div class="sortable-card" data-card-id="variants-trigger">
-                    <div class="variants-trigger-card">
-                        <button type="button" class="variants-trigger-btn" data-bs-toggle="offcanvas"
-                            data-bs-target="#variantsModal" aria-controls="variantsModal">
-                            <span class="variants-trigger-icon"><i class="fa-solid fa-layer-group"
-                                    aria-hidden="true"></i></span>
-                            <span class="variants-trigger-text">
-                                <span class="d-block fw-semibold">Variants</span>
-                                <span class="d-block small text-muted">Manage variant types and combinations</span>
-                            </span>
-                            <span class="variants-trigger-arrow"><i class="fa-solid fa-chevron-right"
-                                    aria-hidden="true"></i></span>
-                        </button>
-                        <div class="card-move-wrap card-move-wrap--inline">
-                            <button type="button" class="card-move-btn" data-move="up" title="Move up"
-                                aria-label="Move card up">
-                                <i class="fa-solid fa-caret-up" aria-hidden="true"></i>
-                            </button>
-                            <button type="button" class="card-move-btn" data-move="down" title="Move down"
-                                aria-label="Move card down">
-                                <i class="fa-solid fa-caret-down" aria-hidden="true"></i>
+                @foreach ($triggers as $t)
+                    <div class="sortable-card" data-card-id="{{ $t['id'] }}">
+                        <div class="variants-trigger-card">
+                            <button type="button" class="variants-trigger-btn" data-bs-toggle="offcanvas"
+                                data-bs-target="#{{ $t['target'] }}" aria-controls="{{ $t['target'] }}">
+                                <span class="variants-trigger-icon">
+                                    <i class="fa-solid {{ $t['icon'] }}" aria-hidden="true"></i>
+                                </span>
+                                <span class="variants-trigger-text">
+                                    <span class="d-block fw-semibold">{{ $t['title'] }}</span>
+                                    <span class="d-block small text-muted">{{ $t['desc'] }}</span>
+                                </span>
+                                <span class="variants-trigger-arrow">
+                                    <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                                </span>
                             </button>
                         </div>
                     </div>
-                </div>
-
-                <div class="sortable-card" data-card-id="media-trigger">
-                    <div class="variants-trigger-card">
-                        <button type="button" class="variants-trigger-btn" data-bs-toggle="offcanvas"
-                            data-bs-target="#mediaLibraryModal" aria-controls="mediaLibraryModal">
-                            <span class="variants-trigger-icon"><i class="fa-solid fa-images"
-                                    aria-hidden="true"></i></span>
-                            <span class="variants-trigger-text">
-                                <span class="d-block fw-semibold">Media</span>
-                                <span class="d-block small text-muted">Upload and manage product images</span>
-                            </span>
-                            <span class="variants-trigger-arrow"><i class="fa-solid fa-chevron-right"
-                                    aria-hidden="true"></i></span>
-                        </button>
-                        <div class="card-move-wrap card-move-wrap--inline">
-                            <button type="button" class="card-move-btn" data-move="up" title="Move up"
-                                aria-label="Move card up">
-                                <i class="fa-solid fa-caret-up" aria-hidden="true"></i>
-                            </button>
-                            <button type="button" class="card-move-btn" data-move="down" title="Move down"
-                                aria-label="Move card down">
-                                <i class="fa-solid fa-caret-down" aria-hidden="true"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                @endforeach
 
                 <div class="sortable-card" data-card-id="shipping">
-                    <div class="card-move-wrap" data-move-wrap>
-                        <button type="button" class="card-move-btn" data-move="up" title="Move up"
-                            aria-label="Move card up">
-                            <i class="fa-solid fa-caret-up" aria-hidden="true"></i>
-                        </button>
-                        <button type="button" class="card-move-btn" data-move="down" title="Move down"
-                            aria-label="Move card down">
-                            <i class="fa-solid fa-caret-down" aria-hidden="true"></i>
-                        </button>
-                    </div>
                     <div class="card p-4 mb-3">
-                        <p class="fs-6 fw-semibold ">Shipping</p>
-                        <div class="ship-type-row" role="radiogroup" aria-label="Product shipping type"
-                            id="shipTypeRow">
-                            <input type="radio" name="ship_type" id="physicalProductBtn" value="physical"
-                                class="ship-type-input" checked>
-                            <label for="physicalProductBtn" class="ship-type-btn">
-                                <i class="fa-solid fa-shirt" aria-hidden="true"></i>
-                                <span>Physical product</span>
-                            </label>
+                        <p class="fs-6 fw-semibold">Shipping</p>
 
-                            <input type="radio" name="ship_type" id="digitalProductBtn" value="digital"
-                                class="ship-type-input">
-                            <label for="digitalProductBtn" class="ship-type-btn">
-                                <i class="fa-solid fa-cloud-arrow-up" aria-hidden="true"></i>
-                                <span>Digital product</span>
+                        <div class="status-toggle ship-toggle" role="radiogroup" aria-label="Product shipping type">
+                            <label class="status-toggle-item">
+                                <input type="radio" name="ship_type" value="physical" class="status-toggle-input" checked>
+                                <span class="status-toggle-button">
+                                    <i class="fa-solid fa-shirt" aria-hidden="true"></i> Physical product
+                                </span>
+                            </label>
+                            <label class="status-toggle-item">
+                                <input type="radio" name="ship_type" value="digital" class="status-toggle-input">
+                                <span class="status-toggle-button">
+                                    <i class="fa-solid fa-cloud-arrow-up" aria-hidden="true"></i> Digital product
+                                </span>
                             </label>
                         </div>
 
                         <div class="py-3 row mb-3" id="shippingDetailsBox">
                             <div class="form-group col-md-6">
                                 <label class="field-label" for="weightInput">Weight</label>
-                                <input type="number" min="0" step="0.1" inputmode="decimal"
-                                    id="weightInput" name="weight" class="form-control" value="5">
+                                <input type="number" min="0" step="0.1" inputmode="decimal" id="weightInput"
+                                    name="weight" class="form-control" value="5">
                             </div>
                             <div class="form-group col-md-6">
                                 <label class="field-label" for="weightUnitSelect">Unit</label>
@@ -161,25 +120,22 @@
                                 </select>
                             </div>
                             <div class="form-group col-md-4">
-                                <label class="field-label text-ink-3" style="font-weight:500;"
-                                    for="lengthInput">Length</label>
-                                <input type="number" min="0" inputmode="decimal" id="lengthInput"
-                                    name="length" class="form-control" value="40">
+                                <label class="form-label text-ink-3" for="lengthInput">Length</label>
+                                <input type="number" min="0" inputmode="decimal" id="lengthInput" name="length"
+                                    class="form-control" value="40">
                             </div>
                             <div class="form-group col-md-4">
-                                <label class="field-label text-ink-3" style="font-weight:500;"
-                                    for="widthInput">Width</label>
+                                <label class="form-label text-ink-3" for="widthInput">Width</label>
                                 <input type="number" min="0" inputmode="decimal" id="widthInput" name="width"
                                     class="form-control" value="30">
                             </div>
                             <div class="form-group col-md-4">
-                                <label class="field-label text-ink-3" style="font-weight:500;"
-                                    for="heightInput">Height</label>
-                                <input type="number" min="0" inputmode="decimal" id="heightInput"
-                                    name="height" class="form-control" value="20">
+                                <label class="form-label text-ink-3" for="heightInput">Height</label>
+                                <input type="number" min="0" inputmode="decimal" id="heightInput" name="height"
+                                    class="form-control" value="20">
                             </div>
                             <div class="form-group col-md-6">
-                                <label class="field-label text-ink-3" style="font-weight:500;"
+                                <label class="form-label text-ink-3"
                                     for="dimensionUnitSelect">Unit</label>
                                 <select class="form-select" id="dimensionUnitSelect" name="dimension_unit">
                                     <option>Centimeter (cm)</option>
@@ -189,40 +145,28 @@
                             </div>
                         </div>
 
-                        <div class="alert alert-primary mt-2 p-3 d-none" id="digitalShippingFields">
-                            Digital products don't need weight or dimensions — customers get access right after purchase,
-                            with
-                            nothing to ship.
+                        <div class="alert alert-primary mt-4 p-3 d-none" id="digitalShippingFields">
+                            Digital products don't need weight or dimensions — customers get access right after
+                            purchase, with nothing to ship.
                         </div>
-
                     </div>
                 </div>
+
             </div>
         </div>
 
+        {{-- ================= RIGHT COLUMN ================= --}}
         <div class="col-4">
             <div id="col4SortArea">
 
                 <div class="sortable-card" data-card-id="product-chart">
-                    <div class="card-move-wrap" data-move-wrap>
-                        <button type="button" class="card-move-btn" data-move="up" title="Move up"
-                            aria-label="Move card up">
-                            <i class="fa-solid fa-caret-up" aria-hidden="true"></i>
-                        </button>
-                        <button type="button" class="card-move-btn" data-move="down" title="Move down"
-                            aria-label="Move card down">
-                            <i class="fa-solid fa-caret-down" aria-hidden="true"></i>
-                        </button>
-                    </div>
                     <div class="card p-4 mb-3">
-                        <div class="d-flex align-items-center justify-content-between mb-1">
-                            <p class="fs-6 fw-semibold mb-0">Product Performance</p>
-                        </div>
+                        <p class="fs-6 fw-semibold mb-1">Product Performance</p>
                         <div class="mb-2">
                             <span class="fs-4 fw-bold" id="perfCurrentValue">—</span>
                             <span class="small ms-1" id="perfChangeValue"></span>
                         </div>
-                        <div style="height:170px;">
+                        <div class="perf-chart">
                             <canvas id="productPerformanceChart"></canvas>
                         </div>
                         <div class="text-muted small mt-2 d-none" id="perfErrorMsg">
@@ -232,110 +176,64 @@
                 </div>
 
                 <div class="sortable-card" data-card-id="stock">
-                    <div class="card-move-wrap" data-move-wrap>
-                        <button type="button" class="card-move-btn" data-move="up" title="Move up"
-                            aria-label="Move card up">
-                            <i class="fa-solid fa-caret-up" aria-hidden="true"></i>
-                        </button>
-                        <button type="button" class="card-move-btn" data-move="down" title="Move down"
-                            aria-label="Move card down">
-                            <i class="fa-solid fa-caret-down" aria-hidden="true"></i>
-                        </button>
-                    </div>
                     <div class="card p-4 mb-3">
-                        <p class="fs-6 fw-semibold ">Stock</p>
+                        <p class="fs-6 fw-semibold">Stock</p>
                         <div class="form-group col-12 px-0">
                             <label class="field-label" for="onHandStockInput">On hand stock</label>
                             <div class="input-group">
-                                <input type="number" class="form-control" name="onHandStockInput" min="0"
-                                    value="" id="onHandStockInput" placeholder="0">
-                                <button type="button" class="btn btn-dark" id="reorderBtn"
-                                    style="white-space:nowrap;">Reorder</button>
+                                <input type="number" class="form-control" name="onHandStockInput" id="onHandStockInput"
+                                    min="0" value="" placeholder="0">
+                                <button type="button" class="btn btn-dark text-nowrap" id="reorderBtn">Reorder</button>
                             </div>
                             <div class="form-check ps-0">
                                 <input class="form-check-input check-black" type="checkbox" id="continueSellingCheck"
-                                    name="continueSellingCheck" checked="">
-                                <label class="form-check-label me-0" for="continueSellingCheck">Continue selling when out
-                                    of
-                                    stock</label>
+                                    name="continueSellingCheck" checked>
+                                <label class="form-check-label me-0" for="continueSellingCheck">
+                                    Continue selling when out of stock
+                                </label>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="sortable-card" data-card-id="product-org">
-                    <div class="card-move-wrap" data-move-wrap>
-                        <button type="button" class="card-move-btn" data-move="up" title="Move up"
-                            aria-label="Move card up">
-                            <i class="fa-solid fa-caret-up" aria-hidden="true"></i>
-                        </button>
-                        <button type="button" class="card-move-btn" data-move="down" title="Move down"
-                            aria-label="Move card down">
-                            <i class="fa-solid fa-caret-down" aria-hidden="true"></i>
-                        </button>
-                    </div>
                     <div class="card p-4 mb-3">
-                        <p class="fs-6 fw-semibold ">Product Organization</p>
+                        <p class="fs-6 fw-semibold">Product Organization</p>
                         <div class="card-body p-0">
                             <div class="form-group px-0">
-                                <label for="sku" class="form-label">SKU </label>
-                                <input type="text" class="form-control" name="sku" value="{{ '' }}"
-                                    id="sku" placeholder="">
+                                <label for="sku" class="form-label">SKU</label>
+                                <input type="text" class="form-control" name="sku" id="sku"
+                                    value="{{ old('sku') }}">
                                 @error('sku')
                                     <span class="error">{{ $message }}</span>
                                 @enderror
-                                <span
-                                    class="ms-1 d-inline-flex align-items-center justify-content-center rounded-circle bg-dark text-white"
-                                    data-bs-toggle="tooltip" data-bs-placement="top" title="custom made by me"
-                                    aria-label="Info: custom made by me"
-                                    style="width: 16px; height: 16px; font-size: 11px; cursor: help;">i</span>
+                                <span class="info-dot ms-1" data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="custom made by me" aria-label="Info: custom made by me">i</span>
+                            </div>
 
-                            </div>
-                            <div class="form-group px-0">
-                                <label for="category" class="form-label">Category </label>
-                                <select name="category" id="category" class="form-select">
-                                    <option value=""></option>
-                                </select>
-                                @error('category')
-                                    <span class="error">{{ $message }}</span>
-                                @enderror
-                            </div>
-                            <div class="form-group px-0">
-                                <label for="type" class="form-label">Type </label>
-                                <select name="type" id="type" class="form-select" disabled>
-                                    <option value=""></option>
-                                </select>
-                                @error('type')
-                                    <span class="error">{{ $message }}</span>
-                                @enderror
-                            </div>
-                            <div class="form-group px-0">
-                                <label for="vendor" class="form-label">Vendor </label>
-                                <select name="vendor" id="vendor" class="form-select">
-                                    <option value=""></option>
-                                </select>
-                                @error('vendor')
-                                    <span class="error">{{ $message }}</span>
-                                @enderror
-                            </div>
-                            <div class="form-group px-0">
-                                <label for="tags" class="form-label">Tags </label>
-                                <select name="tags" id="tags" class="form-select">
-                                    <option value=""></option>
-                                </select>
-                                @error('tags')
-                                    <span class="error">{{ $message }}</span>
-                                @enderror
-                            </div>
+                            @foreach (['category' => 'Category', 'type' => 'Type', 'vendor' => 'Vendor', 'tags' => 'Tags'] as $field => $label)
+                                <div class="form-group px-0">
+                                    <label for="{{ $field }}" class="form-label">{{ $label }}</label>
+                                    <select name="{{ $field }}" id="{{ $field }}" class="form-select"
+                                        {{ $field === 'type' ? 'disabled' : '' }}>
+                                        <option value=""></option>
+                                    </select>
+                                    @error($field)
+                                        <span class="error">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            @endforeach
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
 
+        {{-- ================= NOTES ================= --}}
         <div class="col-md-12 mt-0">
             <div class="card p-4 mb-3 notes-card">
-                <p class="fs-6 fw-semibold ">Notes</p>
+                <p class="fs-6 fw-semibold">Notes</p>
                 <div class="card-body p-0">
                     <div id="summernote"></div>
                     <div class="mt-3 text-end">
@@ -345,41 +243,40 @@
                 </div>
             </div>
         </div>
-
     </div>
 
+    {{-- ================= STICKY ACTION BAR ================= --}}
+    <input type="hidden" name="status" id="productStatusInput" value="draft">
     <div class="sticky-action-bar">
         <div class="sticky-action-bar-inner">
-            <button type="button" class="btn btn-dark bg-dark-gradient" id="saveDraftBtn">
+            <button type="button" class="btn btn-dark bg-dark-gradient" data-status="draft">
                 <i class="fas fa-file-alt me-2"></i> Save as Draft
             </button>
-
-            <button type="button" class="btn btn-secondary bg-secondary-gradient" id="scheduleBtn">
+            <button type="button" class="btn btn-secondary bg-secondary-gradient" data-status="scheduled">
                 <i class="fas fa-calendar-alt me-2"></i> Schedule
             </button>
-
-            <button type="button" class="btn btn-primary bg-primary-gradient" id="publishBtn">
+            <button type="button" class="btn btn-primary bg-primary-gradient" data-status="published">
                 <i class="fas fa-paper-plane me-2"></i> Publish
             </button>
-
         </div>
     </div>
 
-
+    {{-- ================= VARIANTS PANEL ================= --}}
     <div class="offcanvas offcanvas-end" tabindex="-1" id="variantsModal" aria-labelledby="variantsModalLabel">
         <div class="offcanvas-header">
             <h5 class="offcanvas-title" id="variantsModalLabel">Variants</h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
-        <div class="offcanvas-body">
 
+        <div class="offcanvas-body">
             <div class="card p-4 mb-3">
-                <p class="fs-6 fw-semibold">Varients</p>
+                <p class="fs-6 fw-semibold">Variants</p>
+
                 <div id="variantTypeRows">
-                    <div class="row g-0 border p-3 rounded-3 align-items-center variant-type-row">
-                        <div class="col-11">
+                    <div class="row g-0 border p-3 mb-2 rounded-3 align-items-center variant-type-row">
+                        <div class="col">
                             <div class="row">
-                                <div class="col-md-4 form-group">
+                                <div class="col-md-3 form-group">
                                     <label class="field-label">Variant type</label>
                                     <select class="form-select variant-type-select" name="variant_type[]">
                                         <option value="Color">Color</option>
@@ -389,7 +286,7 @@
                                         <option value="Material">Material</option>
                                     </select>
                                 </div>
-                                <div class="col-md-8 form-group">
+                                <div class="col-md-9 form-group">
                                     <label class="field-label">Variant value</label>
                                     <select class="form-select variant-value-select" data-select="tag"
                                         name="variant_value[]" multiple>
@@ -402,22 +299,23 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-1 pt-4 ps-4">
+                        <div class="col-auto pt-4 ps-3">
                             <button type="button"
-                                class="btn mt-2 d-flex py-2 px-1 align-content-center justify-content-center rounded-3 variant-type-delete"
+                                class="btn mt-2 d-flex py-2 px-1 justify-content-center rounded-3 variant-type-delete"
                                 title="Delete variant" aria-label="Delete variant">
                                 <i class="fa-solid fa-trash fs-5 text-danger" aria-hidden="true"></i>
                             </button>
                         </div>
                     </div>
                 </div>
+
                 <button type="button" class="btn btn-secondary col-md-12 mt-2" id="addVariantTypeBtn">
                     <i class="fa-solid fa-plus" aria-hidden="true"></i> Add Another Variation
                 </button>
             </div>
 
             <div class="card p-4 mb-3">
-                <p class="fs-6 fw-semibold">Varients Table</p>
+                <p class="fs-6 fw-semibold">Variants Table</p>
 
                 <button type="button" id="generateVariationsBtn" class="btn btn-dark w-100">
                     <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> Generate Variations
@@ -430,34 +328,21 @@
                     </button>
                 </div>
 
+                {{-- Row template cloned by JS --}}
                 <div id="comboRowTemplate" class="d-none">
                     <div class="row g-3 border rounded-3 p-3 mb-2 align-items-center combo-row">
                         <div class="col-auto">
-                            <label
-                                class="combo-img-picker border rounded d-flex align-items-center justify-content-center text-muted"
-                                title="Set image for this combination" aria-label="Set image for this combination"
-                                data-combo-image>
-                                <svg width="50" height="50" viewBox="0 0 24 24" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg" transform="rotate(0 0 0)">
-                                    <path
-                                        d="M19.0752 16.1484C19.4892 16.1487 19.8252 16.4844 19.8252 16.8984C19.8252 17.6853 20.4632 18.323 21.25 18.3232C21.6639 18.3235 21.9999 18.6593 22 19.0732C22 19.4873 21.664 19.823 21.25 19.8232C20.4633 19.8235 19.8254 20.4614 19.8252 21.248C19.8252 21.6621 19.4892 21.9978 19.0752 21.998C18.6611 21.9979 18.3252 21.6622 18.3252 21.248C18.325 20.4614 17.687 19.8235 16.9004 19.8232C16.4862 19.8232 16.1504 19.4875 16.1504 19.0732C16.1505 18.6591 16.4862 18.3232 16.9004 18.3232C17.6872 18.323 18.3252 17.6853 18.3252 16.8984C18.3252 16.4843 18.6611 16.1485 19.0752 16.1484Z"
-                                        fill="#343C54" />
-                                    <path
-                                        d="M8.6543 6.93652C9.55061 6.9366 10.2773 7.66324 10.2773 8.55957C10.2773 9.4559 9.55061 10.1825 8.6543 10.1826C7.75791 10.1826 7.03125 9.45595 7.03125 8.55957C7.03125 7.66319 7.75791 6.93652 8.6543 6.93652Z"
-                                        fill="#343C54" />
-                                    <path
-                                        d="M18.502 3.25C19.7446 3.25 20.752 4.25736 20.752 5.5V15.4033C20.3884 14.9946 19.8792 14.7188 19.3047 14.6602L19.252 14.6572V13.8604L16.9639 10.6963C16.619 10.2193 15.8836 10.3067 15.6611 10.8516L13.6836 15.6982C13.0242 17.3138 10.8563 17.5966 9.80469 16.2041L8.58984 14.5947C8.29091 14.1989 7.69683 14.197 7.39551 14.5908L7.39453 14.5918L4.75195 18.0488V18.5C4.75195 18.9142 5.08774 19.25 5.50195 19.25H14.6582C14.7046 19.8464 14.9832 20.3753 15.4043 20.75H5.50195C4.25931 20.75 3.25195 19.7426 3.25195 18.5V5.5C3.25195 4.25736 4.25931 3.25 5.50195 3.25H18.502ZM5.50195 4.75C5.08774 4.75 4.75195 5.08579 4.75195 5.5V15.5791L6.20312 13.6807L6.29004 13.5732C7.21689 12.4991 8.91693 12.5398 9.78613 13.6904L11.002 15.2998C11.3524 15.7639 12.075 15.6701 12.2949 15.1318L14.2725 10.2852C14.9397 8.65007 17.145 8.38624 18.1797 9.81738L19.252 11.3008V5.5C19.252 5.08579 18.9162 4.75 18.502 4.75H5.50195Z"
-                                        fill="#343C54" />
-                                </svg>
+                            <div class="combo-img-picker border rounded d-flex align-items-center justify-content-center"
+                                title="Set image for this combination" data-combo-image>
+                                <i class="fa-regular fa-image combo-img-icon" aria-hidden="true"></i>
                                 <img src="" alt="Variant combination image" data-combo-preview>
-                                <span class="combo-img-overlay" data-combo-overlay><i class="fa-solid fa-pen"
-                                        aria-hidden="true"></i></span>
+                                <span class="combo-img-overlay"><i class="fa-solid fa-pen" aria-hidden="true"></i></span>
                                 <button type="button" class="combo-img-remove" data-combo-remove
-                                    aria-label="Remove image" title="Remove image"><i class="fa-solid fa-xmark"
-                                        aria-hidden="true"></i></button>
-                                <input type="file" accept="image/*" data-img-input="" name="variant_image[]">
+                                    aria-label="Remove image" title="Remove image">
+                                    <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                                </button>
                                 <input type="hidden" name="variant_image_url[]" data-combo-value value="">
-                            </label>
+                            </div>
                         </div>
                         <div class="col">
                             <div class="variant-pills mb-2 ps-2"></div>
@@ -466,30 +351,30 @@
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fa-solid fa-barcode"
                                                 aria-hidden="true"></i></span>
-                                        <input type="text" class="form-control" placeholder="SKU" data-sku=""
-                                            name="variant_sku[]" value="">
+                                        <input type="text" class="form-control" placeholder="SKU"
+                                            name="variant_sku[]">
                                     </div>
                                 </div>
                                 <div class="col-md-4 form-group">
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fa-solid fa-tag"
                                                 aria-hidden="true"></i></span>
-                                        <input type="text" class="form-control" placeholder="Price" data-price=""
-                                            name="variant_price[]" value="">
+                                        <input type="text" class="form-control" placeholder="Price"
+                                            name="variant_price[]">
                                     </div>
                                 </div>
                                 <div class="col-md-4 form-group">
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fa-solid fa-boxes-stacked"
                                                 aria-hidden="true"></i></span>
-                                        <input type="text" class="form-control" placeholder="Stock" data-stock=""
-                                            name="variant_stock[]" value="">
+                                        <input type="text" class="form-control" placeholder="Stock"
+                                            name="variant_stock[]">
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-auto">
-                            <button type="button" class="btn mt-2 d-flex py-2 px-1 mt-4 combo-row-delete"
+                            <button type="button" class="btn d-flex py-2 px-1 mt-4 combo-row-delete"
                                 title="Delete variant" aria-label="Delete variant">
                                 <i class="fa-solid fa-trash fs-5 text-danger mt-1" aria-hidden="true"></i>
                             </button>
@@ -497,49 +382,75 @@
                     </div>
                 </div>
             </div>
-
         </div>
+
         <div class="offcanvas-footer">
             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="offcanvas">Close</button>
         </div>
     </div>
 
+    {{-- ================= MEDIA PANEL ================= --}}
     <div class="offcanvas offcanvas-end" tabindex="-1" id="mediaLibraryModal" aria-labelledby="mediaLibraryModalLabel">
         <div class="offcanvas-header">
             <h5 class="offcanvas-title" id="mediaLibraryModalLabel">Media</h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
-        <div class="offcanvas-body">
-            <div class="mm-dropzone" id="mediaLibDropzone">
-                <i class="fa-solid fa-cloud-arrow-up"></i>
-                <div class="mm-drop-title">Drag and drop images here</div>
-                <div class="mm-drop-sub">or click to browse from your computer</div>
-            </div>
-            <input type="file" id="mediaLibFileInput" accept="image/*" multiple class="d-none">
 
-            <div class="mm-library-grid mt-3" id="mediaLibGrid"></div>
+        <div class="offcanvas-body">
+            <div class="card p-4 mb-3">
+                <p class="fs-6 fw-semibold">Upload</p>
+                <div class="mm-dropzone" id="mediaLibDropzone">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <div class="mm-drop-title">Drag and drop images here</div>
+                    <div class="mm-drop-sub">or click to browse from your computer</div>
+                </div>
+                <input type="file" id="mediaLibFileInput" accept="image/*" multiple>
+            </div>
+
+            <div class="card p-4 mb-3">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <p class="fs-6 fw-semibold mb-0">Library</p>
+                    <label class="ml-select-all d-flex align-items-center gap-2 mb-0" for="mediaSelectAll">
+                        <input type="checkbox" class="form-check-input check-black m-0" id="mediaSelectAll">
+                        <span>Select all</span>
+                    </label>
+                </div>
+                <div class="ml-grid" id="mediaLibGrid"></div>
+            </div>
+        </div>
+
+        <div class="offcanvas-footer">
+            <span class="me-auto small text-muted align-self-center" id="mediaSelectedCount">0 selected</span>
+            <button type="button" class="btn btn-outline-danger" id="mediaDeleteSelectedBtn" disabled>
+                Delete selected
+            </button>
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="offcanvas">Close</button>
         </div>
     </div>
 
-    <div class="modal-overlay" id="lightboxOverlay">
-        <div class="lightbox-content">
-            <button type="button" class="modal-close lightbox-close" id="lightboxClose" aria-label="Close"><i
-                    class="fa-solid fa-xmark"></i></button>
+    {{-- ================= LIGHTBOX ================= --}}
+    <div class="alert-overlay" id="lightboxOverlay">
+        <div class="alert-popup lightbox-popup">
+            <button type="button" class="alert-btn-close" id="lightboxClose" aria-label="Close">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
             <img src="" alt="" id="lightboxImage">
         </div>
     </div>
 
-    <div class="modal-overlay" id="mediaModalOverlay">
-        <div class="media-modal">
+    {{-- ================= VARIANT IMAGE PICKER ================= --}}
+    <div class="alert-overlay" id="mediaModalOverlay">
+        <div class="alert-popup media-modal">
             <div class="media-modal-header">
-                <div class="media-modal-title" id="mediaModalTitle">Add combination image</div>
-                <button type="button" class="modal-close" id="mediaModalClose" aria-label="Close"><i
-                        class="fa-solid fa-xmark"></i></button>
+                <div class="media-modal-title">Add combination image</div>
+                <button type="button" class="alert-btn-close" id="mediaModalClose" aria-label="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </div>
 
-            <div class="media-modal-tabs" id="mediaModalTabs">
-                <button type="button" class="mm-tab active" data-tab="upload">Upload</button>
-                <button type="button" class="mm-tab" data-tab="library">Select from library</button>
+            <div class="nav nav-tabs media-modal-tabs" id="mediaModalTabs">
+                <button type="button" class="nav-link active" data-tab="upload">Upload</button>
+                <button type="button" class="nav-link" data-tab="library">Select from library</button>
             </div>
 
             <div class="media-modal-body">
@@ -549,16 +460,15 @@
                         <div class="mm-drop-title">Drag and drop an image here</div>
                         <div class="mm-drop-sub">or click to browse from your computer</div>
                     </div>
-                    <input type="file" id="mmFileInput" accept="image/*" class="d-none">
+                    <input type="file" id="mmFileInput" accept="image/*">
                 </div>
 
                 <div class="mm-panel" id="mmLibraryPanel">
                     <div class="mm-library-toolbar">
-                        <div class="mm-search-box">
-                            <i class="fa-solid fa-magnifying-glass"></i>
+                        <div class="search-box">
+                            <i class="fa-solid fa-magnifying-glass s-icon"></i>
                             <input type="text" id="mmLibrarySearch" placeholder="Search image library">
                         </div>
-                        <div class="mm-selected-count" id="mmSelectedCount">0 selected</div>
                     </div>
                     <div class="mm-library-grid" id="mmLibraryGrid"></div>
                 </div>
@@ -572,23 +482,67 @@
     </div>
 @endsection
 
+
+{{-- ======================================================================
+     STYLES
+     ====================================================================== --}}
 @push('css')
     <style>
+        /* ---------- Page & shared form bits ---------- */
+        #content {
+            padding-bottom: 0;
+        }
+
+        .card {
+            box-shadow: 1px 4px 15px 0 rgb(0 0 0 / 15%);
+            border-radius: 5px;
+        }
+
+        /* Colours come from the global checkbox style; only the size is set here */
+        .check-black[type=checkbox] {
+            width: 1.1rem;
+            height: 1.1rem;
+        }
+
+        .info-dot {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #212529;
+            color: #fff;
+            font-size: 11px;
+            cursor: help;
+        }
+
+        .perf-chart {
+            height: 170px;
+        }
+
+        #summernote p {
+            margin-bottom: 0;
+        }
+
+        input[type=file] {
+            display: none;
+        }
+
+        /* ---------- Select2 tags (variant values) ---------- */
         .select2-container--default .select2-selection--multiple .select2-selection__choice.select2-selection__choice {
             display: inline-flex;
             align-items: center;
             background-color: #1a1a1a;
             border: 1px solid #1a1a1a;
             border-radius: 6px;
-            padding: 0;
-            padding-left: 5px;
-            padding-right: 0;
+            padding: 0 0 0 5px;
             margin: 4px 0 0 6px;
             font-size: 14px;
             font-weight: 500;
             line-height: 24px;
             color: #fff;
-            transition: background-color 0.15s ease, border-color 0.15s ease;
+            transition: background-color .15s ease, border-color .15s ease;
         }
 
         .select2-container--default .select2-selection--multiple .select2-selection__choice.select2-selection__choice:hover {
@@ -597,31 +551,25 @@
         }
 
         .select2-container--default .select2-selection--multiple .select2-selection__choice__display.select2-selection__choice__display {
-            padding-left: 4px;
-            padding-right: 6px;
+            padding: 0 6px 0 4px;
             color: inherit;
             font-weight: 500;
         }
 
         .select2-container--default .select2-selection--multiple .select2-selection__choice__remove.select2-selection__choice__remove {
             position: static;
-            left: auto;
             order: 2;
-            border: none;
-            border-left: 1px solid rgba(255, 255, 255, 0.25);
-            border-right: none;
-            border-top-left-radius: 0;
-            border-bottom-left-radius: 0;
-            border-top-right-radius: 6px;
-            border-bottom-right-radius: 6px;
-            padding: 0 5px;
-            color: #fff;
-            background-color: transparent;
-            font-weight: 500;
-            font-size: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 0 5px;
+            border: 0;
+            border-left: 1px solid rgba(255, 255, 255, .25);
+            border-radius: 0 6px 6px 0;
+            background: transparent;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 500;
             cursor: pointer;
         }
 
@@ -632,848 +580,24 @@
             outline: none;
         }
 
-        .select2-container--default[dir=rtl] .select2-selection--multiple .select2-selection__choice.select2-selection__choice {
-            padding-left: 10px;
-            padding-right: 0;
-            margin-left: 6px;
-            margin-right: 0;
-        }
-    </style>
-@endpush
-@push('js')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-    <script>
-        $(function() {
-            $('input[name="ship_type"]').on('change', function() {
-                $('#shippingDetailsBox').toggleClass('d-none', this.value === 'digital');
-                $('#digitalShippingFields').toggleClass('d-none', this.value === 'physical');
-            }).filter(':checked').trigger('change');
-        });
-
-        $('#summernote').summernote({
-            placeholder: 'Write Here',
-            tabsize: 2,
-            height: 120,
-            toolbar: [
-                ['font', ['bold', 'italic', 'underline', 'clear']],
-                ['color', []],
-                ['insert', ['link', 'picture']],
-                ['view', ['codeview']]
-            ]
-        });
-
-        // Variant combination image: upload / library picker
-        const MEDIA_LIBRARY = [{
-                id: 'lib1',
-                name: 'Black — front',
-                url: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&q=80'
-            },
-            {
-                id: 'lib2',
-                name: 'Black — side',
-                url: 'https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=200&q=80'
-            },
-            {
-                id: 'lib3',
-                name: 'Silver — front',
-                url: 'https://images.unsplash.com/photo-1544117519-31a4b719223d?w=200&q=80'
-            },
-            {
-                id: 'lib4',
-                name: 'Packaging',
-                url: 'https://images.unsplash.com/photo-1622434641406-a158123450f9?w=200&q=80'
-            },
-            {
-                id: 'lib5',
-                name: 'On desk',
-                url: 'https://images.unsplash.com/photo-1434493907317-a46b5bbe7834?w=200&q=80'
-            },
-            {
-                id: 'lib6',
-                name: 'Top view',
-                url: 'https://images.unsplash.com/photo-1533139502658-0198f920d8e8?w=200&q=80'
-            }
-        ];
-
-        // Media library sidebar: upload images and view them in a lightbox (no selection)
-        (function() {
-            const $grid = $('#mediaLibGrid');
-            const $dropzone = $('#mediaLibDropzone');
-            const $fileInput = $('#mediaLibFileInput');
-
-            function addImageToGrid(url, name) {
-                $grid.prepend(
-                    $('<div class="mm-library-item" data-lightbox-src="' + url + '">' +
-                        '<img src="' + url + '" alt="' + (name || 'Product image') + '">' +
-                        '<span class="mm-name">' + (name || 'Product image') + '</span>' +
-                        '</div>')
-                );
-            }
-
-            MEDIA_LIBRARY.forEach(function(item) {
-                addImageToGrid(item.url, item.name);
-            });
-
-            function handleLibraryUploadFiles(fileList) {
-                Array.from(fileList || []).filter(function(f) {
-                    return f.type.startsWith('image/');
-                }).forEach(function(file) {
-                    const reader = new FileReader();
-                    reader.onload = function(ev) {
-                        addImageToGrid(ev.target.result, file.name);
-                    };
-                    reader.readAsDataURL(file);
-                });
-            }
-
-            $dropzone.on('click', function() {
-                $fileInput.trigger('click');
-            });
-            $dropzone.on('dragover', function(e) {
-                e.preventDefault();
-                $(this).addClass('drag-over');
-            });
-            $dropzone.on('dragleave', function() {
-                $(this).removeClass('drag-over');
-            });
-            $dropzone.on('drop', function(e) {
-                e.preventDefault();
-                $(this).removeClass('drag-over');
-                handleLibraryUploadFiles(e.originalEvent.dataTransfer.files);
-            });
-            $fileInput.on('change', function(e) {
-                handleLibraryUploadFiles(e.target.files);
-                $(this).val('');
-            });
-
-            $(document).on('click', '#mediaLibGrid .mm-library-item', function() {
-                $('#lightboxImage').attr('src', $(this).data('lightbox-src'));
-                $('#lightboxOverlay').addClass('show');
-            });
-
-            function closeLightbox() {
-                $('#lightboxOverlay').removeClass('show');
-                $('#lightboxImage').attr('src', '');
-            }
-
-            $('#lightboxClose').on('click', closeLightbox);
-            $('#lightboxOverlay').on('click', function(e) {
-                if (e.target === this) closeLightbox();
-            });
-            $(document).on('keydown', function(e) {
-                if (e.key === 'Escape') closeLightbox();
-            });
-        })();
-
-        // Product Performance chart — demo data from a free, key-free public API
-        // (CoinGecko's keyless market_chart endpoint) standing in for a real
-        // sales/traffic endpoint. Swap fetchPerformanceSeries() for your own
-        // backend call later. If the API or the Chart.js CDN is unreachable,
-        // a locally generated series is used instead so the card never sits blank.
-        (function() {
-            const $current = $('#perfCurrentValue');
-            const $change = $('#perfChangeValue');
-            const $error = $('#perfErrorMsg');
-            const canvas = document.getElementById('productPerformanceChart');
-            if (!canvas) return;
-
-            function formatLabel(d) {
-                return d.toLocaleDateString(undefined, {
-                    month: 'short',
-                    day: 'numeric'
-                });
-            }
-
-            function fetchPerformanceSeries() {
-                const url = 'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart' +
-                    '?vs_currency=usd&days=14&interval=daily';
-
-                return fetch(url).then(function(res) {
-                    if (!res.ok) throw new Error('Request failed: ' + res.status);
-                    return res.json();
-                }).then(function(data) {
-                    const points = data.prices || [];
-                    if (!points.length) throw new Error('Empty series');
-                    return {
-                        labels: points.map(function(p) {
-                            return formatLabel(new Date(p[0]));
-                        }),
-                        values: points.map(function(p) {
-                            return p[1];
-                        })
-                    };
-                });
-            }
-
-            // Used only if the live API call above fails (offline, rate-limited,
-            // blocked by network policy, etc.) so the chart still has something to draw.
-            function buildFallbackSeries() {
-                const labels = [];
-                const values = [];
-                const today = new Date();
-                let value = 800 + Math.random() * 200;
-                for (let i = 13; i >= 0; i--) {
-                    const d = new Date(today);
-                    d.setDate(today.getDate() - i);
-                    value = Math.max(50, value + (Math.random() - 0.45) * 40);
-                    labels.push(formatLabel(d));
-                    values.push(Math.round(value * 100) / 100);
-                }
-                return {
-                    labels: labels,
-                    values: values
-                };
-            }
-
-            function renderChart(series) {
-                const last = series.values[series.values.length - 1];
-                const first = series.values[0];
-                const pctChange = first ? ((last - first) / first) * 100 : 0;
-
-                $current.text('$' + last.toLocaleString(undefined, {
-                    maximumFractionDigits: 2
-                }));
-                $change.text((pctChange >= 0 ? '+' : '') + pctChange.toFixed(2) + '%')
-                    .css('color', pctChange >= 0 ? '#0f9d58' : '#d93025');
-
-                new Chart(canvas, {
-                    type: 'line',
-                    data: {
-                        labels: series.labels,
-                        datasets: [{
-                            label: 'Performance',
-                            data: series.values,
-                            borderColor: '#111',
-                            backgroundColor: 'rgba(17,17,17,0.08)',
-                            fill: true,
-                            tension: 0.35,
-                            pointRadius: 0,
-                            borderWidth: 2
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        },
-                        scales: {
-                            x: {
-                                grid: {
-                                    display: false
-                                },
-                                ticks: {
-                                    maxTicksLimit: 5,
-                                    font: {
-                                        size: 10
-                                    }
-                                }
-                            },
-                            y: {
-                                grid: {
-                                    color: '#f1f1f1'
-                                },
-                                ticks: {
-                                    font: {
-                                        size: 10
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-
-            fetchPerformanceSeries()
-                .catch(function() {
-                    return buildFallbackSeries();
-                })
-                .then(function(series) {
-                    if (typeof Chart === 'undefined') throw new Error('Chart.js not loaded');
-                    renderChart(series);
-                })
-                .catch(function() {
-                    $error.removeClass('d-none');
-                });
-        })();
-
-        let mmSelectedLibraryId = null;
-        let comboImageTarget = null;
-
-        function renderLibraryGrid(filter) {
-            const q = (filter || '').trim().toLowerCase();
-            const $grid = $('#mmLibraryGrid').empty();
-            MEDIA_LIBRARY
-                .filter(item => !q || item.name.toLowerCase().includes(q))
-                .forEach(item => {
-                    const selected = mmSelectedLibraryId === item.id;
-                    $grid.append(
-                        $('<div class="mm-library-item' + (selected ? ' selected' : '') + '" data-lib-id="' + item
-                            .id + '">' +
-                            '<img src="' + item.url + '" alt="' + item.name + '">' +
-                            '<span class="mm-check"><i class="fa-solid fa-check"></i></span>' +
-                            '<span class="mm-name">' + item.name + '</span>' +
-                            '</div>')
-                    );
-                });
+        /* ---------- Shipping type toggle (builds on the global .status-toggle) ---------- */
+        .status-toggle{ 
+            padding: 5px; 
+            box-shadow: 0 1px 2px rgba(10, 74, 110, 0.03), 0 8px 20px -12px rgba(10, 74, 110, 0.18);
         }
 
-        function updateAddButtonState() {
-            const uploadActive = $('#mmUploadPanel').hasClass('active');
-            const $addBtn = $('#mediaModalAdd');
-            if (uploadActive) {
-                $addBtn.prop('disabled', true);
-            } else {
-                $addBtn.prop('disabled', !mmSelectedLibraryId);
-            }
+        .ship-toggle .status-toggle-button {
+            padding-block: 11px;
         }
 
-        function openMediaModal($target) {
-            comboImageTarget = $target;
-            mmSelectedLibraryId = null;
-            $('#mmLibrarySearch').val('');
-            renderLibraryGrid('');
-            $('.mm-tab').removeClass('active').filter('[data-tab="upload"]').addClass('active');
-            $('.mm-panel').removeClass('active');
-            $('#mmUploadPanel').addClass('active');
-            updateAddButtonState();
-            $('#mediaModalOverlay').addClass('show');
-        }
-
-        function closeMediaModal() {
-            $('#mediaModalOverlay').removeClass('show');
-            comboImageTarget = null;
-        }
-
-        function setComboImage(url) {
-            if (!comboImageTarget) return;
-            comboImageTarget.addClass('has-image');
-            comboImageTarget.find('[data-combo-preview]').attr('src', url);
-            comboImageTarget.find('[data-combo-value]').val(url);
-        }
-
-        $(document).on('click', '[data-combo-image]', function(e) {
-            e.preventDefault();
-            openMediaModal($(this));
-        });
-
-        $(document).on('click', '[data-combo-remove]', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            const $picker = $(this).closest('[data-combo-image]');
-            $picker.removeClass('has-image');
-            $picker.find('[data-combo-preview]').attr('src', '');
-            $picker.find('[data-combo-value]').val('');
-        });
-
-        $('#mediaModalClose, #mediaModalCancel').on('click', closeMediaModal);
-        $('#mediaModalOverlay').on('click', function(e) {
-            if (e.target === this) closeMediaModal();
-        });
-        $(document).on('keydown', function(e) {
-            if (e.key === 'Escape') closeMediaModal();
-        });
-
-        $('#mediaModalTabs').on('click', '.mm-tab', function() {
-            $('.mm-tab').removeClass('active');
-            $(this).addClass('active');
-            const tab = $(this).data('tab');
-            $('.mm-panel').removeClass('active');
-            $('#mm' + (tab === 'upload' ? 'Upload' : 'Library') + 'Panel').addClass('active');
-            updateAddButtonState();
-        });
-
-        $('#mmDropzone').on('click', function() {
-            $('#mmFileInput').trigger('click');
-        });
-        $('#mmDropzone').on('dragover', function(e) {
-            e.preventDefault();
-            $(this).addClass('drag-over');
-        });
-        $('#mmDropzone').on('dragleave', function() {
-            $(this).removeClass('drag-over');
-        });
-        $('#mmDropzone').on('drop', function(e) {
-            e.preventDefault();
-            $(this).removeClass('drag-over');
-            handleUploadFiles(e.originalEvent.dataTransfer.files);
-        });
-        $('#mmFileInput').on('change', function(e) {
-            handleUploadFiles(e.target.files);
-            $(this).val('');
-        });
-
-        function handleUploadFiles(fileList) {
-            const file = Array.from(fileList || []).find(f => f.type.startsWith('image/'));
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(ev) {
-                setComboImage(ev.target.result);
-                closeMediaModal();
-            };
-            reader.readAsDataURL(file);
-        }
-
-        $('#mmLibrarySearch').on('input', function() {
-            renderLibraryGrid($(this).val());
-        });
-
-        $('#mmLibraryGrid').on('click', '.mm-library-item', function() {
-            mmSelectedLibraryId = $(this).data('lib-id');
-            renderLibraryGrid($('#mmLibrarySearch').val());
-            updateAddButtonState();
-        });
-
-        $('#mediaModalAdd').on('click', function() {
-            if ($(this).prop('disabled')) return;
-            const item = MEDIA_LIBRARY.find(i => i.id === mmSelectedLibraryId);
-            if (item) setComboImage(item.url);
-            closeMediaModal();
-        });
-
-        $('#submitNoteBtn').on('click', function() {
-            if ($('#summernote').summernote('isEmpty')) {
-                return;
-            }
-
-            let content = $('#summernote').summernote('code');
-            const temp = $('<div>').html(content);
-
-            temp.find('img').each(function() {
-                const src = $(this).attr('src');
-                const iconLink = $('<a>')
-                    .attr('href', src)
-                    .attr('target', '_blank')
-                    .attr('rel', 'noopener noreferrer')
-                    .addClass('text-secondary')
-                    .html('<i class="fa-solid fa-image"></i> View image');
-
-                $(this).replaceWith(iconLink);
-            });
-
-            content = temp.html();
-            $('#summernote-result').html(content);
-
-            $('#summernote').summernote('reset');
-        });
-
-        // Card reordering: up/down buttons, order saved to a cookie (falls back to localStorage)
-        (function() {
-            const COOKIE_DAYS = 365;
-
-            function cookiesAvailable() {
-                if (!navigator.cookieEnabled) return false;
-                try {
-                    document.cookie = 'cookie_test=1;path=/;SameSite=Lax';
-                    const ok = document.cookie.indexOf('cookie_test=') !== -1;
-                    document.cookie = 'cookie_test=;path=/;max-age=0';
-                    return ok;
-                } catch (e) {
-                    return false;
-                }
-            }
-
-            function setCookie(key, value) {
-                const maxAge = COOKIE_DAYS * 24 * 60 * 60;
-                document.cookie = key + '=' + encodeURIComponent(value) + ';path=/;max-age=' + maxAge + ';SameSite=Lax';
-            }
-
-            function getCookie(key) {
-                const match = document.cookie.match(new RegExp('(?:^|; )' + key + '=([^;]*)'));
-                return match ? decodeURIComponent(match[1]) : null;
-            }
-
-            function saveOrder(key, orderArray) {
-                const value = JSON.stringify(orderArray);
-                if (cookiesAvailable()) {
-                    setCookie(key, value);
-                } else {
-                    try {
-                        localStorage.setItem(key, value);
-                    } catch (e) {}
-                }
-            }
-
-            function loadOrder(key) {
-                const fromCookie = getCookie(key);
-                if (fromCookie) {
-                    try {
-                        return JSON.parse(fromCookie);
-                    } catch (e) {}
-                }
-                try {
-                    const fromLocal = localStorage.getItem(key);
-                    if (fromLocal) return JSON.parse(fromLocal);
-                } catch (e) {}
-                return null;
-            }
-
-            function swapNodes(n1, n2) {
-                const parent = n1.parentNode;
-                if (!parent || n2.parentNode !== parent) return;
-                if (n1.nextSibling === n2) {
-                    parent.insertBefore(n2, n1);
-                    return;
-                }
-                if (n2.nextSibling === n1) {
-                    parent.insertBefore(n1, n2);
-                    return;
-                }
-                const next1 = n1.nextSibling;
-                const next2 = n2.nextSibling;
-                parent.insertBefore(n1, next2);
-                parent.insertBefore(n2, next1);
-            }
-
-            function findAdjacentCard(card, direction) {
-                let el = direction === 'up' ? card.previousElementSibling : card.nextElementSibling;
-                while (el && !el.classList.contains('sortable-card')) {
-                    el = direction === 'up' ? el.previousElementSibling : el.nextElementSibling;
-                }
-                return el;
-            }
-
-            function initSortableGroup(containerId, storageKey) {
-                const container = document.getElementById(containerId);
-                if (!container) return;
-
-                const savedOrder = loadOrder(storageKey);
-                if (savedOrder && savedOrder.length) {
-                    savedOrder.forEach(function(cardId) {
-                        const el = container.querySelector(':scope > .sortable-card[data-card-id="' + cardId +
-                            '"]');
-                        if (el) container.appendChild(el);
-                    });
-                }
-
-                function cardList() {
-                    return Array.from(container.querySelectorAll(':scope > .sortable-card'));
-                }
-
-                function refreshDisabledStates() {
-                    const cards = cardList();
-                    cards.forEach(function(card, i) {
-                        card.querySelector('[data-move="up"]').disabled = (i === 0);
-                        card.querySelector('[data-move="down"]').disabled = (i === cards.length - 1);
-                    });
-                }
-
-                container.addEventListener('click', function(e) {
-                    const moveBtn = e.target.closest('[data-move]');
-                    if (!moveBtn || moveBtn.disabled) return;
-                    const card = moveBtn.closest('.sortable-card');
-                    const target = findAdjacentCard(card, moveBtn.dataset.move);
-                    if (!target) return;
-                    swapNodes(card, target);
-                    refreshDisabledStates();
-                    saveOrder(storageKey, cardList().map(function(el) {
-                        return el.dataset.cardId;
-                    }));
-                });
-
-                refreshDisabledStates();
-            }
-
-            initSortableGroup('col8SortArea', 'productFormCardOrder_col8');
-            initSortableGroup('col4SortArea', 'productFormCardOrder_col4');
-        })();
-
-        // Variant type rows: add / remove
-        (function() {
-            const $wrap = $('#variantTypeRows');
-            const template = $wrap.find('.variant-type-row').first().clone();
-
-            $('#addVariantTypeBtn').on('click', function() {
-                const $row = template.clone();
-                $row.find('.variant-type-select').prop('selectedIndex', 0);
-                $row.find('.variant-value-select').val([]);
-                $wrap.append($row);
-            });
-
-            $(document).on('click', '.variant-type-delete', function() {
-                if ($wrap.find('.variant-type-row').length <= 1) return;
-                $(this).closest('.variant-type-row').remove();
-            });
-        })();
-
-        // Variants Table: generate combinations from the variant type rows above,
-        // or add a combination manually. Both feed the same row list.
-        (function() {
-            const $rowsContainer = $('#generatedComboRows');
-            const $wrap = $('#generatedVariantsWrap');
-            const rowTemplate = $('#comboRowTemplate .combo-row').first();
-
-            function blankRow(pillsHtml) {
-                const $row = rowTemplate.clone();
-                $row.find('.variant-pills').html(pillsHtml || '<span class="variant-pill">New combination</span>');
-                return $row;
-            }
-
-            $('#generateVariationsBtn').on('click', function() {
-                const rows = $('#variantTypeRows .variant-type-row').map(function() {
-                    const typeEl = $(this).find('.variant-type-select')[0];
-                    const valueEl = $(this).find('.variant-value-select')[0];
-                    return {
-                        type: typeEl.options[typeEl.selectedIndex].text,
-                        values: Array.from(valueEl.selectedOptions).map(function(o) {
-                            return o.text;
-                        })
-                    };
-                }).get().filter(function(r) {
-                    return r.values.length;
-                });
-
-                if (!rows.length) return;
-
-                let combos = [
-                    []
-                ];
-                rows.forEach(function(r) {
-                    const next = [];
-                    combos.forEach(function(c) {
-                        r.values.forEach(function(v) {
-                            next.push(c.concat([{
-                                type: r.type,
-                                value: v
-                            }]));
-                        });
-                    });
-                    combos = next;
-                });
-
-                $rowsContainer.empty();
-                combos.forEach(function(combo) {
-                    const pillsHtml = combo.map(function(c) {
-                        return '<span class="variant-pill">' + c.type + ': ' + c.value +
-                            '</span>';
-                    }).join('');
-                    $rowsContainer.append(blankRow(pillsHtml));
-                });
-                $wrap.removeClass('d-none');
-            });
-
-            $('#addComboRowBtn').on('click', function() {
-                $rowsContainer.append(blankRow());
-                $wrap.removeClass('d-none');
-            });
-
-            $(document).on('click', '.combo-row-delete', function() {
-                $(this).closest('.combo-row').remove();
-            });
-        })();
-
-        // Sticky bottom action bar — status is tracked in a hidden field;
-        // wire the actual save/schedule/publish requests to your own endpoints.
-        (function() {
-            const $status = $('<input type="hidden" name="status" id="productStatusInput" value="draft">');
-            $('body').append($status);
-
-            function setStatus(value, $btn) {
-                $status.val(value);
-                $btn.prop('disabled', true).data('originalText', $btn.html());
-                setTimeout(function() {
-                    $btn.prop('disabled', false);
-                }, 600);
-            }
-
-            $('#saveDraftBtn').on('click', function() {
-                setStatus('draft', $(this));
-            });
-            $('#scheduleBtn').on('click', function() {
-                setStatus('scheduled', $(this));
-            });
-            $('#publishBtn').on('click', function() {
-                setStatus('published', $(this));
-            });
-        })();
-    </script>
-@endpush
-
-@push('css')
-    <style>
-        #content{
-            padding-bottom: 0px;
-        }
-
-        .card {
-            box-shadow: 1px 4px 15px 0px rgb(0 0 0 / 15%);
-            border-radius: 5px;
-        }
-
-        .check-black[type=checkbox],
-        .check-black[type=checkbox] {
-            border-color: #bbb;
-            background-color: #efefef;
-            width: 1.22rem;
-            height: 1.22rem;
-            letter-spacing: 0px;
-            word-spacing: 0px;
-        }
-
-        .check-black[type="checkbox"]:checked,
-        .check-black[type="checkbox"]:indeterminate {
-            background-color: #111111;
-            border-color: #111111;
-        }
-
-        .form-select {
-            padding: .6rem 1rem;
-            border: 2px solid #dee2e6;
-        }
-
-        .ship-type-row {
-            display: flex;
-            gap: 5px;
-            width: 400px;
-            max-width: 100%;
-            padding: 1px;
-            background: #EFEFEF;
-            border: 1px solid #dddddd;
-            border-radius: 6px;
-        }
-
-        .ship-type-input {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border: 0;
-        }
-
-        .ship-type-btn {
-            flex: 1;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 10px;
-            border: 1px solid transparent;
-            border-radius: 5px;
-            background: transparent;
-            color: #777d86;
-            font: inherit;
-            font-size: 14px;
-            font-weight: 500;
-            white-space: nowrap;
-            cursor: pointer;
-            transition: color .2s ease, background .2s ease, box-shadow .2s ease, border-color .2s ease;
-        }
-
-        .ship-type-btn i {
-            font-size: 15px;
-            color: #8b9097;
-            transition: color .2s ease;
-        }
-
-        .ship-type-btn:hover {
-            color: #353a42;
-        }
-
-        .ship-type-btn:hover i {
-            color: #555b63;
-        }
-
-        .ship-type-input:checked+.ship-type-btn {
-            background: #ffffff;
-            color: #111;
-            border-color: #d7d9db;
-            box-shadow: 0 0px 6px rgb(0 0 0 / 20%);
-        }
-
-        .ship-type-input:checked+.ship-type-btn i {
-            color: #2563eb;
-        }
-
-        .ship-type-input:focus-visible+.ship-type-btn {
-            outline: 2px solid rgba(0, 0, 0, .18);
-            outline-offset: 2px;
-        }
-
-        @media (max-width: 600px) {
-            .ship-type-row {
-                width: calc(100% - 30px);
-            }
-
-            .ship-type-btn {
-                padding: 11px 8px;
-                font-size: 13px;
-            }
-        }
-
-        #summernote p {
-            margin-bottom: 0;
-        }
-
-        .combo-img-picker {
-            width: 64px;
-            height: 64px;
-            flex-shrink: 0;
-            cursor: pointer;
-            overflow: hidden;
-            position: relative;
-            background: #ececec;
-        }
-
-        .combo-img-picker img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: none;
-        }
-
-        .combo-img-picker.has-image svg {
-            display: none;
-        }
-
-        .combo-img-picker.has-image img {
-            display: block;
-        }
-
-        .combo-img-picker .combo-img-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(17, 17, 17, .45);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .ship-toggle .status-toggle-input:checked+.status-toggle-button {
+            background: #232133;
             color: #fff;
-            font-size: 14px;
-            opacity: 0;
-            transition: opacity .15s ease;
-        }
-
-        .combo-img-picker.has-image:hover .combo-img-overlay {
             opacity: 1;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .25);
         }
 
-        .combo-img-picker .combo-img-remove {
-            position: absolute;
-            top: 3px;
-            right: 3px;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: rgba(17, 17, 17, .7);
-            color: #fff;
-            border: none;
-            font-size: 9px;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 2;
-        }
-
-        .combo-img-picker.has-image .combo-img-remove {
-            display: flex;
-        }
-
-        /* Card reordering */
+        /* ---------- Card reordering ---------- */
         .sortable-card {
             position: relative;
         }
@@ -1488,13 +612,21 @@
             gap: 2px;
         }
 
+        .card-move-wrap--inline {
+            position: static;
+            flex-shrink: 0;
+            justify-content: center;
+            padding: 0 12px;
+            border-left: 1px solid #eee;
+        }
+
         .card-move-btn {
             width: 24px;
             height: 22px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: none;
+            border: 0;
             border-radius: 5px;
             background: linear-gradient(45deg, #0000001a, transparent);
             color: #a1a5ab;
@@ -1511,6 +643,7 @@
             cursor: not-allowed;
         }
 
+        /* ---------- Panel trigger cards ---------- */
         .variants-trigger-card {
             display: flex;
             align-items: stretch;
@@ -1518,20 +651,12 @@
             border: 1px solid #eee;
             border-radius: 8px;
             margin-bottom: 1rem;
-            box-shadow: 1px 4px 15px 0px rgb(0 0 0 / 15%);
-            transition: box-shadow .15s ease, transform .15s ease;
+            box-shadow: 1px 4px 15px 0 rgb(0 0 0 / 15%);
+            transition: box-shadow .15s ease;
         }
 
         .variants-trigger-card:hover {
             box-shadow: 0 6px 20px rgb(0 0 0 / 18%);
-        }
-
-        .card-move-wrap--inline {
-            position: static;
-            flex-shrink: 0;
-            justify-content: center;
-            padding: 0 12px;
-            border-left: 1px solid #eee;
         }
 
         .variants-trigger-btn {
@@ -1540,24 +665,24 @@
             gap: 14px;
             flex: 1;
             min-width: 0;
-            text-align: left;
-            background: transparent;
-            border: none;
-            border-radius: 8px;
             padding: 18px 20px;
+            border: 0;
+            border-radius: 8px;
+            background: transparent;
+            text-align: left;
         }
 
         .variants-trigger-icon {
             width: 42px;
             height: 42px;
-            border-radius: 8px;
-            background: #111;
-            color: #fff;
+            flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
+            border-radius: 8px;
+            background: #111;
+            color: #fff;
             font-size: 17px;
-            flex-shrink: 0;
         }
 
         .variants-trigger-text {
@@ -1568,328 +693,52 @@
             color: #999;
         }
 
-        #variantsModal {
-            --bs-offcanvas-width: 880px;
-        }
-
-        #variantsModal .offcanvas-body {
-            background: #f8f9fa;
-        }
-
+        /* ---------- Side panels (Variants + Media): full width minus sidebar ---------- */
+        #variantsModal,
         #mediaLibraryModal {
-            --bs-offcanvas-width: 640px;
+            --bs-offcanvas-width: calc(100vw - var(--sidebar-w, 0px));
+            max-width: 100vw;
         }
 
-        .lightbox-content {
-            position: relative;
-            max-width: 90vw;
-            max-height: 90vh;
+        html.sb-collapsed #variantsModal,
+        html.sb-collapsed #mediaLibraryModal {
+            --bs-offcanvas-width: calc(100vw - var(--sidebar-collapsed));
         }
 
-        .lightbox-content img {
-            max-width: 90vw;
-            max-height: 90vh;
-            border-radius: 10px;
-            display: block;
+        #variantsModal .offcanvas-body,
+        #mediaLibraryModal .offcanvas-body {
+            background: #f8f9fa;
+            /* centers content with a max width on very wide screens */
+            padding: 24px max(24px, calc((100% - 1200px) / 2));
         }
 
-        .lightbox-close {
-            position: absolute;
-            top: -14px;
-            right: -14px;
+        #variantsModal .offcanvas-header,
+        #mediaLibraryModal .offcanvas-header,
+        .offcanvas-footer {
             background: #fff;
+            padding-left: 24px;
+            padding-right: 24px;
+        }
+
+        #variantsModal .offcanvas-header,
+        #mediaLibraryModal .offcanvas-header {
+            border-bottom: 1px solid #dee2e6;
         }
 
         .offcanvas-footer {
             display: flex;
             justify-content: flex-end;
             gap: 10px;
-            padding: 16px 22px;
+            padding-top: 16px;
+            padding-bottom: 16px;
             border-top: 1px solid #dee2e6;
             flex-shrink: 0;
         }
 
-        /* Sticky bottom action bar */
-        .sticky-action-bar {
-            position: sticky;
-            bottom: 0;
-            left: 0;
-            right: 0;
+        /* ---------- Variant rows ---------- */
+        .variant-type-row,
+        .combo-row {
             background: #fff;
-            border-top: 1px solid #e5e5e5;
-            box-shadow: 0 -6px 20px rgb(0 0 0 / 8%);
-            z-index: 1040;
-            margin-top: 1.5rem;
-        }
-
-        .sticky-action-bar-inner {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            padding: 14px 20px;
-            border: 1px solid #00000035;
-            box-shadow: 0px 0px 10px #00000020;
-            border-radius: 5px 5px 0px 0px;
-        }
-
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(17, 17, 17, .55);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1060;
-            padding: 20px;
-        }
-
-        .modal-overlay.show {
-            display: flex;
-        }
-
-        .media-modal {
-            background: #fff;
-            border-radius: 18px;
-            width: 100%;
-            max-width: 620px;
-            max-height: 84vh;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 24px 60px rgba(20, 20, 40, .28);
-            overflow: hidden;
-        }
-
-        .media-modal-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 18px 22px;
-            border-bottom: 1px solid #dee2e6;
-            flex-shrink: 0;
-        }
-
-        .media-modal-title {
-            font-size: 15.5px;
-            font-weight: 600;
-        }
-
-        .modal-close {
-            width: 30px;
-            height: 30px;
-            border-radius: 8px;
-            background: #efefef;
-            border: none;
-            color: #6c757d;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 13px;
-        }
-
-        .modal-close:hover {
-            background: #dee2e6;
-            color: #111;
-        }
-
-        .media-modal-tabs {
-            display: flex;
-            gap: 4px;
-            padding: 12px 22px 0;
-            border-bottom: 1px solid #dee2e6;
-            flex-shrink: 0;
-        }
-
-        .mm-tab {
-            background: none;
-            border: none;
-            padding: 10px 4px 12px;
-            margin-right: 20px;
-            font-size: 13.5px;
-            font-weight: 500;
-            color: #6c757d;
-            border-bottom: 2px solid transparent;
-        }
-
-        .mm-tab.active {
-            color: #111;
-            border-bottom-color: #111;
-        }
-
-        .media-modal-body {
-            padding: 22px;
-            overflow-y: auto;
-            flex: 1;
-            min-height: 320px;
-        }
-
-        .mm-panel {
-            display: none;
-        }
-
-        .mm-panel.active {
-            display: block;
-        }
-
-        .mm-dropzone {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            border: 1.5px dashed #d5d4e4;
-            border-radius: 14px;
-            padding: 52px 20px;
-            text-align: center;
-            cursor: pointer;
-            color: #6c757d;
-            transition: border-color .15s ease, background .15s ease;
-        }
-
-        .mm-dropzone.drag-over,
-        .mm-dropzone:hover {
-            border-color: #111;
-            background: #f1f1f1;
-            color: #111;
-        }
-
-        .mm-dropzone i {
-            font-size: 30px;
-            margin-bottom: 12px;
-        }
-
-        .mm-dropzone:hover .mm-drop-title,
-        .mm-dropzone.drag-over .mm-drop-title {
-            color: #111;
-        }
-
-        .mm-drop-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: #212529;
-            margin-bottom: 4px;
-        }
-
-        .mm-drop-sub {
-            font-size: 12.5px;
-            color: #6c757d;
-        }
-
-        .mm-library-toolbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .mm-search-box {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: #efefef;
-            border-radius: 10px;
-            padding: 9px 14px;
-            color: #6c757d;
-            font-size: 13px;
-        }
-
-        .mm-search-box input {
-            border: none;
-            background: transparent;
-            outline: none;
-            font-size: 13px;
-            color: #212529;
-            width: 100%;
-        }
-
-        .mm-selected-count {
-            font-size: 12.5px;
-            color: #6c757d;
-            font-weight: 500;
-            white-space: nowrap;
-        }
-
-        .mm-library-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-        }
-
-        .mm-library-item {
-            position: relative;
-            border-radius: 12px;
-            overflow: hidden;
-            cursor: pointer;
-            aspect-ratio: 1 / 1;
-            background: #efefef;
-            border: 2px solid transparent;
-        }
-
-        .mm-library-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        .mm-library-item .mm-check {
-            position: absolute;
-            top: 7px;
-            right: 7px;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, .9);
-            border: 1.5px solid #d5d4e4;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            color: transparent;
-            transition: all .12s ease;
-        }
-
-        .mm-library-item.selected {
-            border-color: #111;
-        }
-
-        .mm-library-item.selected .mm-check {
-            background: #111;
-            border-color: #111;
-            color: #fff;
-        }
-
-        .mm-library-item .mm-name {
-            position: absolute;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(0deg, rgba(0, 0, 0, .55), transparent);
-            color: #fff;
-            font-size: 10.5px;
-            padding: 12px 8px 6px;
-            text-overflow: ellipsis;
-            overflow: hidden;
-            white-space: nowrap;
-        }
-
-        @media (max-width: 575px) {
-            .mm-library-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        .media-modal-footer {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            padding: 16px 22px;
-            border-top: 1px solid #dee2e6;
-            flex-shrink: 0;
-        }
-
-        input[type=file] {
-            display: none;
         }
 
         .variant-pills {
@@ -1900,12 +749,12 @@
 
         .variant-pill {
             padding: 3px 10px;
+            border: 1px solid #88888820;
             border-radius: 5px;
             font-size: 13px;
-            line-height: normal;
             font-weight: 600;
-            letter-spacing: 0.3px;
-            border: 1px solid #88888820;
+            line-height: normal;
+            letter-spacing: .3px;
         }
 
         .variant-pills .variant-pill:nth-child(5n+1) {
@@ -1932,5 +781,1103 @@
             background: linear-gradient(135deg, #dbeafe, #bfdbfe);
             color: #1e40af;
         }
+
+        /* Combination image picker */
+        .combo-img-picker {
+            position: relative;
+            width: 64px;
+            height: 64px;
+            flex-shrink: 0;
+            overflow: hidden;
+            background: #ececec;
+            cursor: pointer;
+        }
+
+        .combo-img-icon {
+            font-size: 26px;
+            color: #343c54;
+        }
+
+        .combo-img-picker img {
+            display: none;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .combo-img-picker.has-image img {
+            display: block;
+        }
+
+        .combo-img-picker.has-image .combo-img-icon {
+            display: none;
+        }
+
+        .combo-img-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(17, 17, 17, .45);
+            color: #fff;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity .15s ease;
+        }
+
+        .combo-img-picker.has-image:hover .combo-img-overlay {
+            opacity: 1;
+        }
+
+        .combo-img-remove {
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            z-index: 2;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            border: 0;
+            border-radius: 50%;
+            background: rgba(17, 17, 17, .7);
+            color: #fff;
+            font-size: 9px;
+        }
+
+        .combo-img-picker.has-image .combo-img-remove {
+            display: flex;
+        }
+
+        /* ---------- Media panel ---------- */
+        #mediaLibraryModal {
+            --ml-accent: #111;
+            --ml-accent-ring: rgba(17, 17, 17, .15);
+        }
+
+        #mediaLibraryModal .mm-dropzone {
+            padding: 28px 20px;
+        }
+
+        .ml-select-all {
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            color: #3c4350;
+        }
+
+        .ml-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 16px 12px;
+        }
+
+        .ml-empty {
+            grid-column: 1 / -1;
+            padding: 24px 0;
+            text-align: center;
+            font-size: 13px;
+            color: #6c757d;
+        }
+
+        .ml-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 0;
+        }
+
+        .ml-thumb {
+            position: relative;
+            aspect-ratio: 1 / 1.1;
+            overflow: hidden;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            background: #e9ecf1;
+            cursor: pointer;
+            transition: border-color .15s ease, box-shadow .15s ease;
+        }
+
+        .ml-thumb img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform .25s ease;
+        }
+
+        .ml-item:hover .ml-thumb img {
+            transform: scale(1.05);
+        }
+
+        .ml-item.is-selected .ml-thumb {
+            border-color: var(--ml-accent);
+            box-shadow: 0 0 0 2px var(--ml-accent-ring);
+        }
+
+        .ml-name {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            font-size: 12px;
+            line-height: 1.3;
+            color: #3c4350;
+            word-break: break-word;
+        }
+
+        /* Checkbox (top-left) and edit/delete buttons (top-right): shown on hover or when selected */
+        .ml-check,
+        .ml-actions {
+            position: absolute;
+            top: 6px;
+            opacity: 0;
+            transition: opacity .15s ease;
+        }
+
+        .ml-item:hover .ml-check,
+        .ml-item:hover .ml-actions,
+        .ml-item.is-selected .ml-check,
+        .ml-item.is-selected .ml-actions,
+        .ml-check:focus-within,
+        .ml-actions:focus-within {
+            opacity: 1;
+        }
+
+        .ml-check {
+            left: 6px;
+            width: 20px;
+            height: 20px;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .ml-check input {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .ml-check span {
+            display: block;
+            width: 20px;
+            height: 20px;
+            border: 1px solid #c4cad4;
+            border-radius: 4px;
+            background: #fff;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
+        }
+
+        .ml-check input:checked+span {
+            border-color: var(--ml-accent);
+            background: var(--ml-accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23fff' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round' d='M3.5 8.5l3 3 6-6.5'/%3E%3C/svg%3E") center / 14px no-repeat;
+        }
+
+        .ml-check input:focus-visible+span {
+            outline: 2px solid var(--ml-accent);
+            outline-offset: 2px;
+        }
+
+        .ml-actions {
+            right: 6px;
+            display: flex;
+            gap: 4px;
+        }
+
+        .ml-actions button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            padding: 0;
+            border: 0;
+            border-radius: 50%;
+            background: #fff;
+            color: #444;
+            font-size: 10px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, .25);
+            cursor: pointer;
+        }
+
+        .ml-actions button:hover {
+            background: #f0f2f6;
+        }
+
+        .ml-actions button[data-act="delete"]:hover {
+            background: #fde8e8;
+            color: #c62828;
+        }
+
+        /* ---------- Dropzone (shared by Media panel and image picker) ---------- */
+        .mm-dropzone {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 52px 20px;
+            border: 1.5px dashed #d5d4e4;
+            border-radius: 14px;
+            text-align: center;
+            color: #6c757d;
+            cursor: pointer;
+            transition: border-color .15s ease, background .15s ease;
+        }
+
+        .mm-dropzone:hover,
+        .mm-dropzone.drag-over {
+            border-color: #111;
+            background: #f1f1f1;
+            color: #111;
+        }
+
+        .mm-dropzone i {
+            margin-bottom: 12px;
+            font-size: 30px;
+        }
+
+        .mm-drop-title {
+            margin-bottom: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #212529;
+        }
+
+        .mm-drop-sub {
+            font-size: 12.5px;
+            color: #6c757d;
+        }
+
+        /* ---------- Lightbox + variant image picker (built on .alert-overlay / .alert-popup) ---------- */
+        .lightbox-popup {
+            width: auto;
+            max-width: 90vw;
+            padding: 0;
+            background: none;
+            border: 0;
+        }
+
+        .lightbox-popup img {
+            display: block;
+            max-width: 90vw;
+            max-height: 90vh;
+            border-radius: 10px;
+        }
+
+        .media-modal {
+            display: flex;
+            flex-direction: column;
+            max-width: 620px;
+            max-height: 84vh;
+            padding: 0;
+            text-align: left;
+        }
+
+        .media-modal-header,
+        .media-modal-footer {
+            display: flex;
+            flex-shrink: 0;
+            padding: 16px 22px;
+        }
+
+        .media-modal-header {
+            align-items: center;
+            padding-right: 56px; /* room for the close button */
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .media-modal-footer {
+            justify-content: flex-end;
+            gap: 10px;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .media-modal-title {
+            font-size: 15.5px;
+            font-weight: 600;
+        }
+
+        .media-modal-tabs {
+            flex-shrink: 0;
+            padding: 0 22px;
+        }
+
+        .media-modal-body {
+            flex: 1;
+            min-height: 320px;
+            padding: 22px;
+            overflow-y: auto;
+        }
+
+        .mm-panel {
+            display: none;
+        }
+
+        .mm-panel.active {
+            display: block;
+        }
+
+        .mm-library-toolbar {
+            margin-bottom: 16px;
+        }
+
+        .mm-library-toolbar .search-box {
+            max-width: none;
+        }
+
+        .mm-library-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        @media (max-width: 575px) {
+            .mm-library-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .mm-library-item {
+            position: relative;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            background: #efefef;
+            cursor: pointer;
+        }
+
+        .mm-library-item.selected {
+            border-color: #111;
+        }
+
+        .mm-library-item img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .mm-library-item .mm-check {
+            position: absolute;
+            top: 7px;
+            right: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border: 1.5px solid #d5d4e4;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .9);
+            font-size: 10px;
+            color: transparent;
+            transition: all .12s ease;
+        }
+
+        .mm-library-item.selected .mm-check {
+            border-color: #111;
+            background: #111;
+            color: #fff;
+        }
+
+        .mm-library-item .mm-name {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 12px 8px 6px;
+            overflow: hidden;
+            background: linear-gradient(0deg, rgba(0, 0, 0, .55), transparent);
+            font-size: 10.5px;
+            color: #fff;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* ---------- Sticky action bar ---------- */
+        .sticky-action-bar {
+            position: sticky;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 99;
+            margin-top: 1.5rem;
+            border-top: 1px solid #e5e5e5;
+            background: #fff;
+            box-shadow: 0 -6px 20px rgb(0 0 0 / 8%);
+        }
+
+        .sticky-action-bar-inner {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 14px 20px;
+            border: 1px solid #00000035;
+            border-radius: 5px 5px 0 0;
+            box-shadow: 0 0 10px #00000020;
+        }
     </style>
+@endpush
+
+
+{{-- ======================================================================
+     SCRIPTS
+     ====================================================================== --}}
+@push('js')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script>
+        $(function() {
+            'use strict';
+
+            /* ------------------------------------------------------------
+             * Shared image library (used by the Media panel and the
+             * variant image picker). Replace with data from your backend.
+             * ---------------------------------------------------------- */
+            const MEDIA_LIBRARY = [{
+                    id: 'lib1',
+                    name: 'Black — front',
+                    url: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&q=80'
+                },
+                {
+                    id: 'lib2',
+                    name: 'Black — side',
+                    url: 'https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=200&q=80'
+                },
+                {
+                    id: 'lib3',
+                    name: 'Silver — front',
+                    url: 'https://images.unsplash.com/photo-1544117519-31a4b719223d?w=200&q=80'
+                },
+                {
+                    id: 'lib4',
+                    name: 'Packaging',
+                    url: 'https://images.unsplash.com/photo-1622434641406-a158123450f9?w=200&q=80'
+                },
+                {
+                    id: 'lib5',
+                    name: 'On desk',
+                    url: 'https://images.unsplash.com/photo-1434493907317-a46b5bbe7834?w=200&q=80'
+                },
+                {
+                    id: 'lib6',
+                    name: 'Top view',
+                    url: 'https://images.unsplash.com/photo-1533139502658-0198f920d8e8?w=200&q=80'
+                }
+            ];
+
+            const readImageFile = (file, done) => {
+                const reader = new FileReader();
+                reader.onload = ev => done(ev.target.result);
+                reader.readAsDataURL(file);
+            };
+            const imageFiles = list => Array.from(list || []).filter(f => f.type.startsWith('image/'));
+
+            /** Wires click / drag & drop on a dropzone to a file input. */
+            function bindDropzone($zone, $input, onFiles) {
+                $zone.on('click', () => $input.trigger('click'))
+                    .on('dragover', function(e) {
+                        e.preventDefault();
+                        $(this).addClass('drag-over');
+                    })
+                    .on('dragleave', function() {
+                        $(this).removeClass('drag-over');
+                    })
+                    .on('drop', function(e) {
+                        e.preventDefault();
+                        $(this).removeClass('drag-over');
+                        onFiles(e.originalEvent.dataTransfer.files);
+                    });
+                $input.on('change', function() {
+                    onFiles(this.files);
+                    $(this).val('');
+                });
+            }
+
+            /* ------------------------------------------------------------
+             * Shipping type toggle
+             * ---------------------------------------------------------- */
+            $('input[name="ship_type"]').on('change', function() {
+                $('#shippingDetailsBox').toggleClass('d-none', this.value === 'digital');
+                $('#digitalShippingFields').toggleClass('d-none', this.value === 'physical');
+            }).filter(':checked').trigger('change');
+
+            /* ------------------------------------------------------------
+             * Notes (Summernote)
+             * ---------------------------------------------------------- */
+            $('#summernote').summernote({
+                placeholder: 'Write Here',
+                tabsize: 2,
+                height: 120,
+                toolbar: [
+                    ['font', ['bold', 'italic', 'underline', 'clear']],
+                    ['color', []],
+                    ['insert', ['link', 'picture']],
+                    ['view', ['codeview']]
+                ]
+            });
+
+            $('#submitNoteBtn').on('click', function() {
+                const $note = $('#summernote');
+                if ($note.summernote('isEmpty')) return;
+
+                // Show embedded images as "View image" links instead of inline pictures
+                const $tmp = $('<div>').html($note.summernote('code'));
+                $tmp.find('img').each(function() {
+                    $(this).replaceWith(
+                        $('<a>', {
+                            href: $(this).attr('src'),
+                            target: '_blank',
+                            rel: 'noopener noreferrer',
+                            class: 'text-secondary'
+                        }).html('<i class="fa-solid fa-image"></i> View image')
+                    );
+                });
+
+                $('#summernote-result').html($tmp.html());
+                $note.summernote('reset');
+            });
+
+            /* ------------------------------------------------------------
+             * Sticky action bar: only records the chosen status.
+             * Hook your save / schedule / publish request in here.
+             * ---------------------------------------------------------- */
+            $('[data-status]').on('click', function() {
+                $('#productStatusInput').val($(this).data('status'));
+            });
+
+            /* ------------------------------------------------------------
+             * Product performance chart (demo data from CoinGecko; swap
+             * fetchSeries() for your own endpoint). Falls back to a
+             * generated series if the request or Chart.js fails.
+             * ---------------------------------------------------------- */
+            (function() {
+                const canvas = document.getElementById('productPerformanceChart');
+                if (!canvas) return;
+
+                const fmtDay = d => d.toLocaleDateString(undefined, {
+                    month: 'short',
+                    day: 'numeric'
+                });
+
+                function fetchSeries() {
+                    return fetch(
+                            'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=14&interval=daily'
+                        )
+                        .then(res => {
+                            if (!res.ok) throw new Error('Request failed: ' + res.status);
+                            return res.json();
+                        })
+                        .then(data => {
+                            const points = data.prices || [];
+                            if (!points.length) throw new Error('Empty series');
+                            return {
+                                labels: points.map(p => fmtDay(new Date(p[0]))),
+                                values: points.map(p => p[1])
+                            };
+                        });
+                }
+
+                function fallbackSeries() {
+                    const labels = [],
+                        values = [];
+                    let value = 800 + Math.random() * 200;
+                    for (let i = 13; i >= 0; i--) {
+                        const d = new Date();
+                        d.setDate(d.getDate() - i);
+                        value = Math.max(50, value + (Math.random() - 0.45) * 40);
+                        labels.push(fmtDay(d));
+                        values.push(Math.round(value * 100) / 100);
+                    }
+                    return {
+                        labels,
+                        values
+                    };
+                }
+
+                function render(series) {
+                    const first = series.values[0];
+                    const last = series.values[series.values.length - 1];
+                    const pct = first ? ((last - first) / first) * 100 : 0;
+
+                    $('#perfCurrentValue').text('$' + last.toLocaleString(undefined, {
+                        maximumFractionDigits: 2
+                    }));
+                    $('#perfChangeValue')
+                        .text((pct >= 0 ? '+' : '') + pct.toFixed(2) + '%')
+                        .css('color', pct >= 0 ? '#0f9d58' : '#d93025');
+
+                    new Chart(canvas, {
+                        type: 'line',
+                        data: {
+                            labels: series.labels,
+                            datasets: [{
+                                data: series.values,
+                                borderColor: '#111',
+                                backgroundColor: 'rgba(17,17,17,0.08)',
+                                fill: true,
+                                tension: 0.35,
+                                pointRadius: 0,
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    grid: {
+                                        display: false
+                                    },
+                                    ticks: {
+                                        maxTicksLimit: 5,
+                                        font: {
+                                            size: 10
+                                        }
+                                    }
+                                },
+                                y: {
+                                    grid: {
+                                        color: '#f1f1f1'
+                                    },
+                                    ticks: {
+                                        font: {
+                                            size: 10
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                fetchSeries()
+                    .catch(fallbackSeries)
+                    .then(series => {
+                        if (typeof Chart === 'undefined') throw new Error('Chart.js not loaded');
+                        render(series);
+                    })
+                    .catch(() => $('#perfErrorMsg').removeClass('d-none'));
+            })();
+
+            /* ------------------------------------------------------------
+             * Card reordering (up/down buttons). The order is saved in a
+             * cookie (with a localStorage copy as backup).
+             * ---------------------------------------------------------- */
+            (function() {
+                const MOVE_BUTTONS =
+                    '<button type="button" class="card-move-btn" data-move="up" title="Move up" aria-label="Move card up"><i class="fa-solid fa-caret-up" aria-hidden="true"></i></button>' +
+                    '<button type="button" class="card-move-btn" data-move="down" title="Move down" aria-label="Move card down"><i class="fa-solid fa-caret-down" aria-hidden="true"></i></button>';
+
+                const store = {
+                    save(key, ids) {
+                        const value = JSON.stringify(ids);
+                        document.cookie = key + '=' + encodeURIComponent(value) +
+                            ';path=/;max-age=31536000;SameSite=Lax';
+                        try {
+                            localStorage.setItem(key, value);
+                        } catch (e) {}
+                    },
+                    load(key) {
+                        try {
+                            const match = document.cookie.match(new RegExp('(?:^|; )' + key + '=([^;]*)'));
+                            if (match) return JSON.parse(decodeURIComponent(match[1]));
+                            return JSON.parse(localStorage.getItem(key));
+                        } catch (e) {
+                            return null;
+                        }
+                    }
+                };
+
+                function addMoveButtons(card) {
+                    const wrap = document.createElement('div');
+                    wrap.className = 'card-move-wrap';
+                    wrap.innerHTML = MOVE_BUTTONS;
+
+                    const inline = card.querySelector('.variants-trigger-card');
+                    if (inline) {
+                        wrap.classList.add('card-move-wrap--inline');
+                        inline.appendChild(wrap);
+                    } else {
+                        card.prepend(wrap);
+                    }
+                }
+
+                function initGroup(containerId, storageKey) {
+                    const box = document.getElementById(containerId);
+                    if (!box) return;
+
+                    const cards = () => Array.from(box.querySelectorAll(':scope > .sortable-card'));
+                    cards().forEach(addMoveButtons);
+
+                    (store.load(storageKey) || []).forEach(id => {
+                        const el = box.querySelector(':scope > .sortable-card[data-card-id="' + id + '"]');
+                        if (el) box.appendChild(el);
+                    });
+
+                    const refresh = () => cards().forEach((card, i, all) => {
+                        card.querySelector('[data-move="up"]').disabled = i === 0;
+                        card.querySelector('[data-move="down"]').disabled = i === all.length - 1;
+                    });
+
+                    box.addEventListener('click', e => {
+                        const btn = e.target.closest('[data-move]');
+                        if (!btn || btn.disabled) return;
+
+                        const card = btn.closest('.sortable-card');
+                        const up = btn.dataset.move === 'up';
+                        const sibling = up ? card.previousElementSibling : card.nextElementSibling;
+                        if (!sibling) return;
+
+                        box.insertBefore(up ? card : sibling, up ? sibling : card);
+                        refresh();
+                        store.save(storageKey, cards().map(c => c.dataset.cardId));
+                    });
+
+                    refresh();
+                }
+
+                initGroup('col8SortArea', 'productFormCardOrder_col8');
+                initGroup('col4SortArea', 'productFormCardOrder_col4');
+            })();
+
+            /* ------------------------------------------------------------
+             * Variants: type rows + generated combinations
+             * ---------------------------------------------------------- */
+            (function() {
+                const $typeRows = $('#variantTypeRows');
+                const typeRowTemplate = $typeRows.find('.variant-type-row').first().clone();
+                const $comboRows = $('#generatedComboRows');
+                const $comboWrap = $('#generatedVariantsWrap');
+                const comboRowTemplate = $('#comboRowTemplate .combo-row').first();
+
+                const comboRow = pillsHtml => comboRowTemplate.clone().find('.variant-pills')
+                    .html(pillsHtml || '<span class="variant-pill">New combination</span>').end();
+
+                $('#addVariantTypeBtn').on('click', function() {
+                    const $row = typeRowTemplate.clone();
+                    $row.find('.variant-type-select').prop('selectedIndex', 0);
+                    $row.find('.variant-value-select').val([]);
+                    $typeRows.append($row);
+                });
+
+                $(document).on('click', '.variant-type-delete', function() {
+                    if ($typeRows.find('.variant-type-row').length > 1) {
+                        $(this).closest('.variant-type-row').remove();
+                    }
+                });
+
+                $('#generateVariationsBtn').on('click', function() {
+                    const groups = $typeRows.find('.variant-type-row').map(function() {
+                        const typeEl = $(this).find('.variant-type-select')[0];
+                        const valueEl = $(this).find('.variant-value-select')[0];
+                        return {
+                            type: typeEl.options[typeEl.selectedIndex].text,
+                            values: Array.from(valueEl.selectedOptions).map(o => o.text)
+                        };
+                    }).get().filter(g => g.values.length);
+
+                    if (!groups.length) return;
+
+                    // Cartesian product of every selected value across the variant types
+                    const combos = groups.reduce(
+                        (acc, g) => acc.flatMap(c => g.values.map(v => c.concat({
+                            type: g.type,
+                            value: v
+                        }))), [
+                            []
+                        ]
+                    );
+
+                    $comboRows.empty();
+                    combos.forEach(combo => {
+                        const pills = combo.map(c =>
+                            $('<span class="variant-pill"></span>').text(c.type + ': ' + c.value)[0]
+                            .outerHTML
+                        ).join('');
+                        $comboRows.append(comboRow(pills));
+                    });
+                    $comboWrap.removeClass('d-none');
+                });
+
+                $('#addComboRowBtn').on('click', function() {
+                    $comboRows.append(comboRow());
+                    $comboWrap.removeClass('d-none');
+                });
+
+                $(document).on('click', '.combo-row-delete', function() {
+                    $(this).closest('.combo-row').remove();
+                });
+            })();
+
+            /* ------------------------------------------------------------
+             * Media panel: upload, select, select all, rename, delete,
+             * lightbox preview
+             * ---------------------------------------------------------- */
+            (function() {
+                const $grid = $('#mediaLibGrid');
+                const $selectAll = $('#mediaSelectAll');
+                const $count = $('#mediaSelectedCount');
+                const $deleteSelected = $('#mediaDeleteSelectedBtn');
+                const selected = new Set();
+                let uploadSeq = 0;
+
+                const findItem = id => MEDIA_LIBRARY.find(i => i.id === id);
+
+                function removeItem(id) {
+                    const idx = MEDIA_LIBRARY.findIndex(i => i.id === id);
+                    if (idx > -1) MEDIA_LIBRARY.splice(idx, 1);
+                    selected.delete(id);
+                }
+
+                function syncToolbar() {
+                    const total = MEDIA_LIBRARY.length;
+                    $count.text(selected.size + ' selected');
+                    $deleteSelected.prop('disabled', !selected.size);
+                    $selectAll
+                        .prop('disabled', !total)
+                        .prop('checked', total > 0 && selected.size === total)
+                        .prop('indeterminate', selected.size > 0 && selected.size < total);
+                }
+
+                function renderGrid() {
+                    $grid.empty();
+                    if (!MEDIA_LIBRARY.length) {
+                        $grid.append('<div class="ml-empty">No images yet. Upload some above.</div>');
+                    }
+
+                    MEDIA_LIBRARY.forEach(item => {
+                        const isSelected = selected.has(item.id);
+                        const $thumb = $('<div class="ml-thumb"></div>').append(
+                            $('<img loading="lazy">').attr({
+                                src: item.url,
+                                alt: item.name
+                            }),
+                            $('<label class="ml-check"></label>')
+                            .attr('aria-label', 'Select ' + item.name)
+                            .append($('<input type="checkbox">').prop('checked', isSelected),
+                                '<span></span>'),
+                            $('<div class="ml-actions"></div>').append(
+                                $('<button type="button" data-act="edit" title="Rename"><i class="fa-solid fa-pen" aria-hidden="true"></i></button>')
+                                .attr('aria-label', 'Rename ' + item.name),
+                                $('<button type="button" data-act="delete" title="Delete"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>')
+                                .attr('aria-label', 'Delete ' + item.name)
+                            )
+                        );
+
+                        $('<div class="ml-item"></div>')
+                            .attr('data-id', item.id)
+                            .toggleClass('is-selected', isSelected)
+                            .append($thumb, $('<span class="ml-name"></span>').text(item.name).attr('title',
+                                item.name))
+                            .appendTo($grid);
+                    });
+
+                    syncToolbar();
+                }
+
+                bindDropzone($('#mediaLibDropzone'), $('#mediaLibFileInput'), files => {
+                    imageFiles(files).forEach(file => readImageFile(file, url => {
+                        MEDIA_LIBRARY.unshift({
+                            id: 'up' + (++uploadSeq) + '_' + Date.now(),
+                            name: file.name,
+                            url
+                        });
+                        renderGrid();
+                    }));
+                });
+
+                $grid.on('change', '.ml-check input', function() {
+                    const $item = $(this).closest('.ml-item');
+                    const id = $item.attr('data-id');
+                    this.checked ? selected.add(id) : selected.delete(id);
+                    $item.toggleClass('is-selected', this.checked);
+                    syncToolbar();
+                });
+
+                $selectAll.on('change', function() {
+                    selected.clear();
+                    if (this.checked) MEDIA_LIBRARY.forEach(i => selected.add(i.id));
+                    renderGrid();
+                });
+
+                $grid.on('click', '.ml-item', function(e) {
+                    const id = $(this).attr('data-id');
+                    const item = findItem(id);
+                    if (!item) return;
+
+                    const $action = $(e.target).closest('[data-act]');
+                    if ($action.length) {
+                        if ($action.attr('data-act') === 'delete') {
+                            removeItem(id);
+                        } else {
+                            const name = window.prompt('Rename image', item.name);
+                            if (!name || !name.trim()) return;
+                            item.name = name.trim();
+                        }
+                        renderGrid();
+                        return;
+                    }
+
+                    // Only the picture opens the lightbox (not the checkbox)
+                    if ($(e.target).closest('.ml-check').length || !$(e.target).closest('.ml-thumb').length)
+                        return;
+                    $('#lightboxImage').attr('src', item.url);
+                    $('#lightboxOverlay').addClass('open');
+                });
+
+                $deleteSelected.on('click', function() {
+                    if (!selected.size) return;
+                    const n = selected.size;
+                    if (!window.confirm('Delete ' + n + ' selected image' + (n > 1 ? 's' : '') + '?'))
+                        return;
+                    Array.from(selected).forEach(removeItem);
+                    renderGrid();
+                });
+
+                $('#lightboxClose').on('click', function() {
+                    $('#lightboxOverlay').removeClass('open');
+                    $('#lightboxImage').attr('src', '');
+                });
+                $('#lightboxOverlay').on('click', function(e) {
+                    if (e.target === this) $('#lightboxClose').trigger('click');
+                });
+
+                renderGrid();
+            })();
+
+            /* ------------------------------------------------------------
+             * Variant image picker (upload or choose from the library)
+             * ---------------------------------------------------------- */
+            (function() {
+                const $overlay = $('#mediaModalOverlay');
+                const $addBtn = $('#mediaModalAdd');
+                const $search = $('#mmLibrarySearch');
+                let selectedId = null;
+                let $target = null;
+
+                function renderLibrary() {
+                    const q = $search.val().trim().toLowerCase();
+                    const $grid = $('#mmLibraryGrid').empty();
+
+                    MEDIA_LIBRARY
+                        .filter(item => !q || item.name.toLowerCase().includes(q))
+                        .forEach(item => {
+                            $('<div class="mm-library-item"></div>')
+                                .toggleClass('selected', selectedId === item.id)
+                                .attr('data-lib-id', item.id)
+                                .append(
+                                    $('<img>').attr({
+                                        src: item.url,
+                                        alt: item.name
+                                    }),
+                                    '<span class="mm-check"><i class="fa-solid fa-check"></i></span>',
+                                    $('<span class="mm-name"></span>').text(item.name)
+                                )
+                                .appendTo($grid);
+                        });
+                }
+
+                // "Add image" only applies to the library tab (uploads are applied immediately)
+                const updateAddButton = () =>
+                    $addBtn.prop('disabled', $('#mmUploadPanel').hasClass('active') || !selectedId);
+
+                function open($picker) {
+                    $target = $picker;
+                    selectedId = null;
+                    $search.val('');
+                    renderLibrary();
+                    $('#mediaModalTabs .nav-link').removeClass('active').filter('[data-tab="upload"]').addClass('active');
+                    $('.mm-panel').removeClass('active');
+                    $('#mmUploadPanel').addClass('active');
+                    updateAddButton();
+                    $overlay.addClass('open');
+                }
+
+                function close() {
+                    $overlay.removeClass('open');
+                    $target = null;
+                }
+
+                function setImage(url) {
+                    if (!$target) return;
+                    $target.addClass('has-image');
+                    $target.find('[data-combo-preview]').attr('src', url);
+                    $target.find('[data-combo-value]').val(url);
+                }
+
+                $(document).on('click', '[data-combo-image]', function(e) {
+                    e.preventDefault();
+                    open($(this));
+                });
+
+                $(document).on('click', '[data-combo-remove]', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const $picker = $(this).closest('[data-combo-image]');
+                    $picker.removeClass('has-image');
+                    $picker.find('[data-combo-preview]').attr('src', '');
+                    $picker.find('[data-combo-value]').val('');
+                });
+
+                $('#mediaModalClose, #mediaModalCancel').on('click', close);
+                $overlay.on('click', function(e) {
+                    if (e.target === this) close();
+                });
+
+                $('#mediaModalTabs').on('click', '.nav-link', function() {
+                    $('#mediaModalTabs .nav-link').removeClass('active');
+                    $(this).addClass('active');
+                    $('.mm-panel').removeClass('active');
+                    $($(this).data('tab') === 'upload' ? '#mmUploadPanel' : '#mmLibraryPanel')
+                        .addClass('active');
+                    updateAddButton();
+                });
+
+                bindDropzone($('#mmDropzone'), $('#mmFileInput'), files => {
+                    const file = imageFiles(files)[0];
+                    if (!file) return;
+                    readImageFile(file, url => {
+                        setImage(url);
+                        close();
+                    });
+                });
+
+                $search.on('input', renderLibrary);
+
+                $('#mmLibraryGrid').on('click', '.mm-library-item', function() {
+                    selectedId = $(this).attr('data-lib-id');
+                    renderLibrary();
+                    updateAddButton();
+                });
+
+                $addBtn.on('click', function() {
+                    const item = MEDIA_LIBRARY.find(i => i.id === selectedId);
+                    if (item) setImage(item.url);
+                    close();
+                });
+            })();
+
+            /* ------------------------------------------------------------
+             * Escape closes whichever overlay is open (lightbox / picker)
+             * ---------------------------------------------------------- */
+            $(document).on('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    $('.alert-overlay.open .alert-btn-close').first().trigger('click');
+                }
+            });
+        });
+    </script>
 @endpush

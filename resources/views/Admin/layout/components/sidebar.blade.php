@@ -1,4 +1,26 @@
-<div id="sidebar" class="{{ $collapsed ?? false ? 'collapsed' : '' }}">
+<script>
+    (function () {
+        var html = document.documentElement;
+        var KEY = 'sidebar_collapsed_pages';
+        var page = @json(Route::currentRouteName() ?? request()->path());
+
+        html.classList.add('no-transition');
+
+        try {
+            var saved = JSON.parse(localStorage.getItem(KEY)) || {};
+            if (saved[page]) {
+                html.classList.add('sb-collapsed');
+
+                if (sessionStorage.getItem('sb_peek') === '1') {
+                    html.classList.add('sb-peek');
+                }
+            }
+            sessionStorage.removeItem('sb_peek');
+        } catch (e) {}
+    })();
+</script>
+
+<div id="sidebar">
 
     <div class="sidebar-logo">
         <div class="logo-mark">N</div>
@@ -11,10 +33,10 @@
 
         <ul class="nav-list">
 
-            <li class="nav-item" data-tip="Dashboard">
-                <a href="#">
+            <li class="nav-item {{ isActive('admin.dashboard') || isActive('admin.dashboard.*') ? 'active open' : '' }}" data-tip="Dashboard">
+                <a href="{{ route('admin.dashboard') }}">
                     <span class="nav-icon"><i class="fa-solid fa-gauge-high"></i></span>
-                    <span class="nav-text">Dashboard</span>
+                    <span class="nav-text {{ isActive('admin.dashboard') ? 'active' : '' }}">Dashboard</span>
                 </a>
             </li>
 
@@ -40,18 +62,21 @@
                 </a>
                 <ul class="sub-menu {{ isActive('admin.products.*') ? 'open' : '' }}">
                     <li class="sub-item {{ isActive('admin.products.index') ? 'active' : '' }}">
-                        <a href="{{ route('admin.products.index') }}"></span>Listing</a>
+                        <a href="{{ route('admin.products.index') }}"><span class="sub-dot"></span>All Product</a>
+                    </li>
+                    <li class="sub-item {{ isActive('admin.products.add') ? 'active' : '' }}">
+                        <a href="{{ route('admin.products.add') }}"><span class="sub-dot"></span>Add Product</a>
                     </li>
                     <li class="sub-item">
-                        <a href="{{ route('admin.products.index') }}"></span>Inventory</a>
+                        <a href="{{ route('admin.products.index') }}"><span class="sub-dot"></span>Inventory</a>
                     </li>
                     <li class="sub-item">
-                        <a href="{{ route('admin.products.index') }}"></span>Pricing</a>
+                        <a href="{{ route('admin.products.index') }}"><span class="sub-dot"></span>Pricing</a>
                     </li>
                 </ul>
             </li>
 
-            <li class="nav-item {{ isActive('admin.categories.*') ? 'active' : '' }}" data-tip="Orders">
+            <li class="nav-item {{ isActive('admin.categories.*') ? 'active' : '' }}" data-tip="Categories">
                 <a href="{{ route('admin.categories.index') }}">
                     <span class="nav-icon"><i class="fa-solid fa-chart-diagram"></i></span>
                     <span class="nav-text">Categories</span>
@@ -75,7 +100,7 @@
                 </a>
                 <ul class="sub-menu {{ isActive('admin.customers.*') ? 'open' : '' }}">
                     <li class="sub-item">
-                        <a href="{{ route('admin.customers.index') }}">Listing</a>
+                        <a href="{{ route('admin.customers.index') }}">All Customers</a>
                     </li>
                     <li class="sub-item">
                         <a href="">Add New</a>
@@ -94,10 +119,10 @@
                 </a>
                 <ul class="sub-menu {{ isActive('admin.vendors.*') ? 'open' : '' }}">
                     <li class="sub-item {{ isActive('admin.vendors.index') ? 'active' : '' }}">
-                        <a href="{{ route('admin.vendors.index') }}">Listing</a>
+                        <a href="{{ route('admin.vendors.index') }}">All Vendors</a>
                     </li>
                     <li class="sub-item {{ isActive('admin.vendors.add') ? 'active' : '' }}">
-                        <a href="{{ route('admin.vendors.add') }}">Add New</a>
+                        <a href="{{ route('admin.vendors.add') }}">Add Vendors</a>
                     </li>
                     <li class="sub-item">
                         <a href="">Reports</a>
@@ -105,7 +130,7 @@
                 </ul>
             </li>
 
-            <li class="nav-item" data-tip="Customers">
+            <li class="nav-item" data-tip="Notes">
                 <a href="{{ route('admin.notes.index') }}">
                     <span class="nav-icon"><i class="fa-solid fa-note-sticky"></i></span>
                     <span class="nav-text">Notes</span>
@@ -113,7 +138,9 @@
             </li>
 
         </ul>
+
         <p class="nav-label" style="margin-top:12px;">Management</p>
+
         <ul class="nav-list">
             <li class="nav-item has-sub {{ isActive('admin.settings.*') ? 'active open' : '' }}" data-tip="Settings">
                 <a href="javascript:void(0)">
@@ -131,7 +158,7 @@
                     </li>
                     <li class="sub-item {{ isActive('admin.settings.integrations') ? 'active' : '' }}">
                         <a
-                            href="{{ Route::has('admin.setting.integrations') ? route('admin.settings.integrations') : 'javascript:void(0)' }}"><span
+                            href="{{ Route::has('admin.settings.integrations') ? route('admin.settings.integrations') : 'javascript:void(0)' }}"><span
                                 class="sub-dot"></span>Integrations</a>
                     </li>
                     <li class="sub-item {{ isActive('admin.settings.billing') ? 'active' : '' }}">
@@ -141,6 +168,7 @@
                     </li>
                 </ul>
             </li>
+
             <li class="nav-item" data-tip="Team">
                 <a href="#">
                     <span class="nav-icon"><i class="fa-solid fa-user-group"></i></span>
@@ -158,6 +186,7 @@
         </ul>
 
     </nav>
+
     <div class="sidebar-profile d-none">
         <div class="profile-avatar">JD</div>
         <div class="profile-info">
@@ -176,10 +205,74 @@
 @push('js')
     <script>
         $(function() {
+            var STORAGE_KEY = 'sidebar_collapsed_pages';
+            var PAGE_KEY = @json(Route::currentRouteName() ?? request()->path());
+
+            var $html = $(document.documentElement);
+            var $sidebar = $('#sidebar');
+            var peekTimer = null;
+            var suppressPeek = false;
+
+            requestAnimationFrame(function() {
+                requestAnimationFrame(function() {
+                    $html.removeClass('no-transition');
+                });
+            });
+
+            if ($html.hasClass('sb-peek')) {
+                setTimeout(function() {
+                    if (!$sidebar.is(':hover')) {
+                        $html.removeClass('sb-peek');
+                    }
+                }, 400);
+            }
+
+            function saveSidebarState(collapsed) {
+                try {
+                    var saved = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+                    if (collapsed) {
+                        saved[PAGE_KEY] = true;
+                    } else {
+                        delete saved[PAGE_KEY];
+                    }
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+                } catch (e) {}
+            }
+
+            $sidebar
+                .on('mouseenter', function() {
+                    if (suppressPeek) return;
+                    clearTimeout(peekTimer);
+                    peekTimer = setTimeout(function() {
+                        $html.addClass('sb-peek');
+                    }, 120);
+                })
+                .on('mouseleave', function() {
+                    suppressPeek = false;
+                    clearTimeout(peekTimer);
+                    $html.removeClass('sb-peek');
+                });
+
+            $sidebar.on('click', 'a[href]', function() {
+                var href = $(this).attr('href');
+                if (!href || href === '#' || href.indexOf('javascript:') === 0) return;
+                try {
+                    if ($html.hasClass('sb-collapsed') && $html.hasClass('sb-peek')) {
+                        sessionStorage.setItem('sb_peek', '1');
+                    }
+                } catch (e) {}
+            });
 
             $('#sidebarToggle').on('click', function() {
-                $('#sidebar').toggleClass('collapsed');
-                $('body').toggleClass('collapsed');
+                var collapsed = $html.toggleClass('sb-collapsed').hasClass('sb-collapsed');
+
+                if (collapsed) {
+                    clearTimeout(peekTimer);
+                    $html.removeClass('sb-peek');
+                    suppressPeek = true;
+                }
+
+                saveSidebarState(collapsed);
             });
 
             $('.has-sub').on('click', function(e) {
@@ -202,7 +295,6 @@
                         .closest('.has-sub').addClass('open');
                 }
             });
-
         });
     </script>
 @endpush

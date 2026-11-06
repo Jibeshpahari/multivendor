@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid')->unique();
             $table->foreignId('vendor_id')->constrained('users')->restrictOnDelete();
 
             $table->string('name');
@@ -20,8 +21,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->string('brand')->nullable();
             $table->foreignId('category_id')->nullable()->constrained()->nullOnDelete();
-            $table->enum('status', ['draft', 'pending_approval', 'active', 'rejected', 'archived'])
-                ->default('draft');
+            $table->enum('status', ['draft', 'pending_approval', 'active', 'rejected', 'archived'])->default('draft');
             $table->timestamps();
             $table->softDeletes();
 

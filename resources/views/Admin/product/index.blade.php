@@ -1,128 +1,5 @@
 @extends('admin.layout.app')
 
-@push('css')
-    <style>
-        .row-checkbox {
-            width: 18px;
-            height: 18px;
-        }
-
-        .table thead th {
-            background: #eeeeee75;
-        }
-
-        .table>thead {
-            border-bottom: 2px solid #dddddd80;
-        }
-
-        .table>thead>tr>th,
-        .table>tbody>tr>td {
-            padding: 10px 12px !important;
-        }
-
-        .thumbnail-image {
-            max-width: 52px;
-            max-height: 52px;
-            margin-right: 6px;
-            align-self: center;
-        }
-
-        .product-name {
-            font-size: 1.08rem;
-            font-weight: 500;
-            line-height: 1.55;
-            margin: 0;
-            max-width: 280px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .product-rating {
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            color: #222222;
-            white-space: nowrap;
-            padding: 1px 7px 0.5px 6px;
-            border-radius: 25px;
-            background: #ffc30035;
-            border: 1px solid #ffc30080;
-            display: inline-flex;
-            align-items: center;
-        }
-
-        .product-rating i {
-            color: #ffaa00;
-            font-size: 10.5px;
-            margin-right: 4px;
-            text-shadow: 0px 0px 0px #000000;
-        }
-
-        .rating-divider {
-            width: 100%;
-            height: 1px;
-            background: #d0d0d0;
-            margin: 6px 0 2px;
-            display: block;
-        }
-
-        .sku-txt {
-            font-size: 13px;
-            color: #777777;
-            line-height: 2;
-            font-weight: 600;
-            max-width: 300px;
-            white-space: wrap;
-        }
-
-        .category-badge {
-            background: #e3f2fd;
-            color: #1565c0;
-            font-size: 12.5px;
-            font-weight: 600;
-            padding: 3px 8px;
-            border-radius: 6px;
-            white-space: nowrap;
-        }
-
-        .variant-badge {
-            background: #f3e5f5;
-            color: #6a1b9a;
-            font-size: 12.5px;
-            font-weight: 600;
-            padding: 3px 8px;
-            border-radius: 6px;
-            white-space: nowrap;
-        }
-
-        .discount-chip {
-            font-size: 12px;
-            font-weight: 700;
-            padding: 2px 7px;
-            border-radius: 5px;
-            white-space: nowrap;
-            background: #222222;
-            color: #fff;
-            display: inline-block;
-            width: fit-content;
-        }
-
-        .price-val {
-            font-size: 15.5px;
-            font-weight: 700;
-            white-space: nowrap;
-        }
-
-        .price-was {
-            font-size: 12px;
-            color: #454545;
-            text-decoration: line-through;
-            margin-left: 5px;
-            font-weight: 500;
-        }
-    </style>
-@endpush
 
 @section('content')
     <div class="card p-3">
@@ -456,6 +333,129 @@
     </script>
 @endpush --}}
 
+@push('css')
+    <style>
+        .row-checkbox {
+            width: 18px;
+            height: 18px;
+        }
+
+        .table thead th {
+            background: #eeeeee75;
+        }
+
+        .table>thead {
+            border-bottom: 2px solid #dddddd80;
+        }
+
+        .table>thead>tr>th,
+        .table>tbody>tr>td {
+            padding: 10px 12px !important;
+        }
+
+        .thumbnail-image {
+            max-width: 52px;
+            max-height: 52px;
+            margin-right: 6px;
+            align-self: center;
+        }
+
+        .product-name {
+            font-size: 1.08rem;
+            font-weight: 500;
+            line-height: 1.55;
+            margin: 0;
+            max-width: 280px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .product-rating {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #222222;
+            white-space: nowrap;
+            padding: 1px 7px 0.5px 6px;
+            border-radius: 25px;
+            background: #ffc30035;
+            border: 1px solid #ffc30080;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .product-rating i {
+            color: #ffaa00;
+            font-size: 10.5px;
+            margin-right: 4px;
+            text-shadow: 0px 0px 0px #000000;
+        }
+
+        .rating-divider {
+            width: 100%;
+            height: 1px;
+            background: #d0d0d0;
+            margin: 6px 0 2px;
+            display: block;
+        }
+
+        .sku-txt {
+            font-size: 13px;
+            color: #777777;
+            line-height: 2;
+            font-weight: 600;
+            max-width: 300px;
+            white-space: wrap;
+        }
+
+        .category-badge {
+            background: #e3f2fd;
+            color: #1565c0;
+            font-size: 12.5px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 6px;
+            white-space: nowrap;
+        }
+
+        .variant-badge {
+            background: #f3e5f5;
+            color: #6a1b9a;
+            font-size: 12.5px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 6px;
+            white-space: nowrap;
+        }
+
+        .discount-chip {
+            font-size: 12px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 5px;
+            white-space: nowrap;
+            background: #222222;
+            color: #fff;
+            display: inline-block;
+            width: fit-content;
+        }
+
+        .price-val {
+            font-size: 15.5px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .price-was {
+            font-size: 12px;
+            color: #454545;
+            text-decoration: line-through;
+            margin-left: 5px;
+            font-weight: 500;
+        }
+    </style>
+@endpush
 
 @push('css')
     <style>

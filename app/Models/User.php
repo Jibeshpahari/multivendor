@@ -6,6 +6,7 @@ namespace App\Models;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -48,4 +49,21 @@ class User extends Authenticatable
     {
         return 'uuid';
     }
+
+    public function scopeSearch(Builder $query, ?string $term): Builder
+    {
+        return $query->when($term, function (Builder $query) use ($term) {
+            $like = '%' . addcslashes($term, '%_\\') . '%';
+
+            $query->where(
+                fn($q) => $q
+                    ->where('name', 'like', $like)
+                    ->orWhere('email', 'like', $like)
+                    ->orWhereIn('id', VendorProfile::select('user_id')->where('store_name', 'like', $like))
+            );
+        });
+    }
+
+
+
 }

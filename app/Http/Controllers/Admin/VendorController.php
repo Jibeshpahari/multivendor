@@ -16,18 +16,20 @@ class VendorController extends Controller
 {
     public function index(Request $request)
     {
-        $title = 'Product Categories';
-        $nav = [];
+        $title  = 'Vendors';
+        $nav    = [];
         $search = true;
 
         $vendors = User::with('vendorProfile')
             ->where('role', 'vendor')
+            ->search($request->keyword)
             ->when($request->filled('status'), fn($q) => $q->where('status', $request->status))
-            ->when($request->filled('sort_by'), fn($q) => match($request->sort_by) {
+            ->when($request->filled('sort_by'), fn($q) => match ($request->sort_by) {
                 'date_asc'  => $q->orderBy('updated_at'),
                 'date_desc' => $q->orderByDesc('updated_at'),
                 'name_asc'  => $q->orderBy('name'),
                 'name_desc' => $q->orderByDesc('name'),
+                default     => $q->latest('updated_at'),
             })
             ->paginate($request->integer('per_page', setting(SettingKey::AdminPaginationPerPage)));
 
