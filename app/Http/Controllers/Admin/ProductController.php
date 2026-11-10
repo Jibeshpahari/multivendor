@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\User;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -59,7 +60,6 @@ class ProductController extends Controller
 
         if ($product) {
             abort_if($product->vendor_id !== auth('web')->id(), 403);
-            // abort_if(!in_array($product->status, ['draft', 'rejected']), 422, 'Product is not editable.');
         } else {
             $product = Product::create([
                 'vendor_id' => auth('web')->id(),
@@ -69,16 +69,22 @@ class ProductController extends Controller
             ]);
         }
 
-        $path = $request->file('media')->store("products/{$product->slug}", 'public');
+        $file = $request->file('media');
+        $path = $file->store("products/{$product->slug}", 'public');
 
-        $media = $product->media()->create([
+        $media = $product->productMedia()->create([
             'path' => $path,
-            'type' => $request->file('media')->getMimeType(),
+            'type' => $file->getMimeType(),
         ]);
 
         return response()->json([
-            'product_id' => $product->id,
-            'media'      => $media,
+            'product_id' => $product->uuid,
+            'media'      => [
+                'id'   => $media->id,
+                'name' => $file->getClientOriginalName(),
+                'url'  => asset('storage/' . $path),
+                'type' => $media->type,
+            ],
         ], 201);
     }
 }

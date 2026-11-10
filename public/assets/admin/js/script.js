@@ -5,6 +5,28 @@ $(document).on('click', '[data-pw-toggle-btn]', function () {
     $(this).children('i').toggleClass('bi-eye bi-eye-slash');
 });
 
+const imagePlaceholder = document.currentScript.dataset.imagePlaceholder;
+
+window.setImageFallback = function (image) {
+    if (image instanceof HTMLImageElement && image.src !== imagePlaceholder) {
+        image.src = imagePlaceholder;
+    }
+};
+
+document.addEventListener('error', function (event) {
+    if (event.target instanceof HTMLImageElement) {
+        window.setImageFallback(event.target);
+    }
+}, true);
+
+document.querySelectorAll('img').forEach(function (image) {
+    const source = image.getAttribute('src');
+
+    if (!source || !source.trim() || (image.complete && image.naturalWidth === 0)) {
+        window.setImageFallback(image);
+    }
+});
+
 $(function () {
     $('[data-select-all]').each(function () {
         const $master = $(this);

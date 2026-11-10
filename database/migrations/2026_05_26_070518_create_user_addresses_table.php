@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('vendor_bank_details', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('vendor_profile_id')->unique()->constrained()->cascadeOnDelete();
+            $table->foreignUuid('vendor_profile_id')->unique()->constrained('vendor_profiles', 'uuid')->cascadeOnDelete();
 
             $table->string('bank_name')->nullable();
             $table->string('account_holder_name')->nullable();
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('user_addresses');
+        Schema::dropIfExists('vendor_bank_details');
     }
 };

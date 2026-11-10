@@ -6,7 +6,7 @@
                 <i class="fa-solid fa-magnifying-glass s-icon"></i>
                 <form method="GET">
                     <input type="text" placeholder="Search {{ Str::headline(collect(request()->segments())->last() ?? 'Dashboard') }}…"
-                        id="searchInput" name="keyword">
+                        id="searchInput" name="keyword" value="{{ request()->query('keyword', '') }}">
                 </form>
                 <div class="search-kbd">
                     <span class="kbd" id="searchModKey">Ctrl</span>

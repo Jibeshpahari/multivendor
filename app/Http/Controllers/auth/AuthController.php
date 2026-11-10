@@ -42,6 +42,7 @@ class AuthController extends Controller
             'password.min'      => 'Password must be at least 8 characters.',
         ]);
 
+        
         if (Auth::attempt([
             'email'    => $request->email,
             'password' => $request->password,
@@ -50,7 +51,7 @@ class AuthController extends Controller
         ], $request->boolean('remember_me'))) {
             $request->session()->regenerate();
 
-            return redirect()->intended(route('admin.settings.site-settings'));
+            return redirect()->intended(route('admin.dashboard'));
         }
 
         return back()->withErrors(['error' => 'The provided credentials are incorrect.'])->withInput();

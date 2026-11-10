@@ -80,13 +80,13 @@ if (! function_exists('getStatusRing')) {
 
 if (!function_exists('getImageUrl')) {
     /**
-     * Public URL for a file on the "public" disk, or null when there is no image.
+     * Public URL for an image, falling back to the shared placeholder when no path is provided.
      * Full URLs (http/https) are passed through untouched.
      */
-    function getImageUrl(?string $path): ?string
+    function getImageUrl(?string $path): string
     {
         if (blank($path)) {
-            return null;
+            return asset('assets/global/images/placeholder.png');
         }
 
         if (preg_match('#^https?://#i', $path)) {

@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('admin_notes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('admin_id')->constrained('users')->cascadeOnDelete();
-            $table->foreignId('target_user_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignUuid('admin_id')->constrained('users', 'uuid')->cascadeOnDelete();
+            $table->foreignUuid('target_user_id')->constrained('users', 'uuid')->cascadeOnDelete();
             $table->text('note');
             $table->enum('type', ['general', 'warning', 'ban_reason'])->default('general');
             $table->timestamps();

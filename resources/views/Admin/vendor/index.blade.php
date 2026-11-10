@@ -432,20 +432,12 @@
                                             title="{{ ucfirst($vendor->status) }} &middot; View contact details"
                                             aria-label="View contact details for {{ $vendor->name }}">
                                             @php
-                                                $logo  = getImageUrl($vendor->vendorProfile?->store_logo);
-                                                $color = getAvatarColor($vendor->uuid);
+                                                $logo = getImageUrl($vendor->vendorProfile?->store_logo);
                                             @endphp
                                             <span class="avatar {{ getStatusRing($vendor->status) }}">
-                                                @if ($logo)
-                                                    <span class="avatar-title rounded-circle p-0 overflow-hidden bg-white">
-                                                        <img src="{{ $logo }}" alt="{{ $vendor->name }}" class="avatar-img">
-                                                    </span>
-                                                @else
-                                                    <span class="avatar-title rounded-circle"
-                                                        style="background: {{ $color['bg'] }}; color: {{ $color['text'] }};">
-                                                        {{ getInitials($vendor->name) }}
-                                                    </span>
-                                                @endif
+                                                <span class="avatar-title rounded-circle p-0 overflow-hidden bg-white">
+                                                    <img src="{{ $logo }}" alt="{{ $vendor->name }}" class="avatar-img">
+                                                </span>
                                             </span>
                                         </button>
                                         <div>

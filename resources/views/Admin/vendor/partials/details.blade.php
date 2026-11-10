@@ -9,10 +9,7 @@
     $orgEmail  = $profile?->store_email;
 
     $logoUrl   = getImageUrl($profile?->store_logo);
-    $headColor = getAvatarColor($vendor->uuid);
-
-    $personUrl   = getImageUrl($vendor->avatar ?? null);
-    $personColor = getAvatarColor($vendor->uuid);
+    $personUrl = getImageUrl($vendor->avatar ?? null);
 
     $addressParts = array_filter([
         $profile?->address_line,
@@ -36,16 +33,9 @@
         <div class="d-flex align-items-center gap-3">
             <div class="avatar avatar-xl {{ getStatusRing($vendor->status) }}"
                 title="{{ ucfirst($vendor->status) }}">
-                @if ($logoUrl)
-                    <span class="avatar-title rounded-circle p-0 overflow-hidden bg-white">
-                        <img src="{{ $logoUrl }}" alt="{{ $storeName }}" class="avatar-img">
-                    </span>
-                @else
-                    <span class="avatar-title rounded-circle"
-                        style="background: {{ $headColor['bg'] }}; color: {{ $headColor['text'] }};">
-                        {{ getInitials($storeName) }}
-                    </span>
-                @endif
+                <span class="avatar-title rounded-circle p-0 overflow-hidden bg-white">
+                    <img src="{{ $logoUrl }}" alt="{{ $storeName }}" class="avatar-img">
+                </span>
             </div>
             <div>
                 <div class="contact-vendor" id="contactTitle">{{ $storeName }}</div>
@@ -81,16 +71,9 @@
         @if ($vendor->name)
             <div class="contact-section">Contact person</div>
             <div class="contact-item">
-                @if ($personUrl)
-                    <span class="ci-avatar">
-                        <img src="{{ $personUrl }}" alt="{{ $vendor->name }}">
-                    </span>
-                @else
-                    <span class="ci-avatar"
-                        style="background: {{ $personColor['bg'] }}; color: {{ $personColor['text'] }};">
-                        {{ getInitials($vendor->name) }}
-                    </span>
-                @endif
+                <span class="ci-avatar">
+                    <img src="{{ $personUrl }}" alt="{{ $vendor->name }}">
+                </span>
                 <div class="ci-body">
                     <div class="ci-label">{{ $profile?->contact_role ?: 'Owner' }}</div>
                     <span class="ci-value">{{ $vendor->name }}</span>

@@ -566,8 +566,7 @@
                             id="switchCheckDefault">
                     </div>
                     <div class="col-9 ps-3">
-                        <label class="form-check-label d-block fs-6 fw-semibold" for="switchCheckDefault">Maintenance
-                            Mode</label>
+                        <label class="form-check-label d-block fs-6 fw-semibold" for="switchCheckDefault">Maintenance Mode</label>
                         <sub>Your site is live and accessible to all users.</sub>
                     </div>
                     <div class="col-12 d-none">
@@ -606,8 +605,8 @@
         });
 
         $(function() {
-            var liveText = 'Your site is live and accessible to all users.';
-            var offlineText = 'Your site is offline for maintenance.';
+            var offlineText= 'Your site is live and accessible to all users.';
+            var liveText = 'Your site is offline for maintenance.';
 
             $('#switchCheckDefault').on('change', function() {
                 var $wrapper = $(this).closest('.maintenance');

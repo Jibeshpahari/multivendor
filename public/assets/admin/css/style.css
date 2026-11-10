@@ -2255,3 +2255,10 @@ table td .form-check-input[type="checkbox"]:focus-visible {
     background: #252525 !important;
     border-color: #252525 !important;
 }
+
+.pagination-wrap .form-select {
+    border: 2px solid #dee2e6;
+    padding: .45rem 1.65rem 0.45rem 0.8rem;
+    margin-left: 5px;
+    border-radius: 6px;
+}

@@ -2,17 +2,26 @@
 
 @section('content')
     @php
-        // Cards that open a side panel (order is saved per user, so keep the ids stable)
         $triggers = [
-            ['id' => 'variants-trigger', 'target' => 'variantsModal', 'icon' => 'fa-layer-group', 'title' => 'Variants', 'desc' => 'Manage variant types and combinations'],
-            ['id' => 'media-trigger', 'target' => 'mediaLibraryModal', 'icon' => 'fa-images', 'title' => 'Media', 'desc' => 'Upload and manage product images'],
+            [
+                'id' => 'variants-trigger',
+                'target' => 'variantsModal',
+                'icon' => 'fa-layer-group',
+                'title' => 'Variants',
+                'desc' => 'Manage variant types and combinations',
+            ],
+            [
+                'id' => 'media-trigger',
+                'target' => 'mediaLibraryModal',
+                'icon' => 'fa-images',
+                'title' => 'Media',
+                'desc' => 'Upload and manage product images',
+            ],
         ];
     @endphp
 
-    {{-- Up/down move buttons are injected into every .sortable-card by JS --}}
     <div class="row g-3">
 
-        {{-- ================= LEFT COLUMN ================= --}}
         <div class="col-8">
             <div id="col8SortArea">
 
@@ -108,8 +117,8 @@
                         <div class="py-3 row mb-3" id="shippingDetailsBox">
                             <div class="form-group col-md-6">
                                 <label class="field-label" for="weightInput">Weight</label>
-                                <input type="number" min="0" step="0.1" inputmode="decimal" id="weightInput"
-                                    name="weight" class="form-control" value="5">
+                                <input type="number" min="0" step="0.1" inputmode="decimal"
+                                    id="weightInput" name="weight" class="form-control" value="5">
                             </div>
                             <div class="form-group col-md-6">
                                 <label class="field-label" for="weightUnitSelect">Unit</label>
@@ -121,8 +130,8 @@
                             </div>
                             <div class="form-group col-md-4">
                                 <label class="form-label text-ink-3" for="lengthInput">Length</label>
-                                <input type="number" min="0" inputmode="decimal" id="lengthInput" name="length"
-                                    class="form-control" value="40">
+                                <input type="number" min="0" inputmode="decimal" id="lengthInput"
+                                    name="length" class="form-control" value="40">
                             </div>
                             <div class="form-group col-md-4">
                                 <label class="form-label text-ink-3" for="widthInput">Width</label>
@@ -131,12 +140,11 @@
                             </div>
                             <div class="form-group col-md-4">
                                 <label class="form-label text-ink-3" for="heightInput">Height</label>
-                                <input type="number" min="0" inputmode="decimal" id="heightInput" name="height"
-                                    class="form-control" value="20">
+                                <input type="number" min="0" inputmode="decimal" id="heightInput"
+                                    name="height" class="form-control" value="20">
                             </div>
                             <div class="form-group col-md-6">
-                                <label class="form-label text-ink-3"
-                                    for="dimensionUnitSelect">Unit</label>
+                                <label class="form-label text-ink-3" for="dimensionUnitSelect">Unit</label>
                                 <select class="form-select" id="dimensionUnitSelect" name="dimension_unit">
                                     <option>Centimeter (cm)</option>
                                     <option>Meter (m)</option>
@@ -155,7 +163,6 @@
             </div>
         </div>
 
-        {{-- ================= RIGHT COLUMN ================= --}}
         <div class="col-4">
             <div id="col4SortArea">
 
@@ -230,7 +237,6 @@
             </div>
         </div>
 
-        {{-- ================= NOTES ================= --}}
         <div class="col-md-12 mt-0">
             <div class="card p-4 mb-3 notes-card">
                 <p class="fs-6 fw-semibold">Notes</p>
@@ -245,7 +251,7 @@
         </div>
     </div>
 
-    {{-- ================= STICKY ACTION BAR ================= --}}
+    <input type="hidden" name="product_id" id="productIdInput" value="{{ $product->uuid ?? '' }}">
     <input type="hidden" name="status" id="productStatusInput" value="draft">
     <div class="sticky-action-bar">
         <div class="sticky-action-bar-inner">
@@ -261,7 +267,6 @@
         </div>
     </div>
 
-    {{-- ================= VARIANTS PANEL ================= --}}
     <div class="offcanvas offcanvas-end" tabindex="-1" id="variantsModal" aria-labelledby="variantsModalLabel">
         <div class="offcanvas-header">
             <h5 class="offcanvas-title" id="variantsModalLabel">Variants</h5>
@@ -328,7 +333,6 @@
                     </button>
                 </div>
 
-                {{-- Row template cloned by JS --}}
                 <div id="comboRowTemplate" class="d-none">
                     <div class="row g-3 border rounded-3 p-3 mb-2 align-items-center combo-row">
                         <div class="col-auto">
@@ -389,7 +393,6 @@
         </div>
     </div>
 
-    {{-- ================= MEDIA PANEL ================= --}}
     <div class="offcanvas offcanvas-end" tabindex="-1" id="mediaLibraryModal" aria-labelledby="mediaLibraryModalLabel">
         <div class="offcanvas-header">
             <h5 class="offcanvas-title" id="mediaLibraryModalLabel">Media</h5>
@@ -428,7 +431,6 @@
         </div>
     </div>
 
-    {{-- ================= LIGHTBOX ================= --}}
     <div class="alert-overlay" id="lightboxOverlay">
         <div class="alert-popup lightbox-popup">
             <button type="button" class="alert-btn-close" id="lightboxClose" aria-label="Close">
@@ -438,7 +440,6 @@
         </div>
     </div>
 
-    {{-- ================= VARIANT IMAGE PICKER ================= --}}
     <div class="alert-overlay" id="mediaModalOverlay">
         <div class="alert-popup media-modal">
             <div class="media-modal-header">
@@ -482,13 +483,8 @@
     </div>
 @endsection
 
-
-{{-- ======================================================================
-     STYLES
-     ====================================================================== --}}
 @push('css')
     <style>
-        /* ---------- Page & shared form bits ---------- */
         #content {
             padding-bottom: 0;
         }
@@ -498,7 +494,6 @@
             border-radius: 5px;
         }
 
-        /* Colours come from the global checkbox style; only the size is set here */
         .check-black[type=checkbox] {
             width: 1.1rem;
             height: 1.1rem;
@@ -529,7 +524,6 @@
             display: none;
         }
 
-        /* ---------- Select2 tags (variant values) ---------- */
         .select2-container--default .select2-selection--multiple .select2-selection__choice.select2-selection__choice {
             display: inline-flex;
             align-items: center;
@@ -580,9 +574,8 @@
             outline: none;
         }
 
-        /* ---------- Shipping type toggle (builds on the global .status-toggle) ---------- */
-        .status-toggle{ 
-            padding: 5px; 
+        .status-toggle {
+            padding: 5px;
             box-shadow: 0 1px 2px rgba(10, 74, 110, 0.03), 0 8px 20px -12px rgba(10, 74, 110, 0.18);
         }
 
@@ -597,7 +590,6 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, .25);
         }
 
-        /* ---------- Card reordering ---------- */
         .sortable-card {
             position: relative;
         }
@@ -643,7 +635,6 @@
             cursor: not-allowed;
         }
 
-        /* ---------- Panel trigger cards ---------- */
         .variants-trigger-card {
             display: flex;
             align-items: stretch;
@@ -693,7 +684,6 @@
             color: #999;
         }
 
-        /* ---------- Side panels (Variants + Media): full width minus sidebar ---------- */
         #variantsModal,
         #mediaLibraryModal {
             --bs-offcanvas-width: calc(100vw - var(--sidebar-w, 0px));
@@ -708,7 +698,6 @@
         #variantsModal .offcanvas-body,
         #mediaLibraryModal .offcanvas-body {
             background: #f8f9fa;
-            /* centers content with a max width on very wide screens */
             padding: 24px max(24px, calc((100% - 1200px) / 2));
         }
 
@@ -735,7 +724,6 @@
             flex-shrink: 0;
         }
 
-        /* ---------- Variant rows ---------- */
         .variant-type-row,
         .combo-row {
             background: #fff;
@@ -782,7 +770,6 @@
             color: #1e40af;
         }
 
-        /* Combination image picker */
         .combo-img-picker {
             position: relative;
             width: 64px;
@@ -851,7 +838,6 @@
             display: flex;
         }
 
-        /* ---------- Media panel ---------- */
         #mediaLibraryModal {
             --ml-accent: #111;
             --ml-accent-ring: rgba(17, 17, 17, .15);
@@ -928,7 +914,6 @@
             word-break: break-word;
         }
 
-        /* Checkbox (top-left) and edit/delete buttons (top-right): shown on hover or when selected */
         .ml-check,
         .ml-actions {
             position: absolute;
@@ -1016,7 +1001,6 @@
             color: #c62828;
         }
 
-        /* ---------- Dropzone (shared by Media panel and image picker) ---------- */
         .mm-dropzone {
             display: flex;
             flex-direction: column;
@@ -1055,7 +1039,6 @@
             color: #6c757d;
         }
 
-        /* ---------- Lightbox + variant image picker (built on .alert-overlay / .alert-popup) ---------- */
         .lightbox-popup {
             width: auto;
             max-width: 90vw;
@@ -1089,7 +1072,7 @@
 
         .media-modal-header {
             align-items: center;
-            padding-right: 56px; /* room for the close button */
+            padding-right: 56px;
             border-bottom: 1px solid #dee2e6;
         }
 
@@ -1202,7 +1185,6 @@
             white-space: nowrap;
         }
 
-        /* ---------- Sticky action bar ---------- */
         .sticky-action-bar {
             position: sticky;
             bottom: 0;
@@ -1227,60 +1209,37 @@
     </style>
 @endpush
 
-
-{{-- ======================================================================
-     SCRIPTS
-     ====================================================================== --}}
 @push('js')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
     <script>
         $(function() {
             'use strict';
 
-            /* ------------------------------------------------------------
-             * Shared image library (used by the Media panel and the
-             * variant image picker). Replace with data from your backend.
-             * ---------------------------------------------------------- */
-            const MEDIA_LIBRARY = [{
-                    id: 'lib1',
-                    name: 'Black — front',
-                    url: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&q=80'
-                },
-                {
-                    id: 'lib2',
-                    name: 'Black — side',
-                    url: 'https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=200&q=80'
-                },
-                {
-                    id: 'lib3',
-                    name: 'Silver — front',
-                    url: 'https://images.unsplash.com/photo-1544117519-31a4b719223d?w=200&q=80'
-                },
-                {
-                    id: 'lib4',
-                    name: 'Packaging',
-                    url: 'https://images.unsplash.com/photo-1622434641406-a158123450f9?w=200&q=80'
-                },
-                {
-                    id: 'lib5',
-                    name: 'On desk',
-                    url: 'https://images.unsplash.com/photo-1434493907317-a46b5bbe7834?w=200&q=80'
-                },
-                {
-                    id: 'lib6',
-                    name: 'Top view',
-                    url: 'https://images.unsplash.com/photo-1533139502658-0198f920d8e8?w=200&q=80'
+            const $doc = $(document);
+
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
-            ];
+            });
+
+            const MEDIA_UPLOAD_URL = "{{ route('admin.products.add.media') }}";
+            const MEDIA_UPLOAD_URL_WITH_PRODUCT = "{{ route('admin.products.add.media', ['product' => '__ID__']) }}";
+            let currentProductId = @json($product->uuid ?? null);
+
+            const mediaUploadUrl = () => currentProductId ?
+                MEDIA_UPLOAD_URL_WITH_PRODUCT.replace('__ID__', currentProductId) :
+                MEDIA_UPLOAD_URL;
+
+            const MEDIA_LIBRARY = [];
 
             const readImageFile = (file, done) => {
                 const reader = new FileReader();
                 reader.onload = ev => done(ev.target.result);
                 reader.readAsDataURL(file);
             };
+
             const imageFiles = list => Array.from(list || []).filter(f => f.type.startsWith('image/'));
 
-            /** Wires click / drag & drop on a dropzone to a file input. */
             function bindDropzone($zone, $input, onFiles) {
                 $zone.on('click', () => $input.trigger('click'))
                     .on('dragover', function(e) {
@@ -1295,23 +1254,18 @@
                         $(this).removeClass('drag-over');
                         onFiles(e.originalEvent.dataTransfer.files);
                     });
+
                 $input.on('change', function() {
                     onFiles(this.files);
                     $(this).val('');
                 });
             }
 
-            /* ------------------------------------------------------------
-             * Shipping type toggle
-             * ---------------------------------------------------------- */
             $('input[name="ship_type"]').on('change', function() {
                 $('#shippingDetailsBox').toggleClass('d-none', this.value === 'digital');
                 $('#digitalShippingFields').toggleClass('d-none', this.value === 'physical');
             }).filter(':checked').trigger('change');
 
-            /* ------------------------------------------------------------
-             * Notes (Summernote)
-             * ---------------------------------------------------------- */
             $('#summernote').summernote({
                 placeholder: 'Write Here',
                 tabsize: 2,
@@ -1328,7 +1282,6 @@
                 const $note = $('#summernote');
                 if ($note.summernote('isEmpty')) return;
 
-                // Show embedded images as "View image" links instead of inline pictures
                 const $tmp = $('<div>').html($note.summernote('code'));
                 $tmp.find('img').each(function() {
                     $(this).replaceWith(
@@ -1345,19 +1298,10 @@
                 $note.summernote('reset');
             });
 
-            /* ------------------------------------------------------------
-             * Sticky action bar: only records the chosen status.
-             * Hook your save / schedule / publish request in here.
-             * ---------------------------------------------------------- */
             $('[data-status]').on('click', function() {
                 $('#productStatusInput').val($(this).data('status'));
             });
 
-            /* ------------------------------------------------------------
-             * Product performance chart (demo data from CoinGecko; swap
-             * fetchSeries() for your own endpoint). Falls back to a
-             * generated series if the request or Chart.js fails.
-             * ---------------------------------------------------------- */
             (function() {
                 const canvas = document.getElementById('productPerformanceChart');
                 if (!canvas) return;
@@ -1367,27 +1311,25 @@
                     day: 'numeric'
                 });
 
-                function fetchSeries() {
-                    return fetch(
-                            'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=14&interval=daily'
-                        )
-                        .then(res => {
-                            if (!res.ok) throw new Error('Request failed: ' + res.status);
-                            return res.json();
-                        })
-                        .then(data => {
-                            const points = data.prices || [];
-                            if (!points.length) throw new Error('Empty series');
-                            return {
-                                labels: points.map(p => fmtDay(new Date(p[0]))),
-                                values: points.map(p => p[1])
-                            };
-                        });
-                }
+                const fetchSeries = () => fetch(
+                        'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=14&interval=daily'
+                    )
+                    .then(res => {
+                        if (!res.ok) throw new Error('Request failed: ' + res.status);
+                        return res.json();
+                    })
+                    .then(data => {
+                        const points = data.prices || [];
+                        if (!points.length) throw new Error('Empty series');
+                        return {
+                            labels: points.map(p => fmtDay(new Date(p[0]))),
+                            values: points.map(p => p[1])
+                        };
+                    });
 
                 function fallbackSeries() {
-                    const labels = [],
-                        values = [];
+                    const labels = [];
+                    const values = [];
                     let value = 800 + Math.random() * 200;
                     for (let i = 13; i >= 0; i--) {
                         const d = new Date();
@@ -1413,6 +1355,12 @@
                     $('#perfChangeValue')
                         .text((pct >= 0 ? '+' : '') + pct.toFixed(2) + '%')
                         .css('color', pct >= 0 ? '#0f9d58' : '#d93025');
+
+                    const tickFont = {
+                        font: {
+                            size: 10
+                        }
+                    };
 
                     new Chart(canvas, {
                         type: 'line',
@@ -1443,20 +1391,14 @@
                                     },
                                     ticks: {
                                         maxTicksLimit: 5,
-                                        font: {
-                                            size: 10
-                                        }
+                                        ...tickFont
                                     }
                                 },
                                 y: {
                                     grid: {
                                         color: '#f1f1f1'
                                     },
-                                    ticks: {
-                                        font: {
-                                            size: 10
-                                        }
-                                    }
+                                    ticks: tickFont
                                 }
                             }
                         }
@@ -1472,10 +1414,6 @@
                     .catch(() => $('#perfErrorMsg').removeClass('d-none'));
             })();
 
-            /* ------------------------------------------------------------
-             * Card reordering (up/down buttons). The order is saved in a
-             * cookie (with a localStorage copy as backup).
-             * ---------------------------------------------------------- */
             (function() {
                 const MOVE_BUTTONS =
                     '<button type="button" class="card-move-btn" data-move="up" title="Move up" aria-label="Move card up"><i class="fa-solid fa-caret-up" aria-hidden="true"></i></button>' +
@@ -1553,9 +1491,6 @@
                 initGroup('col4SortArea', 'productFormCardOrder_col4');
             })();
 
-            /* ------------------------------------------------------------
-             * Variants: type rows + generated combinations
-             * ---------------------------------------------------------- */
             (function() {
                 const $typeRows = $('#variantTypeRows');
                 const typeRowTemplate = $typeRows.find('.variant-type-row').first().clone();
@@ -1573,7 +1508,7 @@
                     $typeRows.append($row);
                 });
 
-                $(document).on('click', '.variant-type-delete', function() {
+                $doc.on('click', '.variant-type-delete', function() {
                     if ($typeRows.find('.variant-type-row').length > 1) {
                         $(this).closest('.variant-type-row').remove();
                     }
@@ -1591,7 +1526,6 @@
 
                     if (!groups.length) return;
 
-                    // Cartesian product of every selected value across the variant types
                     const combos = groups.reduce(
                         (acc, g) => acc.flatMap(c => g.values.map(v => c.concat({
                             type: g.type,
@@ -1601,14 +1535,13 @@
                         ]
                     );
 
-                    $comboRows.empty();
-                    combos.forEach(combo => {
+                    $comboRows.empty().append(combos.map(combo => {
                         const pills = combo.map(c =>
                             $('<span class="variant-pill"></span>').text(c.type + ': ' + c.value)[0]
                             .outerHTML
                         ).join('');
-                        $comboRows.append(comboRow(pills));
-                    });
+                        return comboRow(pills);
+                    }));
                     $comboWrap.removeClass('d-none');
                 });
 
@@ -1617,22 +1550,17 @@
                     $comboWrap.removeClass('d-none');
                 });
 
-                $(document).on('click', '.combo-row-delete', function() {
+                $doc.on('click', '.combo-row-delete', function() {
                     $(this).closest('.combo-row').remove();
                 });
             })();
 
-            /* ------------------------------------------------------------
-             * Media panel: upload, select, select all, rename, delete,
-             * lightbox preview
-             * ---------------------------------------------------------- */
             (function() {
                 const $grid = $('#mediaLibGrid');
                 const $selectAll = $('#mediaSelectAll');
                 const $count = $('#mediaSelectedCount');
                 const $deleteSelected = $('#mediaDeleteSelectedBtn');
                 const selected = new Set();
-                let uploadSeq = 0;
 
                 const findItem = id => MEDIA_LIBRARY.find(i => i.id === id);
 
@@ -1652,52 +1580,74 @@
                         .prop('indeterminate', selected.size > 0 && selected.size < total);
                 }
 
+                function buildItem(item) {
+                    const isSelected = selected.has(item.id);
+                    const $thumb = $('<div class="ml-thumb"></div>').append(
+                        $('<img loading="lazy">').attr({
+                            src: item.url,
+                            alt: item.name
+                        }),
+                        $('<label class="ml-check"></label>')
+                        .attr('aria-label', 'Select ' + item.name)
+                        .append($('<input type="checkbox">').prop('checked', isSelected), '<span></span>'),
+                        $('<div class="ml-actions"></div>').append(
+                            $('<button type="button" data-act="edit" title="Rename"><i class="fa-solid fa-pen" aria-hidden="true"></i></button>')
+                            .attr('aria-label', 'Rename ' + item.name),
+                            $('<button type="button" data-act="delete" title="Delete"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>')
+                            .attr('aria-label', 'Delete ' + item.name)
+                        )
+                    );
+
+                    return $('<div class="ml-item"></div>')
+                        .attr('data-id', item.id)
+                        .toggleClass('is-selected', isSelected)
+                        .append($thumb, $('<span class="ml-name"></span>').text(item.name).attr('title', item.name));
+                }
+
                 function renderGrid() {
-                    $grid.empty();
-                    if (!MEDIA_LIBRARY.length) {
-                        $grid.append('<div class="ml-empty">No images yet. Upload some above.</div>');
-                    }
-
-                    MEDIA_LIBRARY.forEach(item => {
-                        const isSelected = selected.has(item.id);
-                        const $thumb = $('<div class="ml-thumb"></div>').append(
-                            $('<img loading="lazy">').attr({
-                                src: item.url,
-                                alt: item.name
-                            }),
-                            $('<label class="ml-check"></label>')
-                            .attr('aria-label', 'Select ' + item.name)
-                            .append($('<input type="checkbox">').prop('checked', isSelected),
-                                '<span></span>'),
-                            $('<div class="ml-actions"></div>').append(
-                                $('<button type="button" data-act="edit" title="Rename"><i class="fa-solid fa-pen" aria-hidden="true"></i></button>')
-                                .attr('aria-label', 'Rename ' + item.name),
-                                $('<button type="button" data-act="delete" title="Delete"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>')
-                                .attr('aria-label', 'Delete ' + item.name)
-                            )
-                        );
-
-                        $('<div class="ml-item"></div>')
-                            .attr('data-id', item.id)
-                            .toggleClass('is-selected', isSelected)
-                            .append($thumb, $('<span class="ml-name"></span>').text(item.name).attr('title',
-                                item.name))
-                            .appendTo($grid);
-                    });
-
+                    $grid.empty().append(
+                        MEDIA_LIBRARY.length ?
+                        MEDIA_LIBRARY.map(buildItem) :
+                        '<div class="ml-empty">No images yet. Upload some above.</div>'
+                    );
                     syncToolbar();
                 }
 
-                bindDropzone($('#mediaLibDropzone'), $('#mediaLibFileInput'), files => {
-                    imageFiles(files).forEach(file => readImageFile(file, url => {
-                        MEDIA_LIBRARY.unshift({
-                            id: 'up' + (++uploadSeq) + '_' + Date.now(),
-                            name: file.name,
-                            url
-                        });
-                        renderGrid();
-                    }));
-                });
+                function uploadFiles(files) {
+                    const queue = imageFiles(files);
+
+                    const uploadNext = () => {
+                        const file = queue.shift();
+                        if (!file) return;
+
+                        const fd = new FormData();
+                        fd.append('media', file);
+
+                        $.ajax({
+                            url: mediaUploadUrl(),
+                            method: 'POST',
+                            data: fd,
+                            processData: false,
+                            contentType: false
+                        }).done(res => {
+                            currentProductId = res.product_id;
+                            $('#productIdInput').val(res.product_id);
+                            MEDIA_LIBRARY.unshift({
+                                id: String(res.media.id),
+                                name: res.media.name || file.name,
+                                url: res.media.url
+                            });
+                            renderGrid();
+                        }).fail(xhr => {
+                            console.error(xhr.status, xhr.responseText);
+                            alert('Upload failed: ' + file.name);
+                        }).always(uploadNext);
+                    };
+
+                    uploadNext();
+                }
+
+                bindDropzone($('#mediaLibDropzone'), $('#mediaLibFileInput'), uploadFiles);
 
                 $grid.on('change', '.ml-check input', function() {
                     const $item = $(this).closest('.ml-item');
@@ -1731,18 +1681,14 @@
                         return;
                     }
 
-                    // Only the picture opens the lightbox (not the checkbox)
-                    if ($(e.target).closest('.ml-check').length || !$(e.target).closest('.ml-thumb').length)
-                        return;
+                    if ($(e.target).closest('.ml-check').length || !$(e.target).closest('.ml-thumb').length) return;
                     $('#lightboxImage').attr('src', item.url);
                     $('#lightboxOverlay').addClass('open');
                 });
 
                 $deleteSelected.on('click', function() {
-                    if (!selected.size) return;
                     const n = selected.size;
-                    if (!window.confirm('Delete ' + n + ' selected image' + (n > 1 ? 's' : '') + '?'))
-                        return;
+                    if (!n || !window.confirm('Delete ' + n + ' selected image' + (n > 1 ? 's' : '') + '?')) return;
                     Array.from(selected).forEach(removeItem);
                     renderGrid();
                 });
@@ -1751,6 +1697,7 @@
                     $('#lightboxOverlay').removeClass('open');
                     $('#lightboxImage').attr('src', '');
                 });
+
                 $('#lightboxOverlay').on('click', function(e) {
                     if (e.target === this) $('#lightboxClose').trigger('click');
                 });
@@ -1758,51 +1705,53 @@
                 renderGrid();
             })();
 
-            /* ------------------------------------------------------------
-             * Variant image picker (upload or choose from the library)
-             * ---------------------------------------------------------- */
             (function() {
                 const $overlay = $('#mediaModalOverlay');
                 const $addBtn = $('#mediaModalAdd');
                 const $search = $('#mmLibrarySearch');
+                const $grid = $('#mmLibraryGrid');
+                const $tabs = $('#mediaModalTabs .nav-link');
+                const $panels = $('.mm-panel');
+                const $uploadPanel = $('#mmUploadPanel');
                 let selectedId = null;
                 let $target = null;
 
                 function renderLibrary() {
                     const q = $search.val().trim().toLowerCase();
-                    const $grid = $('#mmLibraryGrid').empty();
 
-                    MEDIA_LIBRARY
+                    $grid.empty().append(
+                        MEDIA_LIBRARY
                         .filter(item => !q || item.name.toLowerCase().includes(q))
-                        .forEach(item => {
-                            $('<div class="mm-library-item"></div>')
-                                .toggleClass('selected', selectedId === item.id)
-                                .attr('data-lib-id', item.id)
-                                .append(
-                                    $('<img>').attr({
-                                        src: item.url,
-                                        alt: item.name
-                                    }),
-                                    '<span class="mm-check"><i class="fa-solid fa-check"></i></span>',
-                                    $('<span class="mm-name"></span>').text(item.name)
-                                )
-                                .appendTo($grid);
-                        });
+                        .map(item => $('<div class="mm-library-item"></div>')
+                            .toggleClass('selected', selectedId === item.id)
+                            .attr('data-lib-id', item.id)
+                            .append(
+                                $('<img>').attr({
+                                    src: item.url,
+                                    alt: item.name
+                                }),
+                                '<span class="mm-check"><i class="fa-solid fa-check"></i></span>',
+                                $('<span class="mm-name"></span>').text(item.name)
+                            ))
+                    );
                 }
 
-                // "Add image" only applies to the library tab (uploads are applied immediately)
                 const updateAddButton = () =>
-                    $addBtn.prop('disabled', $('#mmUploadPanel').hasClass('active') || !selectedId);
+                    $addBtn.prop('disabled', $uploadPanel.hasClass('active') || !selectedId);
+
+                function showTab(tab) {
+                    $tabs.removeClass('active').filter('[data-tab="' + tab + '"]').addClass('active');
+                    $panels.removeClass('active');
+                    $(tab === 'upload' ? '#mmUploadPanel' : '#mmLibraryPanel').addClass('active');
+                    updateAddButton();
+                }
 
                 function open($picker) {
                     $target = $picker;
                     selectedId = null;
                     $search.val('');
                     renderLibrary();
-                    $('#mediaModalTabs .nav-link').removeClass('active').filter('[data-tab="upload"]').addClass('active');
-                    $('.mm-panel').removeClass('active');
-                    $('#mmUploadPanel').addClass('active');
-                    updateAddButton();
+                    showTab('upload');
                     $overlay.addClass('open');
                 }
 
@@ -1818,12 +1767,12 @@
                     $target.find('[data-combo-value]').val(url);
                 }
 
-                $(document).on('click', '[data-combo-image]', function(e) {
+                $doc.on('click', '[data-combo-image]', function(e) {
                     e.preventDefault();
                     open($(this));
                 });
 
-                $(document).on('click', '[data-combo-remove]', function(e) {
+                $doc.on('click', '[data-combo-remove]', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
                     const $picker = $(this).closest('[data-combo-image]');
@@ -1833,17 +1782,13 @@
                 });
 
                 $('#mediaModalClose, #mediaModalCancel').on('click', close);
+
                 $overlay.on('click', function(e) {
                     if (e.target === this) close();
                 });
 
                 $('#mediaModalTabs').on('click', '.nav-link', function() {
-                    $('#mediaModalTabs .nav-link').removeClass('active');
-                    $(this).addClass('active');
-                    $('.mm-panel').removeClass('active');
-                    $($(this).data('tab') === 'upload' ? '#mmUploadPanel' : '#mmLibraryPanel')
-                        .addClass('active');
-                    updateAddButton();
+                    showTab($(this).data('tab'));
                 });
 
                 bindDropzone($('#mmDropzone'), $('#mmFileInput'), files => {
@@ -1857,7 +1802,7 @@
 
                 $search.on('input', renderLibrary);
 
-                $('#mmLibraryGrid').on('click', '.mm-library-item', function() {
+                $grid.on('click', '.mm-library-item', function() {
                     selectedId = $(this).attr('data-lib-id');
                     renderLibrary();
                     updateAddButton();
@@ -1870,10 +1815,7 @@
                 });
             })();
 
-            /* ------------------------------------------------------------
-             * Escape closes whichever overlay is open (lightbox / picker)
-             * ---------------------------------------------------------- */
-            $(document).on('keydown', function(e) {
+            $doc.on('keydown', function(e) {
                 if (e.key === 'Escape') {
                     $('.alert-overlay.open .alert-btn-close').first().trigger('click');
                 }

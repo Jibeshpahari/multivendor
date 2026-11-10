@@ -20,18 +20,19 @@ class NoteController extends Controller
         $title = 'Notes';
         $search = true;
         $nav = [];
-        $userId = $request->user()->id;
+        $userId = auth('web')->id();
 
         $topics = TaskNoteTopic::where('user_id', $userId)
             ->orderBy('name')
             ->get();
+
 
         $notes = TaskNote::with('taskNoteTopic')
             ->where('user_id', $userId)
             ->when($request->filled('topic'), fn($q) => $q->where('topic_id', $request->topic))
             ->when($request->filled('status'), fn($q) => $q->where('status', $request->status))
             ->when($request->filled('priority'), fn($q) => $q->where('priority', $request->priority))
-            ->when($request->filled('q'), fn($q) => $q->where('title', 'like', '%' . $request->q . '%'))
+            ->when($request->filled('keyword'), fn($q) => $q->where('title', 'like', '%' . $request->keyword . '%'))
             ->when($request->filled('from'), fn($q) => $q->whereDate('created_at', '>=', $request->from))
             ->when($request->filled('to'), fn($q) => $q->whereDate('created_at', '<=', $request->to))
             ->orderByDesc('created_at')

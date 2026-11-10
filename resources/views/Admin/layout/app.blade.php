@@ -137,7 +137,8 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('assets/global/js/select2.min.js') }}"></script>
-    <script src="{{ asset('assets/admin/js/script.js') }}"></script>
+    <script src="{{ asset('assets/admin/js/script.js') }}"
+        data-image-placeholder="{{ asset('assets/global/images/placeholder.png') }}"></script>
     <script src="{{ asset('assets/global/js/date-time-picker.min.js') }}"></script>
     <script src="{{ asset('assets/global/js/summernote-lite.min.js') }}"></script>
 

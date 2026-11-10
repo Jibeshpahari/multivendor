@@ -14,12 +14,12 @@ class TaskNoteSeeder extends Seeder
      */
     public function run(): void
     {
-        $user = User::findOrFail(2);
+        $user = User::where('email', 'user@user.com')->firstOrFail();
 
         $topics = collect(['General', 'Client work', 'Personal', 'Ideas'])
             ->mapWithKeys(fn($name) => [
                 $name => TaskNoteTopic::firstOrCreate([
-                    'user_id' => $user->id,
+                    'user_id' => $user->uuid,
                     'name' => $name,
                 ]),
             ]);
@@ -72,7 +72,7 @@ class TaskNoteSeeder extends Seeder
 
         foreach ($notes as $note) {
             TaskNote::forceCreate([
-                'user_id' => $user->id,
+                'user_id' => $user->uuid,
                 'topic_id' => $topics[$note['topic']]->id,
                 'title' => $note['title'],
                 'content' => $note['content'],

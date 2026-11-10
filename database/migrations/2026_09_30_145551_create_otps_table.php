@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('otps', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignUuid('user_id')->nullable()->constrained('users', 'uuid')->cascadeOnDelete();
             $table->string('identifier');
             $table->string('channel', 20)->default('email');
             $table->enum('purpose', [

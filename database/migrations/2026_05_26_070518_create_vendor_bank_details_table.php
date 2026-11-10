@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('user_addresses', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignUuid('user_id')->constrained('users', 'uuid')->cascadeOnDelete();
 
             $table->enum('label', ['home', 'work', 'other'])->default('home');
             $table->string('full_name');
@@ -35,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('vendor_bank_details');
+        Schema::dropIfExists('user_addresses');
     }
 };

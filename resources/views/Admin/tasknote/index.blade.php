@@ -152,12 +152,6 @@
                         <i class="fa-solid fa-rotate-left"></i> Clear filters
                     </a>
                 </div>
-
-                <div class="card-search">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" name="q" id="searchInput" placeholder="Search notes..."
-                        value="{{ $filters['q'] ?? '' }}">
-                </div>
             </div>
         </form>
     </div>
@@ -773,7 +767,7 @@
         .empty-state i {
             font-size: 30px;
             margin-bottom: 14px;
-            color: var(--line-strong);
+            color: var(--bs-indigo);
         }
 
         .empty-state h6 {

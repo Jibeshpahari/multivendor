@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\Admin;
 
-use App\Models\VendorProfile;
+use App\Models\User;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Hash;
@@ -22,21 +22,21 @@ class VendorRequest extends FormRequest
 
     public function rules(): array
     {
-        /** @var VendorProfile|null $profile */
-        $profile = $this->route('vendor');
-        $userId    = $profile?->user_id;
+        /** @var User|null $vendor */
+        $vendor = $this->route('vendor');
+        $userId = $vendor?->uuid;
 
         return [
             // users table
             'name'            => ['required', 'string', 'max:255'],
-            'email'           => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($userId),],
+            'email'           => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($userId, 'uuid'),],
             'phone'           => ['nullable', 'string', 'max:20', 'regex:/^[0-9+\-\s()]+$/'],
             'avatar'          => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'status'          => ['required', 'in:pending,active,rejected,suspended,banned'],
             // vendor_profiles table
             'store_name'      => ['required', 'string', 'max:255'],
             'store_slug'      => ['required', 'string', 'max:255', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/'],
-            'store_logo'      => [$profile ? 'nullable' : 'required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'store_logo'      => [$vendor ? 'nullable' : 'required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'contact_role'    => ['nullable', 'string', 'max:100'],
             'store_email'     => ['nullable', 'email', 'max:255'],
             'store_phone'     => ['nullable', 'string', 'max:20', 'regex:/^[0-9+\-\s()]+$/'],

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('product_variants', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->constrained()->cascadeOnDelete();
+            $table->foreignUuid('product_id')->constrained('products', 'uuid')->cascadeOnDelete();
             $table->string('sku')->unique();
             $table->string('barcode')->nullable()->index(); // UPC/EAN
             $table->unsignedInteger('price'); // store in minor units (cents)

@@ -21,6 +21,8 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, HasUuids, Notifiable;
 
+    protected $primaryKey = 'uuid';
+
     /**
      * Get the attributes that should be cast.
      *
@@ -36,7 +38,7 @@ class User extends Authenticatable
 
     public function vendorProfile(): HasOne
     {
-        return $this->hasOne(VendorProfile::class);
+        return $this->hasOne(VendorProfile::class, 'user_id', 'uuid');
     }
 
     public function uniqueIds(): array
@@ -59,7 +61,7 @@ class User extends Authenticatable
                 fn($q) => $q
                     ->where('name', 'like', $like)
                     ->orWhere('email', 'like', $like)
-                    ->orWhereIn('id', VendorProfile::select('user_id')->where('store_name', 'like', $like))
+                    ->orWhereIn('uuid', VendorProfile::select('user_id')->where('store_name', 'like', $like))
             );
         });
     }

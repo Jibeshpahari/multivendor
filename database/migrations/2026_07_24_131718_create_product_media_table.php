@@ -13,12 +13,10 @@ return new class extends Migration
     {
         Schema::create('product_media', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->constrained()->cascadeOnDelete();
+            $table->foreignUuid('product_id')->constrained('products', 'uuid')->cascadeOnDelete();
             $table->foreignId('product_variant_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->string('url');
-            $table->string('title')->nullable();
-            $table->string('alt_text')->nullable();
-            $table->unsignedSmallInteger('position')->default(0);
+            $table->string('path');
+            $table->string('type', 100);
             $table->timestamps();
         });
     }

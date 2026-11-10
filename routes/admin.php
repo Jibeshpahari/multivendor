@@ -20,7 +20,7 @@ Route::controller(ProductController::class)->prefix('products')->name('products.
     Route::get('/delete/{category}', 'delete')->name('delete');
     Route::post('/toggle-status', 'toggleStatus')->name('toggleStatus');
     // Media
-    Route::get('/add-to-media/{product?}', 'addToMedia')->name('add.media');
+    Route::post('/add-to-media/{product?}', 'addToMedia')->name('add.media');
 });
 
 Route::controller(CategoryController::class)->prefix('product/categories')->name('categories.')->group( function() {

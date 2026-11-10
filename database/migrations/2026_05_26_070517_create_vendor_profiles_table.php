@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('vendor_profiles', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->unique()->constrained()->cascadeOnDelete();
+            $table->uuid('uuid')->primary();
+            $table->foreignUuid('user_id')->unique()->constrained('users', 'uuid')->cascadeOnDelete();
 
             $table->string('store_name');
             $table->string('store_slug')->unique();
@@ -32,7 +32,7 @@ return new class extends Migration
             $table->char('country', 2)->nullable();
 
             $table->timestamp('approved_at')->nullable();
-            $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignUuid('approved_by')->nullable()->constrained('users', 'uuid')->nullOnDelete();
 
             $table->timestamps();
             $table->softDeletes();
